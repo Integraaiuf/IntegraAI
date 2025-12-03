@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Integra AI UF – AI för företag i Halmstad</title>
+  <meta name="description" content="Skräddarsydda AI-agenter, AI-marknadsföring och moderna hemsidor byggda av fyra drivna elever från Kattegattgymnasiet i Halmstad." />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --accent: #00b4ff;
+      --light: #f9fafb;
+      --muted: #94a3b8;
+      --radius: 1rem;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      color: #fff;
+      background-color: var(--bg);
+      overflow-x: hidden;
+    }
+
+    header {
+      position: relative;
+      height: 100vh;
+      background: url("hero-bg.png") center/cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Mörk overlay */
+    header::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      z-index: 0;
+    }
+
+    .navbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 4vw;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+    }
+
+    .badge {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 999px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.6rem;
+      margin-left: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .nav-links a {
+      color: #fff;
+      text-decoration: none;
+      opacity: 0.85;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-links a:hover { opacity: 1; }
+
+    /* Hero Content */
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      max-width: 800px;
+      margin: auto;
+      margin-top: 6rem;
+      padding: 0 1rem;
+    }
+
+    .hero-content h1 {
+      font-size: clamp(2.8rem, 5vw, 4rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px rgba(0, 180, 255, 0.6);
+    }
+
+    .hero-content p {
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 0.8rem 1.6rem;
+      border-radius: var(--radius);
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.25s ease;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 20px rgba(0,180,255,0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0,180,255,0.5);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+    }
+
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* Info Section */
+    main {
+      background: #fff;
+      color: #0f172a;
+      padding: 5rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .section-sub {
+      color: var(--muted);
+      font-size: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      text-align: left;
+    }
+
+    .card {
+      background: #f9fafb;
+      border-radius: var(--radius);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      padding: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.08);
+    }
+
+    .card h3 {
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+
+    footer {
+      background: #0f172a;
+      color: #94a3b8;
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 800px) {
+      .nav-links { display: none; }
+      .hero-content { margin-top: 5rem; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">Integra AI UF<span class="badge">Halmstad</span></div>
+      <div class="nav-links">
+        <a href="tjanster.html">Tjänster</a>
+        <a href="om-oss.html">Om oss</a>
+        <a href="kontakt.html">Kontakt</a>
+      </div>
+    </nav>
+
+    <div class="hero-content">
+      <h1>Integrera AI i ditt företag</h1>
+      <p>Vi bygger skräddarsydda AI-agenter, marknadsföring med AI och moderna hemsidor.  
+         Fyra drivna elever från Kattegattgymnasiet i Halmstad som hjälper företag att ta nästa steg med AI.</p>
+      <div class="btn-group">
+        <a href="kontakt.html"><button class="btn btn-primary">Kontakta oss</button></a>
+        <a href="tjanster.html"><button class="btn btn-outline">Se våra tjänster</button></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <h2 class="section-title">Vad vi erbjuder</h2>
+      <p class="section-sub">Tre tjänster som gör AI enkelt, effektivt och lönsamt.</p>
+
+      <div class="services">
+        <div class="card">
+          <h3>Skräddarsydda AI-agenter</h3>
+          <p>Vi utvecklar AI-agenter som kan svara på kundfrågor, samla in leads och automatisera vardagliga uppgifter.</p>
+        </div>
+        <div class="card">
+          <h3>Marknadsföring med AI</h3>
+          <p>Få AI-genererat innehåll, kampanjer och planering som sparar tid och ökar synligheten på sociala medier.</p>
+        </div>
+        <div class="card">
+          <h3>Skapande av hemsidor</h3>
+          <p>Moderna och snabba hemsidor byggda med AI-stödd design och text – perfekta för företag i Halland.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    © Integra AI UF – Kattegattgymnasiet, Halmstad
+  </footer>
+</body>
+</html>
