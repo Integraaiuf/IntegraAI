@@ -1,93 +1,660 @@
-<!-- ═══════ HalmstadGPT Chattbot - klistra in precis innan </body> ═══════ -->
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chatt Pop-up</title>
 <style>
-  .chat-toggle{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;align-items:center;gap:8px;background:#F5A623;color:#fff;border:none;padding:14px 22px;border-radius:50px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;box-shadow:0 4px 16px rgba(245,166,35,0.45);transition:all .3s cubic-bezier(.4,0,.2,1);letter-spacing:.3px}
-  .chat-toggle:hover{background:#D4880F;box-shadow:0 6px 24px rgba(245,166,35,0.55);transform:translateY(-2px)}
-  .chat-toggle.hidden{opacity:0;pointer-events:none;transform:scale(.8) translateY(10px)}
-  .chat-toggle svg{flex-shrink:0}
-  .chat-window{position:fixed;bottom:24px;right:24px;width:380px;max-height:540px;height:540px;z-index:10000;border-radius:14px;overflow:hidden;display:flex;flex-direction:column;background:#fff;box-shadow:0 8px 32px rgba(0,0,0,0.18);opacity:0;pointer-events:none;transform:translateY(20px) scale(.95);transition:all .35s cubic-bezier(.4,0,.2,1);border:2px solid #F5A623}
-  .chat-window.open{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
-  .chat-header{background:#F5A623;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
-  .chat-header-title{font-size:16px;font-weight:700;font-family:'DM Sans',sans-serif;letter-spacing:.3px}
-  .chat-header-actions{display:flex;gap:6px}
-  .chat-header-actions button{background:rgba(255,255,255,0.25);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
-  .chat-header-actions button:hover{background:rgba(255,255,255,0.4)}
-  .chat-body{flex:1;display:none;flex-direction:column;overflow:hidden}
-  .chat-body.active{display:flex}
-  .chat-disclaimer{padding:10px 16px;font-size:12px;color:#777;text-align:center;background:#FDF0DB;border-bottom:1px solid #E5E5E5;flex-shrink:0;font-family:'DM Sans',sans-serif}
-  .chat-messages{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth}
-  .chat-messages::-webkit-scrollbar{width:5px}
-  .chat-messages::-webkit-scrollbar-track{background:transparent}
-  .chat-messages::-webkit-scrollbar-thumb{background:#ccc;border-radius:10px}
-  .msg{display:flex;gap:10px;max-width:88%;min-width:0;animation:hgptMsgIn .35s cubic-bezier(.4,0,.2,1)}
-  @keyframes hgptMsgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-  .msg.bot{align-self:flex-start}
-  .msg.user{align-self:flex-end;flex-direction:row-reverse}
-  .msg-avatar{width:34px;height:34px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;background:#FDF0DB;border:2px solid #F5A623}
-  .msg.user .msg-avatar{background:#F5A623;border-color:#E8961A;color:#fff;font-size:13px;font-weight:700}
-  .msg-content{display:flex;flex-direction:column;gap:3px;min-width:0;overflow:hidden}
-  .msg-name{font-size:12px;font-weight:600;color:#777;padding-left:2px;font-family:'DM Sans',sans-serif}
-  .msg.user .msg-name{text-align:right;padding-right:2px}
-  .msg-bubble{padding:10px 14px;border-radius:12px;font-size:14px;line-height:1.5;word-wrap:break-word;overflow-wrap:break-word;word-break:break-word;white-space:pre-wrap;max-width:100%;overflow:hidden;font-family:'DM Sans',sans-serif}
-  .msg.bot .msg-bubble{background:#F0F0F0;color:#333;border-bottom-left-radius:4px}
-  .msg.user .msg-bubble{background:#F5A623;color:#fff;border-bottom-right-radius:4px}
-  .chat-link{color:#1a73e8;text-decoration:none;font-weight:500;border-bottom:1px solid transparent;transition:border-color .2s}
-  .chat-link:hover{border-bottom-color:#1a73e8}
-  .typing-indicator{display:flex;gap:4px;padding:12px 16px;align-items:center}
-  .typing-indicator span{width:7px;height:7px;border-radius:50%;background:#bbb;animation:hgptTypeDot 1.2s infinite}
-  .typing-indicator span:nth-child(2){animation-delay:.2s}
-  .typing-indicator span:nth-child(3){animation-delay:.4s}
-  @keyframes hgptTypeDot{0%,60%,100%{opacity:.3;transform:scale(.8)}30%{opacity:1;transform:scale(1)}}
-  .chat-input-bar{display:flex;align-items:center;gap:8px;padding:12px 14px;border-top:1px solid #E5E5E5;background:#fff;flex-shrink:0}
-  .chat-input-bar input{flex:1;border:2px solid #E5E5E5;border-radius:24px;padding:10px 16px;font-family:'DM Sans',sans-serif;font-size:14px;color:#333;transition:border-color .2s}
-  .chat-input-bar input:focus{outline:none;border-color:#F5A623}
-  .chat-input-bar input::placeholder{color:#aaa}
-  .new-session-btn{background:#F5A623;border:none;color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-  .new-session-btn:hover{background:#D4880F;transform:scale(1.05)}
-  .new-session-btn:active{transform:scale(.95)}
-  .send-btn{background:#F5A623;border:none;color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
-  .send-btn:hover{background:#D4880F;transform:scale(1.05)}
-  .send-btn:active{transform:scale(.95)}
-  @media(max-width:420px){.chat-window{width:calc(100vw - 16px);height:calc(100vh - 80px);max-height:calc(100vh - 80px);bottom:8px;right:8px}}
-</style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --yellow: #F5A623;
+    --yellow-dark: #E8961A;
+    --yellow-light: #FDF0DB;
+    --yellow-hover: #D4880F;
+    --header-bg: #F5A623;
+    --bg: #FAFAFA;
+    --white: #FFFFFF;
+    --text: #333333;
+    --text-light: #777777;
+    --border: #E5E5E5;
+    --bot-bubble: #F0F0F0;
+    --user-bubble: #F5A623;
+    --shadow: 0 8px 32px rgba(0,0,0,0.18);
+    --radius: 14px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #E8F4F8;
+    min-height: 100vh;
+    color: var(--text);
+  }
+
+  /* ── Demo background to simulate a page ── */
+  .demo-page {
+    padding: 60px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    opacity: 0.5;
+  }
+  .demo-page h1 { font-size: 28px; color: #1a5276; margin-bottom: 12px; }
+  .demo-page p { color: #555; line-height: 1.7; }
+
+  /* ══════════════════════════════════════════
+     CHAT TOGGLE BUTTON (closed state)
+  ══════════════════════════════════════════ */
+  .chat-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--yellow);
+    color: var(--white);
+    border: none;
+    padding: 14px 22px;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(245,166,35,0.45);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.3px;
+  }
+  .chat-toggle:hover {
+    background: var(--yellow-hover);
+    box-shadow: 0 6px 24px rgba(245,166,35,0.55);
+    transform: translateY(-2px);
+  }
+  .chat-toggle.hidden { 
+    opacity: 0; 
+    pointer-events: none; 
+    transform: scale(0.8) translateY(10px); 
+  }
+  .chat-toggle svg { flex-shrink: 0; }
+
+  /* ══════════════════════════════════════════
+     CHAT WINDOW
+  ══════════════════════════════════════════ */
+  .chat-window {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 380px;
+    max-height: 540px;
+    height: 540px;
+    z-index: 10000;
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid var(--yellow);
+  }
+  .chat-window.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0) scale(1);
+  }
+
+  /* ── Header ── */
+  .chat-header {
+    background: var(--header-bg);
+    color: var(--white);
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+  }
+  .chat-header-title {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+  .chat-header-actions {
+    display: flex;
+    gap: 6px;
+  }
+  .chat-header-actions button {
+    background: rgba(255,255,255,0.25);
+    border: none;
+    color: var(--white);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .chat-header-actions button:hover {
+    background: rgba(255,255,255,0.4);
+  }
+
+  /* ── Pre-chat form (topic selector) ── */
+  .chat-prechat {
+    padding: 28px 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: var(--white);
+  }
+  .chat-prechat.hidden { display: none; }
+
+  .chat-prechat label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .chat-prechat select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    cursor: pointer;
+    transition: border-color 0.2s;
+    appearance: auto;
+  }
+  .chat-prechat select:focus {
+    outline: none;
+    border-color: var(--yellow);
+  }
+  .chat-prechat .start-btn {
+    background: var(--yellow);
+    color: var(--white);
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .chat-prechat .start-btn:hover {
+    background: var(--yellow-hover);
+  }
+  .chat-prechat .wait-time {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-light);
+  }
+
+  /* ── Chat area ── */
+  .chat-body {
+    flex: 1;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .chat-body.active {
+    display: flex;
+  }
+
+  .chat-disclaimer {
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--text-light);
+    text-align: center;
+    background: var(--yellow-light);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+  .chat-messages::-webkit-scrollbar { width: 5px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+  /* ── Message bubbles ── */
+  .msg {
+    display: flex;
+    gap: 10px;
+    max-width: 88%;
+    min-width: 0;
+    animation: msgIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    background: var(--yellow-light);
+    border: 2px solid var(--yellow);
+  }
+  .msg.user .msg-avatar {
+    background: var(--user-bubble);
+    border-color: var(--yellow-dark);
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .msg-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .msg-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    padding-left: 2px;
+  }
+  .msg.user .msg-name { text-align: right; padding-right: 2px; }
+
+  .msg-bubble {
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+    overflow: hidden;
+  }
+  .msg.bot .msg-bubble {
+    background: var(--bot-bubble);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user .msg-bubble {
+    background: var(--user-bubble);
+    color: var(--white);
+    border-bottom-right-radius: 4px;
+  }
+
+  .chat-link {
+    color: #1a73e8;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .chat-link:hover {
+    border-bottom-color: #1a73e8;
+  }
+  .msg-bubble ul {
+    margin: 4px 0;
+    padding-left: 18px;
+    list-style: disc;
+  }
+  .msg-bubble li {
+    margin-bottom: 4px;
+  }
+  .msg-bubble strong {
+    font-weight: 700;
+  }
+
+  /* typing indicator */
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    align-items: center;
+  }
+  .typing-indicator span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #bbb;
+    animation: typeDot 1.2s infinite;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typeDot {
+    0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+    30% { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── Input bar ── */
+  .chat-input-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--white);
+    flex-shrink: 0;
+  }
+  .chat-input-bar input {
+    flex: 1;
+    border: 2px solid var(--border);
+    border-radius: 24px;
+    padding: 10px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    transition: border-color 0.2s;
+  }
+  .chat-input-bar input:focus {
+    outline: none;
+    border-color: var(--yellow);
+  }
+  .chat-input-bar input::placeholder { color: #aaa; }
+
+  .new-session-btn {
+    background: var(--yellow);
+    border: none;
+    color: var(--white);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .new-session-btn:hover {
+    background: var(--yellow-hover);
+    transform: scale(1.05);
+  }
+  .new-session-btn:active { transform: scale(0.95); }
+
+  .send-btn {
+    background: var(--yellow);
+    border: none;
+    color: var(--white);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--yellow-hover); transform: scale(1.05); }
+  .send-btn:active { transform: scale(0.95); }
+
+  /* ── Responsive ── */
+  @media (max-width: 420px) {
+    .chat-window {
+      width: calc(100vw - 16px);
+      height: calc(100vh - 80px);
+      max-height: calc(100vh - 80px);
+      bottom: 8px;
+      right: 8px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Demo background page content -->
+<div class="demo-page">
+  <h1>Hej, vad kan vi hjälpa dig med?</h1>
+  <p>Det här är en demo-sida för att visa chatt-popup-widgeten. Klicka på den gula "Chatt"-knappen längst ner till höger för att öppna chatten.</p>
+</div>
+
+<!-- ════════ CHAT TOGGLE BUTTON ════════ -->
 <button class="chat-toggle" id="chatToggle" onclick="openChat()">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
   Chatt
 </button>
 
+<!-- ════════ CHAT WINDOW ════════ -->
 <div class="chat-window" id="chatWindow">
+
+  <!-- Header -->
   <div class="chat-header">
     <span class="chat-header-title">HalmstadGPT</span>
     <div class="chat-header-actions">
-      <button onclick="minimizeChat()" title="Minimera"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></button>
-      <button onclick="closeChat()" title="Stäng"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      <button onclick="minimizeChat()" title="Minimera">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <button onclick="closeChat()" title="Stäng">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
     </div>
   </div>
+
+  <!-- Chat body -->
   <div class="chat-body active" id="chatBody">
-    <div class="chat-disclaimer">AI kan begå misstag. Kontrollera viktig information.</div>
+    <div class="chat-disclaimer">
+      AI kan begå misstag. Kontrollera viktig information.
+    </div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-bar">
-      <button class="new-session-btn" onclick="newSession()" title="Ny chatt"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+      <button class="new-session-btn" onclick="newSession()" title="Ny chatt">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+      </button>
       <input type="text" id="chatInput" placeholder="Skriv din fråga här..." onkeydown="if(event.key==='Enter')sendMessage()">
-      <button class="send-btn" onclick="sendMessage()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      <button class="send-btn" onclick="sendMessage()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/>
+          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
     </div>
   </div>
 </div>
 
 <script>
-  const chatWindow=document.getElementById('chatWindow'),chatToggle=document.getElementById('chatToggle'),chatBody=document.getElementById('chatBody'),chatMessages=document.getElementById('chatMessages'),chatInput=document.getElementById('chatInput');
-  const WEBHOOK_URL='http://87.106.108.7:5678/webhook/3de1b3ca-7b1d-4a79-a8ee-091d37fa213a';
-  let sessionId='';
-  function generateSessionId(){return'session_'+Date.now()+'_'+Math.random().toString(36).substr(2,9)}
-  function openChat(){chatWindow.classList.add('open');chatToggle.classList.add('hidden');if(chatMessages.children.length===0){sessionId=generateSessionId();setTimeout(()=>{addMessage('bot','Hejsan! Vad kan jag hjälpa till med?')},400)}chatInput.focus()}
-  function minimizeChat(){chatWindow.classList.remove('open');chatToggle.classList.remove('hidden')}
-  function closeChat(){chatWindow.classList.remove('open');chatToggle.classList.remove('hidden');chatMessages.innerHTML='';sessionId=''}
-  function newSession(){chatMessages.innerHTML='';sessionId=generateSessionId();setTimeout(()=>{addMessage('bot','Hejsan! Vad kan jag hjälpa till med?')},200);chatInput.focus()}
-  function formatMessage(t){let f=t;f=f.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');f=f.replace(/__(.+?)__/g,'<strong>$1</strong>');f=f.replace(/\*(.+?)\*/g,'<em>$1</em>');f=f.replace(/_(.+?)_/g,'<em>$1</em>');f=f.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" class="chat-link">$1</a>');f=f.replace(/(?<!href="|">)(https?:\/\/[^\s<>"]+)/g,function(url){let title='Läs mer';try{const u=new URL(url);const p=u.pathname.replace(/\.html$|\.htm$/i,'').replace(/\.[a-z]+\d*$/i,'');const parts=p.split('/').filter(x=>x.length>0);if(parts.length>0){let l=parts[parts.length-1];l=l.replace(/([a-z])([A-Z])/g,'$1 $2').replace(/och/g,' och ').replace(/[-_]/g,' ').replace(/\s+/g,' ').trim();title=l.charAt(0).toUpperCase()+l.slice(1)}else{title=u.hostname.replace('www.','')}}catch(e){}return'<a href="'+url+'" target="_blank" class="chat-link">'+title+'</a>'});f=f.replace(/^[\-•]\s+(.+)$/gm,'<li>$1</li>');f=f.replace(/(<li>.*<\/li>\n?)+/g,'<ul>$&</ul>');f=f.replace(/\n/g,'<br>');return f}
-  function addMessage(type,text){const msg=document.createElement('div');msg.className='msg '+type;const ft=type==='bot'?formatMessage(text):text;if(type==='bot'){msg.innerHTML=`<div class="msg-avatar"><img src="https://cdn.discordapp.com/attachments/1430636296765837334/1484589125817471066/AIdro_kmhKK9wu11Crf-F1iy7fnZVtYrJUnkIqNoPxWpyEwY1ws900-c-k-c0x00ffffff-no-rj.png?ex=69c169dd&is=69c0185d&hm=7490a23447ee11994728f3ce5fdc44c03bd4966035458b6e384fe4c1ce2b7d51&" alt="Halmstad" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div><div class="msg-content"><span class="msg-name">HalmstadGPT</span><div class="msg-bubble">${ft}</div></div>`}else{msg.innerHTML=`<div class="msg-avatar">DU</div><div class="msg-content"><span class="msg-name">Du</span><div class="msg-bubble">${ft}</div></div>`}chatMessages.appendChild(msg);chatMessages.scrollTop=chatMessages.scrollHeight}
-  function showTyping(){const el=document.createElement('div');el.className='msg bot';el.id='typingIndicator';el.innerHTML=`<div class="msg-avatar"><img src="https://cdn.discordapp.com/attachments/1430636296765837334/1484589125817471066/AIdro_kmhKK9wu11Crf-F1iy7fnZVtYrJUnkIqNoPxWpyEwY1ws900-c-k-c0x00ffffff-no-rj.png?ex=69c169dd&is=69c0185d&hm=7490a23447ee11994728f3ce5fdc44c03bd4966035458b6e384fe4c1ce2b7d51&" alt="Halmstad" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div><div class="msg-content"><div class="msg-bubble"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>`;chatMessages.appendChild(el);chatMessages.scrollTop=chatMessages.scrollHeight}
-  function removeTyping(){const el=document.getElementById('typingIndicator');if(el)el.remove()}
-  async function sendMessage(){const text=chatInput.value.trim();if(!text)return;addMessage('user',text);chatInput.value='';chatInput.disabled=true;showTyping();try{const res=await fetch(WEBHOOK_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:text,sessionId:sessionId})});removeTyping();if(!res.ok)throw new Error('Webhook error');const data=await res.json();const reply=typeof data==='string'?data:(data.output||data.message||data.reply||data.response||data.text||JSON.stringify(data));addMessage('bot',reply)}catch(err){removeTyping();addMessage('bot','Oj, något gick fel. Försök igen om en stund.');console.error('Webhook error:',err)}finally{chatInput.disabled=false;chatInput.focus()}}
+  const chatWindow  = document.getElementById('chatWindow');
+  const chatToggle  = document.getElementById('chatToggle');
+  const chatBody    = document.getElementById('chatBody');
+  const chatMessages= document.getElementById('chatMessages');
+  const chatInput   = document.getElementById('chatInput');
+
+  function openChat() {
+    chatWindow.classList.add('open');
+    chatToggle.classList.add('hidden');
+    if (chatMessages.children.length === 0) {
+      sessionId = generateSessionId();
+      setTimeout(() => {
+        addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?');
+      }, 400);
+    }
+    chatInput.focus();
+  }
+
+  function minimizeChat() {
+    chatWindow.classList.remove('open');
+    chatToggle.classList.remove('hidden');
+  }
+
+  function closeChat() {
+    chatWindow.classList.remove('open');
+    chatToggle.classList.remove('hidden');
+    chatMessages.innerHTML = '';
+    sessionId = '';
+  }
+
+  function newSession() {
+    chatMessages.innerHTML = '';
+    sessionId = generateSessionId();
+    setTimeout(() => {
+      addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?');
+    }, 200);
+    chatInput.focus();
+  }
+
+  function formatMessage(text) {
+    // Convert Markdown to HTML
+    let formatted = text;
+
+    // Bold: **text** or __text__
+    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
+
+    // Italic: *text* or _text_
+    formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    formatted = formatted.replace(/_(.+?)_/g, '<em>$1</em>');
+
+    // Markdown links: [text](url)
+    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" class="chat-link">$1</a>');
+
+    // Plain URLs (not already in an <a> tag)
+    formatted = formatted.replace(/(?<!href="|">)(https?:\/\/[^\s<>"]+)/g, function(url) {
+      let title = url;
+      try {
+        const urlObj = new URL(url);
+        const path = urlObj.pathname.replace(/\.html$|\.htm$/i, '').replace(/\.[a-z]+\d*$/i, '');
+        const parts = path.split('/').filter(p => p.length > 0);
+        if (parts.length > 0) {
+          let lastPart = parts[parts.length - 1];
+          lastPart = lastPart
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/och/g, ' och ')
+            .replace(/[-_]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+          title = lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
+        } else {
+          title = urlObj.hostname.replace('www.', '');
+        }
+      } catch(e) {
+        title = 'Läs mer';
+      }
+      return '<a href="' + url + '" target="_blank" class="chat-link">' + title + '</a>';
+    });
+
+    // Bullet lists: lines starting with - or •
+    formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
+    formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+
+    // Line breaks
+    formatted = formatted.replace(/\n/g, '<br>');
+
+    return formatted;
+  }
+
+  function addMessage(type, text) {
+    const msg = document.createElement('div');
+    msg.className = 'msg ' + type;
+
+    const formattedText = type === 'bot' ? formatMessage(text) : text;
+
+    if (type === 'bot') {
+      msg.innerHTML = `
+        <div class="msg-avatar"><img src="https://cdn.discordapp.com/attachments/1430636296765837334/1484589125817471066/AIdro_kmhKK9wu11Crf-F1iy7fnZVtYrJUnkIqNoPxWpyEwY1ws900-c-k-c0x00ffffff-no-rj.png?ex=69c169dd&is=69c0185d&hm=7490a23447ee11994728f3ce5fdc44c03bd4966035458b6e384fe4c1ce2b7d51&" alt="Halmstad" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+        <div class="msg-content">
+          <span class="msg-name">HalmstadGPT</span>
+          <div class="msg-bubble">${formattedText}</div>
+        </div>`;
+    } else {
+      msg.innerHTML = `
+        <div class="msg-avatar">DU</div>
+        <div class="msg-content">
+          <span class="msg-name">Du</span>
+          <div class="msg-bubble">${formattedText}</div>
+        </div>`;
+    }
+    chatMessages.appendChild(msg);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'msg bot';
+    el.id = 'typingIndicator';
+    el.innerHTML = `
+      <div class="msg-avatar"><img src="https://cdn.discordapp.com/attachments/1430636296765837334/1484589125817471066/AIdro_kmhKK9wu11Crf-F1iy7fnZVtYrJUnkIqNoPxWpyEwY1ws900-c-k-c0x00ffffff-no-rj.png?ex=69c169dd&is=69c0185d&hm=7490a23447ee11994728f3ce5fdc44c03bd4966035458b6e384fe4c1ce2b7d51&" alt="Halmstad" style="width:100%;height:100%;object-fit:cover;border-radius:50%;"></div>
+      <div class="msg-content">
+        <div class="msg-bubble">
+          <div class="typing-indicator"><span></span><span></span><span></span></div>
+        </div>
+      </div>`;
+    chatMessages.appendChild(el);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  const WEBHOOK_URL = 'http://87.106.108.7:5678/webhook/3de1b3ca-7b1d-4a79-a8ee-091d37fa213a';
+  let sessionId = '';
+
+  function generateSessionId() {
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  }
+
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    addMessage('user', text);
+    chatInput.value = '';
+    chatInput.disabled = true;
+
+    showTyping();
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, sessionId: sessionId })
+      });
+
+      removeTyping();
+
+      if (!res.ok) throw new Error('Webhook svarade med status ' + res.status);
+
+      const data = await res.json();
+      const reply = typeof data === 'string' ? data : (data.output || data.message || data.reply || data.response || data.text || JSON.stringify(data));
+      addMessage('bot', reply);
+    } catch (err) {
+      removeTyping();
+      addMessage('bot', 'Oj, något gick fel. Försök igen om en stund.');
+      console.error('Webhook error:', err);
+    } finally {
+      chatInput.disabled = false;
+      chatInput.focus();
+    }
+  }
 </script>
-<!-- ═══════ SLUT HalmstadGPT Chattbot ═══════ -->
+</body>
+</html>
