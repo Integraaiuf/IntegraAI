@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HalmstadGPT — Integra AI</title>
+<title>Chatt Pop-up</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
@@ -28,49 +28,20 @@
 
   body {
     font-family: 'DM Sans', sans-serif;
-    background: #030814;
+    background: #E8F4F8;
     min-height: 100vh;
     color: var(--text);
   }
 
-  .back-link {
-    position: fixed;
-    top: 20px;
-    left: 24px;
-    z-index: 9999;
-    color: rgba(255,255,255,0.5);
-    font-family: Inter, sans-serif;
-    font-size: 14px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    transition: color 0.2s;
+  /* ── Demo background to simulate a page ── */
+  .demo-page {
+    padding: 60px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    opacity: 0.5;
   }
-  .back-link:hover { color: rgba(255,255,255,0.9); }
-
-  .page-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    padding: 40px 20px;
-    text-align: center;
-  }
-  .page-center h1 {
-    font-family: Inter, sans-serif;
-    font-size: 28px;
-    font-weight: 600;
-    color: #edf3fa;
-    margin-bottom: 8px;
-  }
-  .page-center p {
-    font-family: Inter, sans-serif;
-    font-size: 16px;
-    color: #8ca2bf;
-    margin-bottom: 32px;
-  }
+  .demo-page h1 { font-size: 28px; color: #1a5276; margin-bottom: 12px; }
+  .demo-page p { color: #555; line-height: 1.7; }
 
   /* ══════════════════════════════════════════
      CHAT TOGGLE BUTTON (closed state)
@@ -314,6 +285,33 @@
   }
   .msg.user .msg-name { text-align: right; padding-right: 2px; }
 
+  .msg-time {
+    font-size: 10px;
+    color: #aaa;
+    margin-top: 2px;
+  }
+  .msg.user .msg-time { text-align: right; }
+
+  .chat-input-wrap {
+    position: relative;
+    flex: 1;
+  }
+  .chat-input-wrap input {
+    width: 100%;
+  }
+  .char-counter {
+    position: absolute;
+    bottom: -14px;
+    right: 12px;
+    font-size: 10px;
+    font-family: 'DM Sans', sans-serif;
+    color: #aaa;
+    pointer-events: none;
+    transition: color 0.2s;
+  }
+  .char-counter.warning { color: #e67e22; }
+  .char-counter.limit { color: #e74c3c; font-weight: 600; }
+
   .msg-bubble {
     padding: 10px 14px;
     border-radius: 12px;
@@ -456,14 +454,10 @@
 </head>
 <body>
 
-<a href="index.html" class="back-link">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
-  Tillbaka
-</a>
-
-<div class="page-center">
-  <h1>HalmstadGPT</h1>
-  <p>AI-chattbot för Halmstad kommun — klicka på knappen nedan till höger</p>
+<!-- Demo background page content -->
+<div class="demo-page">
+  <h1>Hej, vad kan vi hjälpa dig med?</h1>
+  <p>Det här är en demo-sida för att visa chatt-popup-widgeten. Klicka på den gula "Chatt"-knappen längst ner till höger för att öppna chatten.</p>
 </div>
 
 <!-- ════════ CHAT TOGGLE BUTTON ════════ -->
@@ -499,13 +493,16 @@
       AI kan begå misstag. Kontrollera viktig information.
     </div>
     <div class="chat-messages" id="chatMessages"></div>
-    <div class="chat-input-bar">
+    <div class="chat-input-bar" style="padding-bottom:22px;">
       <button class="new-session-btn" onclick="newSession()" title="Ny chatt">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
         </svg>
       </button>
-      <input type="text" id="chatInput" placeholder="Skriv din fråga här..." onkeydown="if(event.key==='Enter')sendMessage()">
+      <div class="chat-input-wrap">
+        <input type="text" id="chatInput" placeholder="Skriv din fråga här..." maxlength="1000" oninput="updateCharCount()" onkeydown="if(event.key==='Enter')sendMessage()">
+        <span class="char-counter" id="charCounter">0 / 1000</span>
+      </div>
       <button class="send-btn" onclick="sendMessage()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"/>
@@ -638,9 +635,23 @@
     return formatted;
   }
 
+  function getTimeStr() {
+    return new Date().toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function updateCharCount() {
+    const counter = document.getElementById('charCounter');
+    const len = chatInput.value.length;
+    counter.textContent = len + ' / 1000';
+    counter.classList.remove('warning', 'limit');
+    if (len >= 1000) counter.classList.add('limit');
+    else if (len >= 800) counter.classList.add('warning');
+  }
+
   function addMessage(type, text) {
     const msg = document.createElement('div');
     msg.className = 'msg ' + type;
+    const time = getTimeStr();
 
     const formattedText = type === 'bot' ? formatMessage(text) : text;
 
@@ -650,6 +661,7 @@
         <div class="msg-content">
           <span class="msg-name">HalmstadGPT</span>
           <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">${time}</span>
         </div>`;
     } else {
       msg.innerHTML = `
@@ -657,6 +669,7 @@
         <div class="msg-content">
           <span class="msg-name">Du</span>
           <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">${time}</span>
         </div>`;
     }
     chatMessages.appendChild(msg);
@@ -696,6 +709,7 @@
 
     addMessage('user', text);
     chatInput.value = '';
+    updateCharCount();
     chatInput.disabled = true;
 
     showTyping();
