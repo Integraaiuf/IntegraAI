@@ -538,14 +538,26 @@
   }
 
   function closeChat() {
+    // Abort any pending webhook request
+    if (currentAbortController) {
+      currentAbortController.abort();
+      currentAbortController = null;
+    }
     chatWindow.classList.remove('open');
     chatToggle.classList.remove('hidden');
     chatMessages.innerHTML = '';
+    chatInput.disabled = false;
     sessionId = '';
   }
 
   function newSession() {
+    // Abort any pending webhook request
+    if (currentAbortController) {
+      currentAbortController.abort();
+      currentAbortController = null;
+    }
     chatMessages.innerHTML = '';
+    chatInput.disabled = false;
     sessionId = generateSessionId();
     setTimeout(() => {
       addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?');
@@ -698,6 +710,7 @@
 
   const WEBHOOK_URL = 'https://api.halmstadchattbot.se/chat';
   let sessionId = '';
+  let currentAbortController = null;
 
   function generateSessionId() {
     return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -714,27 +727,49 @@
 
     showTyping();
 
+    // Abort any previous pending request
+    if (currentAbortController) {
+      currentAbortController.abort();
+    }
+    currentAbortController = new AbortController();
+    const abortSignal = currentAbortController.signal;
+    const requestSessionId = sessionId;
+
     try {
       const res = await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, sessionId: sessionId })
+        body: JSON.stringify({ message: text, sessionId: requestSessionId }),
+        signal: abortSignal
       });
+
+      // If session changed while waiting, discard the response
+      if (sessionId !== requestSessionId) return;
 
       removeTyping();
 
       if (!res.ok) throw new Error('Webhook svarade med status ' + res.status);
 
       const data = await res.json();
+
+      // Double-check session hasn't changed during JSON parsing
+      if (sessionId !== requestSessionId) return;
+
       const reply = typeof data === 'string' ? data : (data.output || data.message || data.reply || data.response || data.text || JSON.stringify(data));
       addMessage('bot', reply);
     } catch (err) {
+      if (err.name === 'AbortError') {
+        // Request was aborted due to new session — do nothing
+        return;
+      }
       removeTyping();
       addMessage('bot', 'Oj, något gick fel. Försök igen om en stund.');
       console.error('Webhook error:', err);
     } finally {
-      chatInput.disabled = false;
-      chatInput.focus();
+      if (sessionId === requestSessionId) {
+        chatInput.disabled = false;
+        chatInput.focus();
+      }
     }
   }
 </script>
