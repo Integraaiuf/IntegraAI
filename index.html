@@ -25,6 +25,9 @@
     .mobile-menu.open{display:block}
     .mobile-menu a{display:block;padding:14px 16px;border-radius:12px;color:rgba(255,255,255,0.75)}
     .mobile-menu .demo-link{color:rgba(255,255,255,0.35);font-size:14px}
+.demo-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    .demo-btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.78);font-size:14px;font-weight:500;transition:all .2s ease}
+    .demo-btn:hover{color:white;background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.2);transform:translateY(-1px)}
     .hero{position:relative;min-height:885px;overflow:hidden;padding-top:180px;display:flex;align-items:flex-start;justify-content:center}
     .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,rgba(21,114,180,0.30),transparent 35%),linear-gradient(180deg,#071220 0%,#020814 100%)}
     .hero-overlay{position:absolute;inset:0;opacity:0.8;pointer-events:none}
@@ -91,7 +94,12 @@
         <a href="#om-oss">Om oss</a>
         <a href="#faq">FAQ</a>
         <a href="#kontakt">Kontakt</a>
-        <a href="halmstad-chattbot.html" class="demo-link">Halmstad chattbot</a>
+        <div class="demo-links">
+        <a href="halland-chattbot-ny.html" class="demo-btn">HallandGPT</a>
+        <a href="laholm-chattbot-ny.html" class="demo-btn">LaholmGPT</a>
+        <a href="hylte-chattbot-ny.html" class="demo-btn">HylteGPT</a>
+        <a href="halmstad-chattbot.html" class="demo-btn">HalmstadGPT</a>
+      </div>
       </nav>
       <a href="#kontakt" class="cta-btn">Kontakta oss</a>
       <button class="menu-btn" id="menuBtn" aria-label="Öppna meny" aria-expanded="false">
@@ -103,7 +111,10 @@
       <a href="#om-oss">Om oss</a>
       <a href="#faq">FAQ</a>
       <a href="#kontakt">Kontakt</a>
-      <a href="halmstad-chattbot.html" class="demo-link">Halmstad chattbot</a>
+      <a href="halland-chattbot-ny.html" class="demo-link">HallandGPT</a>
+      <a href="laholm-chattbot-ny.html" class="demo-link">LaholmGPT</a>
+      <a href="hylte-chattbot-ny.html" class="demo-link">HylteGPT</a>
+      <a href="halmstad-chattbot.html" class="demo-link">HalmstadGPT</a>
     </div>
   </header>
   <main>
