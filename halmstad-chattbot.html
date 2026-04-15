@@ -883,12 +883,12 @@
   const starFilledSVG = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>`;
   const starEmptySVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>`;
 
-  function createStarRating(msgId) {
+  function createStarRating(interactionId) {
     const container = document.createElement('div');
     container.className = 'star-rating';
     container.dataset.rating = '0';
     container.dataset.locked = 'false';
-    container.dataset.msgId = msgId;
+    container.dataset.interactionId = interactionId || '';
 
     for (let i = 1; i <= 5; i++) {
       const btn = document.createElement('button');
@@ -897,30 +897,52 @@
       btn.innerHTML = starEmptySVG;
       btn.title = i + ' av 5 stjärnor';
 
-      btn.addEventListener('click', function() {
-        // If already rated, ignore further clicks
+      btn.addEventListener('click', async function() {
         if (container.dataset.locked === 'true') return;
 
-        const rating = parseInt(this.dataset.value);
-        container.dataset.rating = rating;
-        container.dataset.locked = 'true'; // Lock after first rating
+        const rating = parseInt(this.dataset.value, 10);
+        const currentInteractionId = container.dataset.interactionId;
 
-        // Update all stars
-        const stars = container.querySelectorAll('.star-btn');
-        stars.forEach((s, idx) => {
-          if (idx < rating) {
-            s.classList.add('active');
-            s.innerHTML = starFilledSVG;
-          } else {
-            s.classList.remove('active');
-            s.innerHTML = starEmptySVG;
+        if (!currentInteractionId) {
+          console.error('Saknar interactionId för rating.');
+          return;
+        }
+
+        try {
+          const res = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'rating',
+              interactionId: currentInteractionId,
+              sessionId: ensureSessionId(),
+              rating: rating
+            })
+          });
+
+          if (!res.ok) {
+            throw new Error('Webhook svarade med status ' + res.status);
           }
-          // Disable hover cursor on locked stars
-          s.style.cursor = 'default';
-        });
 
-        // Optional: send rating to backend
-        console.log('Rating for message ' + msgId + ': ' + rating + ' stars');
+          container.dataset.rating = String(rating);
+          container.dataset.locked = 'true';
+
+          const stars = container.querySelectorAll('.star-btn');
+          stars.forEach((s, idx) => {
+            if (idx < rating) {
+              s.classList.add('active');
+              s.innerHTML = starFilledSVG;
+            } else {
+              s.classList.remove('active');
+              s.innerHTML = starEmptySVG;
+            }
+            s.style.cursor = 'default';
+          });
+
+          console.log('Rating skickad för interactionId ' + currentInteractionId + ': ' + rating + ' stjärnor');
+        } catch (err) {
+          console.error('Rating webhook error:', err);
+        }
       });
 
       // Hover preview (only when not locked)
@@ -1165,7 +1187,7 @@
 
   let botMsgCounter = 0;
 
-  function addMessage(type, text, showStars) {
+  function addMessage(type, text, showStars, interactionId = null) {
     // showStars defaults to true for bot messages, false for user
     if (showStars === undefined) showStars = (type === 'bot');
 
@@ -1190,7 +1212,7 @@
       // Add star rating only if showStars is true (not for welcome message)
       if (showStars) {
         const contentDiv = msg.querySelector('.msg-content');
-        const starRating = createStarRating(msgId);
+        const starRating = createStarRating(interactionId);
         contentDiv.appendChild(starRating);
       }
     } else if (type === 'human') {
@@ -1445,7 +1467,7 @@ function ensureSessionId() {
       data.text ||
       JSON.stringify(data);
 
-    addMessage('bot', reply);
+    addMessage('bot', reply, true, interactionId);
   } catch (err) {
     if (sessionId !== originSessionId) return;
     removeTyping();
