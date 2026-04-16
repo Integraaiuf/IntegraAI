@@ -886,19 +886,19 @@ function escapeHtml(str) {
     const tokens = [];
 
     working = working.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, label, href) => {
-      const token = `__TOKEN_${tokens.length}__`;
+      const token = `@@TOKEN_${tokens.length}@@`;
       tokens.push(makeLinkChip(href, label.trim() || 'Öppna länk', 'link'));
       return token;
     });
 
     working = working.replace(/https?:\/\/[^\s<>"')]+/g, (href) => {
-      const token = `__TOKEN_${tokens.length}__`;
+      const token = `@@TOKEN_${tokens.length}@@`;
       tokens.push(makeLinkChip(href, 'Öppna länk', 'link'));
       return token;
     });
 
     working = working.replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, (email) => {
-      const token = `__TOKEN_${tokens.length}__`;
+      const token = `@@TOKEN_${tokens.length}@@`;
       tokens.push(makeLinkChip(`mailto:${email}`, email, 'email'));
       return token;
     });
@@ -906,7 +906,7 @@ function escapeHtml(str) {
     working = working.replace(/(?<!\w)(\+?\d[\d\s-]{5,}\d)(?!\w)/g, (tel) => {
       const compact = tel.replace(/[^\d+]/g, '');
       if (compact.length < 6) return tel;
-      const token = `__TOKEN_${tokens.length}__`;
+      const token = `@@TOKEN_${tokens.length}@@`;
       tokens.push(makeLinkChip(`tel:${compact}`, tel.trim(), 'tel'));
       return token;
     });
@@ -917,7 +917,8 @@ function escapeHtml(str) {
   function sanitizeBrokenRtlArtifacts(text) {
     let t = text;
     t = t.replace(/(^|[\s>])([A-Za-z]?%[0-9A-Fa-f]{2}(?:%[0-9A-Fa-f]{2}){3,})(?=$|[\s<])/g, '$1');
-    t = t.replace(/(Läs mer|Mer info|Read more|اقرأ المزيد|المزيد|مزيد من المعلومات)\s*:\s*(?=__TOKEN_\d+__)/gi, '$1:\n');
+    t = t.replace(/(^|[\s>])[A-Za-z]((?:%[0-9A-Fa-f]{2}){3,})(?=$|[\s<])/g, '$1');
+    t = t.replace(/(Läs mer|Mer info|Read more|اقرأ المزيد|المزيد|مزيد من المعلومات)\s*:\s*(?=@@TOKEN_\d+@@)/gi, '$1:\n');
     return t;
   }
 
@@ -931,15 +932,15 @@ function escapeHtml(str) {
     formatted = escapeHtml(formatted);
 
     formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/(^|\W)__(.+?)__(?=\W|$)/g, '$1<strong>$2</strong>');
     formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    formatted = formatted.replace(/_(.+?)_/g, '<em>$1</em>');
+    formatted = formatted.replace(/(^|\W)_(.+?)_(?=\W|$)/g, '$1<em>$2</em>');
 
     formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
     formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
 
     tokenized.tokens.forEach((htmlToken, i) => {
-      const token = `__TOKEN_${i}__`;
+      const token = `@@TOKEN_${i}@@`;
       formatted = formatted.replaceAll(token, `<br>${htmlToken}<br>`);
     });
 
