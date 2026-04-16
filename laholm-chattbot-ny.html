@@ -344,6 +344,41 @@
   .chat-link:hover {
     border-bottom-color: #1a73e8;
   }
+  .chat-link-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    margin: 6px 0 2px;
+    padding: 7px 10px;
+    border-radius: 10px;
+    background: #fff;
+    color: #1a73e8;
+    border: 1px solid #d6e4ff;
+    text-decoration: none;
+    font-weight: 600;
+    line-height: 1.3;
+    direction: ltr;
+    unicode-bidi: isolate;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  .chat-link-chip:hover {
+    background: #f6faff;
+    border-color: #b8d1ff;
+  }
+  .chat-link-chip .chat-link-chip-icon {
+    flex: 0 0 auto;
+  }
+  .chat-link-chip .chat-link-chip-text {
+    min-width: 0;
+  }
+  .msg-bubble[dir="rtl"] .chat-link-chip {
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: left;
+  }
   .msg-bubble ul {
     margin: 4px 0;
     padding-left: 18px;
@@ -372,6 +407,15 @@
     word-break: break-all;
     overflow-wrap: anywhere;
     margin-top: 4px;
+  }
+  .msg-bubble[dir="rtl"] .inline-ltr {
+    display: inline-block;
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: left;
+    max-width: 100%;
+    word-break: break-all;
+    overflow-wrap: anywhere;
   }
 
   /* typing indicator */
@@ -796,7 +840,8 @@
     URL.revokeObjectURL(url);
   }
 
-  function escapeHtml(str) {
+  
+function escapeHtml(str) {
     return String(str ?? '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -808,7 +853,6 @@
   function normalizeBotText(text) {
     let normalized = String(text ?? '');
 
-    // Unwrap accidental surrounding quotes from JSON-stringified strings
     if (normalized.startsWith('"') && normalized.endsWith('"')) {
       normalized = normalized.slice(1, -1);
     }
@@ -818,7 +862,9 @@
       .replace(/\\n/g, '\n')
       .replace(/\\t/g, '\t')
       .replace(/\\"/g, '"')
-      .replace(/\\\\/g, '\\');
+      .replace(/\\\\/g, '\\')
+      .replace(/^\s*"+|"+\s*$/g, '')
+      .replace(/[\u200e\u200f]/g, '');
 
     return normalized;
   }
@@ -828,40 +874,76 @@
     return /[\u0590-\u08FF]/.test(s) ? 'rtl' : 'ltr';
   }
 
-  function formatMessage(text) {
-    let formatted = normalizeBotText(text);
+  function makeLinkChip(href, label, kind = 'link') {
+    const safeHref = escapeHtml(href);
+    const safeLabel = escapeHtml(label);
+    const icons = { link: '🔗', email: '✉️', tel: '📞' };
+    return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="chat-link chat-link-chip" dir="ltr"><span class="chat-link-chip-icon">${icons[kind] || '🔗'}</span><span class="chat-link-chip-text">${safeLabel}</span></a>`;
+  }
 
-    // Protect URLs before other formatting
-    const urls = [];
-    formatted = formatted.replace(/https?:\/\/[^\s<>"')]+/g, (url) => {
-      const token = `__URL_${urls.length}__`;
-      urls.push(url);
+  function tokenizeLinks(text) {
+    let working = text;
+    const tokens = [];
+
+    working = working.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, label, href) => {
+      const token = `__TOKEN_${tokens.length}__`;
+      tokens.push(makeLinkChip(href, label.trim() || 'Öppna länk', 'link'));
       return token;
     });
 
-    // Escape HTML first
+    working = working.replace(/https?:\/\/[^\s<>"')]+/g, (href) => {
+      const token = `__TOKEN_${tokens.length}__`;
+      tokens.push(makeLinkChip(href, 'Öppna länk', 'link'));
+      return token;
+    });
+
+    working = working.replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, (email) => {
+      const token = `__TOKEN_${tokens.length}__`;
+      tokens.push(makeLinkChip(`mailto:${email}`, email, 'email'));
+      return token;
+    });
+
+    working = working.replace(/(?<!\w)(\+?\d[\d\s-]{5,}\d)(?!\w)/g, (tel) => {
+      const compact = tel.replace(/[^\d+]/g, '');
+      if (compact.length < 6) return tel;
+      const token = `__TOKEN_${tokens.length}__`;
+      tokens.push(makeLinkChip(`tel:${compact}`, tel.trim(), 'tel'));
+      return token;
+    });
+
+    return { working, tokens };
+  }
+
+  function sanitizeBrokenRtlArtifacts(text) {
+    let t = text;
+    t = t.replace(/(^|[\s>])([A-Za-z]?%[0-9A-Fa-f]{2}(?:%[0-9A-Fa-f]{2}){3,})(?=$|[\s<])/g, '$1');
+    t = t.replace(/(Läs mer|Mer info|Read more|اقرأ المزيد|المزيد|مزيد من المعلومات)\s*:\s*(?=__TOKEN_\d+__)/gi, '$1:\n');
+    return t;
+  }
+
+  function formatMessage(text) {
+    let formatted = normalizeBotText(text);
+    formatted = sanitizeBrokenRtlArtifacts(formatted);
+
+    const tokenized = tokenizeLinks(formatted);
+    formatted = tokenized.working;
+
     formatted = escapeHtml(formatted);
 
-    // Bold: **text** or __text__
     formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
-
-    // Italic: *text* or _text_
     formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
     formatted = formatted.replace(/_(.+?)_/g, '<em>$1</em>');
 
-    // Bullet lists: lines starting with - or •
     formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
     formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
 
-    // Restore URLs exactly as links on their own line
-    urls.forEach((url, i) => {
-      const safeUrl = escapeHtml(url);
-      const replacement = `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="chat-link chat-link-url" dir="ltr">${safeUrl}</a>`;
-      formatted = formatted.replace(`__URL_${i}__`, replacement);
+    tokenized.tokens.forEach((htmlToken, i) => {
+      const token = `__TOKEN_${i}__`;
+      formatted = formatted.replaceAll(token, `<br>${htmlToken}<br>`);
     });
 
-    // Line breaks last
+    formatted = formatted.replace(/(?:<br>\s*){3,}/g, '<br><br>');
     formatted = formatted.replace(/\n/g, '<br>');
 
     return formatted;
@@ -890,7 +972,8 @@
     msg.className = 'msg ' + type;
     const time = getTimeStr();
 
-    const formattedText = type === 'bot' ? formatMessage(text) : text;
+    const formattedText = type === 'bot' ? formatMessage(text) : escapeHtml(text);
+    const bubbleDir = detectDirection(text);
 
     if (type === 'bot') {
       botMsgCounter++;
@@ -915,7 +998,7 @@
         <div class="msg-avatar">DU</div>
         <div class="msg-content">
           <span class="msg-name">Du</span>
-          <div class="msg-bubble">${formattedText}</div>
+          <div class="msg-bubble" dir="${bubbleDir}">${formattedText}</div>
           <span class="msg-time">${time}</span>
         </div>`;
     }
