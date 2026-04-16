@@ -322,6 +322,7 @@
     word-break: break-word;
     max-width: 100%;
     overflow: hidden;
+    unicode-bidi: plaintext;
   }
   .msg.bot .msg-bubble {
     background: var(--bot-bubble);
@@ -343,6 +344,14 @@
   }
   .chat-link:hover {
     border-bottom-color: #1a73e8;
+  }
+  .chat-link-url {
+    display: block;
+    direction: ltr;
+    unicode-bidi: isolate;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    margin-top: 4px;
   }
   .msg-bubble ul {
     margin: 4px 0;
@@ -779,7 +788,25 @@
   }
 
   function formatMessage(text) {
-    let formatted = text;
+    let formatted = String(text ?? '');
+
+    // Normalisera escaped radbrytningar och tabbar från backend
+    formatted = formatted
+      .replace(/\\r\\n/g, '\n')
+      .replace(/\\n/g, '\n')
+      .replace(/\\t/g, '\t');
+
+    // Markdown links: [text](url)
+    formatted = formatted.replace(
+      /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,
+      '<a href="$2" target="_blank" rel="noopener noreferrer" class="chat-link" dir="ltr">$1</a>'
+    );
+
+    // Plain URLs (not already in an <a> tag)
+    formatted = formatted.replace(
+      /(?<!href="|">)(https?:\/\/[^\s<>"]+)/g,
+      '<a href="$1" target="_blank" rel="noopener noreferrer" class="chat-link chat-link-url" dir="ltr">$1</a>'
+    );
 
     // Bold: **text** or __text__
     formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
@@ -788,34 +815,6 @@
     // Italic: *text* or _text_
     formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
     formatted = formatted.replace(/_(.+?)_/g, '<em>$1</em>');
-
-    // Markdown links: [text](url)
-    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" class="chat-link">$1</a>');
-
-    // Plain URLs (not already in an <a> tag)
-    formatted = formatted.replace(/(?<!href="|">)(https?:\/\/[^\s<>"]+)/g, function(url) {
-      let title = url;
-      try {
-        const urlObj = new URL(url);
-        const path = urlObj.pathname.replace(/\.html$|\.htm$/i, '').replace(/\.[a-z]+\d*$/i, '');
-        const parts = path.split('/').filter(p => p.length > 0);
-        if (parts.length > 0) {
-          let lastPart = parts[parts.length - 1];
-          lastPart = lastPart
-            .replace(/([a-z])([A-Z])/g, '$1 $2')
-            .replace(/och/g, ' och ')
-            .replace(/[-_]/g, ' ')
-            .replace(/\s+/g, ' ')
-            .trim();
-          title = lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
-        } else {
-          title = urlObj.hostname.replace('www.', '');
-        }
-      } catch(e) {
-        title = 'Läs mer';
-      }
-      return '<a href="' + url + '" target="_blank" class="chat-link">' + title + '</a>';
-    });
 
     // Bullet lists: lines starting with - or •
     formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
@@ -826,6 +825,7 @@
 
     return formatted;
   }
+
 
   function getTimeStr() {
     return new Date().toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
@@ -962,7 +962,16 @@
 
       if (sessionId !== originSessionId) return;
 
-      const reply = typeof data === 'string' ? data : (data.output || data.message || data.reply || data.response || data.text || JSON.stringify(data));
+      let reply = typeof data === 'string'
+        ? data
+        : (data.output || data.message || data.reply || data.response || data.text || JSON.stringify(data));
+
+      reply = String(reply)
+        .replace(/^"(.*)"$/s, '$1')
+        .replace(/\\"/g, '"')
+        .replace(/\\r\\n/g, '\n')
+        .replace(/\\n/g, '\n');
+
       addMessage('bot', reply);
     } catch (err) {
       if (sessionId !== originSessionId) return;
