@@ -344,40 +344,29 @@
   .chat-link:hover {
     border-bottom-color: #1a73e8;
   }
-  .chat-link-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    max-width: 100%;
-    margin: 6px 0 2px;
-    padding: 7px 10px;
-    border-radius: 10px;
-    background: #fff;
-    color: #1a73e8;
-    border: 1px solid #d6e4ff;
-    text-decoration: none;
-    font-weight: 600;
-    line-height: 1.3;
+  .msg-bubble.bot-rtl {
+    direction: rtl;
+    text-align: right;
+    unicode-bidi: plaintext;
+  }
+  .msg-bubble.bot-ltr {
     direction: ltr;
-    unicode-bidi: isolate;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-  }
-  .chat-link-chip:hover {
-    background: #f6faff;
-    border-color: #b8d1ff;
-  }
-  .chat-link-chip .chat-link-chip-icon {
-    flex: 0 0 auto;
-  }
-  .chat-link-chip .chat-link-chip-text {
-    min-width: 0;
-  }
-  .msg-bubble[dir="rtl"] .chat-link-chip {
-    direction: ltr;
-    unicode-bidi: isolate;
     text-align: left;
+    unicode-bidi: plaintext;
+  }
+  .chat-link {
+    display: inline-block;
+    direction: ltr;
+    unicode-bidi: embed;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+    max-width: 100%;
+  }
+  .chat-url-block {
+    display: block;
+    margin-top: 6px;
+    direction: ltr;
+    unicode-bidi: embed;
   }
   .msg-bubble ul {
     margin: 4px 0;
@@ -389,33 +378,6 @@
   }
   .msg-bubble strong {
     font-weight: 700;
-  }
-  .msg-bubble[dir="rtl"] {
-    direction: rtl;
-    text-align: right;
-    unicode-bidi: plaintext;
-  }
-  .msg-bubble[dir="ltr"] {
-    direction: ltr;
-    text-align: left;
-    unicode-bidi: plaintext;
-  }
-  .chat-link-url {
-    display: block;
-    direction: ltr;
-    unicode-bidi: isolate;
-    word-break: break-all;
-    overflow-wrap: anywhere;
-    margin-top: 4px;
-  }
-  .msg-bubble[dir="rtl"] .inline-ltr {
-    display: inline-block;
-    direction: ltr;
-    unicode-bidi: isolate;
-    text-align: left;
-    max-width: 100%;
-    word-break: break-all;
-    overflow-wrap: anywhere;
   }
 
   /* typing indicator */
@@ -840,8 +802,7 @@
     URL.revokeObjectURL(url);
   }
 
-  
-function escapeHtml(str) {
+  function escapeHtml(str) {
     return String(str ?? '')
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
@@ -851,101 +812,39 @@ function escapeHtml(str) {
   }
 
   function normalizeBotText(text) {
-    let normalized = String(text ?? '');
+    let s = String(text ?? '');
 
-    if (normalized.startsWith('"') && normalized.endsWith('"')) {
-      normalized = normalized.slice(1, -1);
+    s = s
+      .replace(/\r\n/g, '
+')
+      .replace(/\n/g, '
+')
+      .replace(/\t/g, '	')
+      .replace(/\"/g, '"');
+
+    if (s.startsWith('"') && s.endsWith('"')) {
+      s = s.slice(1, -1);
     }
 
-    normalized = normalized
-      .replace(/\\r\\n/g, '\n')
-      .replace(/\\n/g, '\n')
-      .replace(/\\t/g, '\t')
-      .replace(/\\"/g, '"')
-      .replace(/\\\\/g, '\\')
-      .replace(/^\s*"+|"+\s*$/g, '')
-      .replace(/[\u200e\u200f]/g, '');
-
-    return normalized;
+    return s;
   }
 
   function detectDirection(text) {
-    const s = String(text ?? '');
-    return /[\u0590-\u08FF]/.test(s) ? 'rtl' : 'ltr';
-  }
-
-  function makeLinkChip(href, label, kind = 'link') {
-    const safeHref = escapeHtml(href);
-    const safeLabel = escapeHtml(label);
-    const icons = { link: '🔗', email: '✉️', tel: '📞' };
-    return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="chat-link chat-link-chip" dir="ltr"><span class="chat-link-chip-icon">${icons[kind] || '🔗'}</span><span class="chat-link-chip-text">${safeLabel}</span></a>`;
-  }
-
-  function tokenizeLinks(text) {
-    let working = text;
-    const tokens = [];
-
-    working = working.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, (_, label, href) => {
-      const token = `@@TOKEN_${tokens.length}@@`;
-      tokens.push(makeLinkChip(href, label.trim() || 'Öppna länk', 'link'));
-      return token;
-    });
-
-    working = working.replace(/https?:\/\/[^\s<>"')]+/g, (href) => {
-      const token = `@@TOKEN_${tokens.length}@@`;
-      tokens.push(makeLinkChip(href, 'Öppna länk', 'link'));
-      return token;
-    });
-
-    working = working.replace(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi, (email) => {
-      const token = `@@TOKEN_${tokens.length}@@`;
-      tokens.push(makeLinkChip(`mailto:${email}`, email, 'email'));
-      return token;
-    });
-
-    working = working.replace(/(?<!\w)(\+?\d[\d\s-]{5,}\d)(?!\w)/g, (tel) => {
-      const compact = tel.replace(/[^\d+]/g, '');
-      if (compact.length < 6) return tel;
-      const token = `@@TOKEN_${tokens.length}@@`;
-      tokens.push(makeLinkChip(`tel:${compact}`, tel.trim(), 'tel'));
-      return token;
-    });
-
-    return { working, tokens };
-  }
-
-  function sanitizeBrokenRtlArtifacts(text) {
-    let t = text;
-    t = t.replace(/(^|[\s>])([A-Za-z]?%[0-9A-Fa-f]{2}(?:%[0-9A-Fa-f]{2}){3,})(?=$|[\s<])/g, '$1');
-    t = t.replace(/(^|[\s>])[A-Za-z]((?:%[0-9A-Fa-f]{2}){3,})(?=$|[\s<])/g, '$1');
-    t = t.replace(/(Läs mer|Mer info|Read more|اقرأ المزيد|المزيد|مزيد من المعلومات)\s*:\s*(?=@@TOKEN_\d+@@)/gi, '$1:\n');
-    return t;
+    return /[֐-ࣿ]/.test(String(text ?? '')) ? 'rtl' : 'ltr';
   }
 
   function formatMessage(text) {
     let formatted = normalizeBotText(text);
-    formatted = sanitizeBrokenRtlArtifacts(formatted);
-
-    const tokenized = tokenizeLinks(formatted);
-    formatted = tokenized.working;
 
     formatted = escapeHtml(formatted);
 
-    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    formatted = formatted.replace(/(^|\W)__(.+?)__(?=\W|$)/g, '$1<strong>$2</strong>');
-    formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    formatted = formatted.replace(/(^|\W)_(.+?)_(?=\W|$)/g, '$1<em>$2</em>');
+    formatted = formatted.replace(
+      /(https?:\/\/[^\s<>"']+)/g,
+      '<span class="chat-url-block"><a href="$1" target="_blank" rel="noopener noreferrer" class="chat-link">$1</a></span>'
+    );
 
-    formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
-    formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
-
-    tokenized.tokens.forEach((htmlToken, i) => {
-      const token = `@@TOKEN_${i}@@`;
-      formatted = formatted.replaceAll(token, `<br>${htmlToken}<br>`);
-    });
-
-    formatted = formatted.replace(/(?:<br>\s*){3,}/g, '<br><br>');
-    formatted = formatted.replace(/\n/g, '<br>');
+    formatted = formatted.replace(/
+/g, '<br>');
 
     return formatted;
   }
@@ -973,8 +872,10 @@ function escapeHtml(str) {
     msg.className = 'msg ' + type;
     const time = getTimeStr();
 
-    const formattedText = type === 'bot' ? formatMessage(text) : escapeHtml(text);
-    const bubbleDir = detectDirection(text);
+    const bubbleDir = type === 'bot' ? detectDirection(text) : 'ltr';
+    const formattedText = type === 'bot'
+      ? formatMessage(text)
+      : escapeHtml(text).replace(/\n/g, '<br>');
 
     if (type === 'bot') {
       botMsgCounter++;
@@ -984,7 +885,7 @@ function escapeHtml(str) {
         <div class="msg-avatar"><img src="data:image/webp;base64,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" alt="Laholm" style="width:100%;height:100%;object-fit:contain;border-radius:50%;background:#fff;"></div>
         <div class="msg-content">
           <span class="msg-name">LaholmGPT</span>
-          <div class="msg-bubble" dir="${detectDirection(text)}">${formattedText}</div>
+          <div class="msg-bubble ${bubbleDir === 'rtl' ? 'bot-rtl' : 'bot-ltr'}" dir="${bubbleDir}">${formattedText}</div>
           <span class="msg-time">${time}</span>
         </div>`;
       
@@ -999,7 +900,7 @@ function escapeHtml(str) {
         <div class="msg-avatar">DU</div>
         <div class="msg-content">
           <span class="msg-name">Du</span>
-          <div class="msg-bubble" dir="${bubbleDir}">${formattedText}</div>
+          <div class="msg-bubble">${formattedText}</div>
           <span class="msg-time">${time}</span>
         </div>`;
     }
@@ -1086,9 +987,11 @@ function escapeHtml(str) {
 
       if (sessionId !== originSessionId) return;
 
-      let reply = typeof data === 'string' ? data : (data.output || data.message || data.reply || data.response || data.text || JSON.stringify(data));
-      reply = normalizeBotText(reply);
-      addMessage('bot', reply);
+      const reply = typeof data === 'string'
+        ? data
+        : (data.output || data.message || data.reply || data.response || data.text || JSON.stringify(data));
+
+      addMessage('bot', normalizeBotText(reply));
     } catch (err) {
       if (sessionId !== originSessionId) return;
       removeTyping();
