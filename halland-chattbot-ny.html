@@ -72,10 +72,10 @@
     box-shadow: 0 6px 24px rgba(245,166,35,0.55);
     transform: translateY(-2px);
   }
-  .chat-toggle.hidden { 
-    opacity: 0; 
-    pointer-events: none; 
-    transform: scale(0.8) translateY(10px); 
+  .chat-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8) translateY(10px);
   }
   .chat-toggle svg { flex-shrink: 0; }
 
@@ -119,9 +119,29 @@
     flex-shrink: 0;
   }
   .chat-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.3px;
+  }
+  .chat-header-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .chat-header-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 50%;
   }
   .chat-header-actions {
     display: flex;
@@ -205,6 +225,7 @@
     display: none;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
   }
   .chat-body.active {
     display: flex;
@@ -499,6 +520,211 @@
     transform: translateX(-50%) translateY(0);
   }
 
+  /* ── Custom Tooltips ── */
+  [data-tooltip] {
+    position: relative;
+  }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--yellow);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 100;
+    box-shadow: 0 3px 12px rgba(245,166,35,0.3);
+    letter-spacing: 0.2px;
+  }
+  [data-tooltip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    border: 6px solid transparent;
+    border-top-color: var(--yellow);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 100;
+  }
+  [data-tooltip]:hover::after,
+  [data-tooltip]:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  /* Header buttons: tooltip below instead */
+  .chat-header-actions [data-tooltip]::after {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
+  .chat-header-actions [data-tooltip]::before {
+    bottom: auto;
+    top: calc(100% + 2px);
+    border-top-color: transparent;
+    border-bottom-color: var(--yellow);
+  }
+
+  /* ── Human agent message avatar ── */
+  .msg.human .msg-avatar {
+    background: #e8f5e9;
+    border: 2px solid #66bb6a;
+    color: #388e3c;
+  }
+  .msg.human .msg-bubble {
+    background: #e8f5e9;
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+
+  /* ── Human agent button ── */
+  .human-agent-btn {
+    background: var(--yellow);
+    border: none;
+    color: var(--white);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .human-agent-btn:hover {
+    background: var(--yellow-hover);
+    transform: scale(1.05);
+  }
+  .human-agent-btn:active { transform: scale(0.95); }
+
+  /* ── Handover topic selector overlay ── */
+  .handover-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: var(--white);
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 24px;
+    gap: 18px;
+    animation: msgIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .handover-overlay.visible {
+    display: flex;
+  }
+  .handover-overlay-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+  }
+  .handover-overlay-subtitle {
+    font-size: 13px;
+    color: var(--text-light);
+    text-align: center;
+    margin-top: -8px;
+  }
+  .handover-overlay select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--white);
+    cursor: pointer;
+    transition: border-color 0.2s;
+    appearance: auto;
+  }
+  .handover-overlay select:focus {
+    outline: none;
+    border-color: var(--yellow);
+  }
+  .handover-overlay .handover-start-btn {
+    background: var(--yellow);
+    color: var(--white);
+    border: none;
+    padding: 14px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, opacity 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .handover-overlay .handover-start-btn:hover {
+    background: var(--yellow-hover);
+  }
+  .handover-overlay .handover-start-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .handover-overlay .handover-cancel-btn {
+    background: none;
+    border: none;
+    color: var(--text-light);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+    text-align: center;
+  }
+  .handover-overlay .handover-cancel-btn:hover {
+    color: var(--text);
+  }
+  .handover-overlay .handover-wait {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-light);
+  }
+
+  /* ── Handover divider ── */
+  .handover-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0;
+    animation: msgIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .handover-divider .line {
+    flex: 1;
+    height: 1px;
+    background: #ccc;
+  }
+  .handover-divider .label {
+    font-size: 12px;
+    color: #999;
+    text-align: center;
+    line-height: 1.4;
+    white-space: nowrap;
+  }
+  .handover-divider .label strong {
+    display: block;
+    color: #777;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .handover-divider .wait-time {
+    font-size: 11px;
+    color: #aaa;
+    font-style: italic;
+  }
+
   /* ── Responsive ── */
   @media (max-width: 420px) {
     .chat-window {
@@ -532,15 +758,30 @@
 
   <!-- Header -->
   <div class="chat-header">
-    <span class="chat-header-title">HallandGPT</span>
+    <div class="chat-header-title" id="chatHeaderTitle">
+      <div class="chat-header-icon" id="chatHeaderIcon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="8" rx="3" ry="3" width="16" height="11"/>
+          <path d="M4 19l-2 2"/>
+          <line x1="12" y1="8" x2="12" y2="5"/>
+          <circle cx="12" cy="4" r="1.2"/>
+          <rect x="1" y="11" width="2.5" height="4" rx="1"/>
+          <rect x="20.5" y="11" width="2.5" height="4" rx="1"/>
+          <circle cx="9.5" cy="13.5" r="1.5"/>
+          <circle cx="14.5" cy="13.5" r="1.5"/>
+          <path d="M9.5 17.2c0 0 1.2 1.2 2.5 1.2s2.5-1.2 2.5-1.2"/>
+        </svg>
+      </div>
+      <span id="chatHeaderText">HallandGPT</span>
+    </div>
     <div class="chat-header-actions">
-      <button onclick="downloadChat()" title="Ladda ner chatt">
+      <button onclick="downloadChat()" data-tooltip="Ladda ner chatt">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </button>
-      <button onclick="minimizeChat()" title="Minimera">
+      <button onclick="minimizeChat()" data-tooltip="Minimera">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
       </button>
-      <button onclick="closeChat()" title="Stäng">
+      <button onclick="closeChat()" data-tooltip="Stäng">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
@@ -558,10 +799,31 @@
       Du skickar för många meddelanden. Vänta 10 sekunder.
     </div>
 
+    <!-- Handover topic selector overlay -->
+    <div class="handover-overlay" id="handoverOverlay">
+      <div class="handover-overlay-title">Vad gäller ditt ärende?</div>
+      <select id="handoverTopic" onchange="updateHandoverBtn()">
+        <option value="" disabled selected>Välj ämne…</option>
+      </select>
+      <button class="handover-start-btn" id="handoverStartBtn" disabled onclick="confirmHandover()">Starta chatt med handläggare</button>
+      <div class="handover-wait" id="handoverWait"></div>
+      <button class="handover-cancel-btn" onclick="cancelHandover()">Avbryt</button>
+    </div>
+
     <div class="chat-input-bar" style="padding-bottom:22px;">
-      <button class="new-session-btn" onclick="newSession()" title="Ny chatt">
+      <button class="new-session-btn" onclick="newSession()" data-tooltip="Ny chatt">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+      </button>
+      <button class="human-agent-btn" onclick="connectToHumanAgent()" data-tooltip="Mänsklig handläggare">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+          <path d="M6 7h-.5A2.5 2.5 0 0 0 3 9.5v.5"/>
+          <path d="M18 7h.5A2.5 2.5 0 0 1 21 9.5v.5"/>
+          <path d="M3 10v2"/><path d="M21 10v2"/>
+          <path d="M6 7c0-1 .5-2 1.5-2.5"/><path d="M18 7c0-1-.5-2-1.5-2.5"/>
         </svg>
       </button>
       <div class="chat-input-wrap">
@@ -621,12 +883,12 @@
   const starFilledSVG = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>`;
   const starEmptySVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>`;
 
-  function createStarRating(msgId) {
+  function createStarRating(interactionId) {
     const container = document.createElement('div');
     container.className = 'star-rating';
     container.dataset.rating = '0';
     container.dataset.locked = 'false';
-    container.dataset.msgId = msgId;
+    container.dataset.interactionId = interactionId || '';
 
     for (let i = 1; i <= 5; i++) {
       const btn = document.createElement('button');
@@ -635,30 +897,52 @@
       btn.innerHTML = starEmptySVG;
       btn.title = i + ' av 5 stjärnor';
 
-      btn.addEventListener('click', function() {
-        // If already rated, ignore further clicks
+      btn.addEventListener('click', async function() {
         if (container.dataset.locked === 'true') return;
 
-        const rating = parseInt(this.dataset.value);
-        container.dataset.rating = rating;
-        container.dataset.locked = 'true'; // Lock after first rating
+        const rating = parseInt(this.dataset.value, 10);
+        const currentInteractionId = container.dataset.interactionId;
 
-        // Update all stars
-        const stars = container.querySelectorAll('.star-btn');
-        stars.forEach((s, idx) => {
-          if (idx < rating) {
-            s.classList.add('active');
-            s.innerHTML = starFilledSVG;
-          } else {
-            s.classList.remove('active');
-            s.innerHTML = starEmptySVG;
+        if (!currentInteractionId) {
+          console.error('Saknar interactionId för rating.');
+          return;
+        }
+
+        try {
+          const res = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'rating',
+              interactionId: currentInteractionId,
+              sessionId: ensureSessionId(),
+              rating: rating
+            })
+          });
+
+          if (!res.ok) {
+            throw new Error('Webhook svarade med status ' + res.status);
           }
-          // Disable hover cursor on locked stars
-          s.style.cursor = 'default';
-        });
 
-        // Optional: send rating to backend
-        console.log('Rating for message ' + msgId + ': ' + rating + ' stars');
+          container.dataset.rating = String(rating);
+          container.dataset.locked = 'true';
+
+          const stars = container.querySelectorAll('.star-btn');
+          stars.forEach((s, idx) => {
+            if (idx < rating) {
+              s.classList.add('active');
+              s.innerHTML = starFilledSVG;
+            } else {
+              s.classList.remove('active');
+              s.innerHTML = starEmptySVG;
+            }
+            s.style.cursor = 'default';
+          });
+
+          console.log('Rating skickad för interactionId ' + currentInteractionId + ': ' + rating + ' stjärnor');
+        } catch (err) {
+          console.error('Rating webhook error:', err);
+        }
       });
 
       // Hover preview (only when not locked)
@@ -703,14 +987,16 @@
   function openChat() {
     chatWindow.classList.add('open');
     chatToggle.classList.add('hidden');
-    if (chatMessages.children.length === 0) {
-      sessionId = generateSessionId();
-      setTimeout(() => {
-        addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?', false);
-      }, 400);
-    }
-    chatInput.focus();
+
+  if (chatMessages.children.length === 0) {
+    ensureSessionId();
+    setTimeout(() => {
+      addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?', false);
+    }, 400);
   }
+
+  chatInput.focus();
+}
 
   function minimizeChat() {
     chatWindow.classList.remove('open');
@@ -723,21 +1009,79 @@
     chatMessages.innerHTML = '';
     chatInput.disabled = false;
     sessionId = '';
-    // Reset rate limiter
+    localStorage.removeItem('halland_chat_session_id');
+
+  // Reset rate limiter
     messageTimes.length = 0;
+    isHumanAgentMode = false;
+
+    // Hide handover overlay if open
+    document.getElementById('handoverOverlay').classList.remove('visible');
+
+    // Reset disclaimer
+    const disclaimer = document.querySelector('.chat-disclaimer');
+    if (disclaimer) {
+      disclaimer.textContent = 'AI kan begå misstag. Kontrollera viktig information.';
+      disclaimer.style.background = '';
+    }
+
+    // Reset header title and icon
+    document.getElementById('chatHeaderText').textContent = 'HallandGPT';
+    document.getElementById('chatHeaderIcon').innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="8" rx="3" ry="3" width="16" height="11"/>
+        <path d="M4 19l-2 2"/>
+        <line x1="12" y1="8" x2="12" y2="5"/>
+        <circle cx="12" cy="4" r="1.2"/>
+        <rect x="1" y="11" width="2.5" height="4" rx="1"/>
+        <rect x="20.5" y="11" width="2.5" height="4" rx="1"/>
+        <circle cx="9.5" cy="13.5" r="1.5"/>
+        <circle cx="14.5" cy="13.5" r="1.5"/>
+        <path d="M9.5 17.2c0 0 1.2 1.2 2.5 1.2s2.5-1.2 2.5-1.2"/>
+      </svg>`;
   }
 
   function newSession() {
-    chatMessages.innerHTML = '';
-    chatInput.disabled = false;
-    sessionId = generateSessionId();
-    // Reset rate limiter
-    messageTimes.length = 0;
-    setTimeout(() => {
-      addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?', false);
-    }, 200);
-    chatInput.focus();
+  chatMessages.innerHTML = '';
+  chatInput.disabled = false;
+  sessionId = generateSessionId();
+  localStorage.setItem('halland_chat_session_id', sessionId);
+
+  // Reset rate limiter
+  messageTimes.length = 0;
+  isHumanAgentMode = false;
+
+  // Hide handover overlay if open
+  document.getElementById('handoverOverlay').classList.remove('visible');
+
+  // Reset disclaimer
+  const disc = document.querySelector('.chat-disclaimer');
+  if (disc) {
+    disc.textContent = 'AI kan begå misstag. Kontrollera viktig information.';
+    disc.style.background = '';
   }
+
+  // Reset header title and icon
+  document.getElementById('chatHeaderText').textContent = 'HallandGPT';
+  document.getElementById('chatHeaderIcon').innerHTML = `
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4" y="8" rx="3" ry="3" width="16" height="11"/>
+      <path d="M4 19l-2 2"/>
+      <line x1="12" y1="8" x2="12" y2="5"/>
+      <circle cx="12" cy="4" r="1.2"/>
+      <rect x="1" y="11" width="2.5" height="4" rx="1"/>
+      <rect x="20.5" y="11" width="2.5" height="4" rx="1"/>
+      <circle cx="9.5" cy="13.5" r="1.5"/>
+      <circle cx="14.5" cy="13.5" r="1.5"/>
+      <path d="M9.5 17.2c0 0 1.2 1.2 2.5 1.2s2.5-1.2 2.5-1.2"/>
+    </svg>`;
+
+  setTimeout(() => {
+    addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?', false);
+  }, 200);
+
+  chatInput.focus();
+}
 
   function downloadChat() {
     const messages = chatMessages.querySelectorAll('.msg');
@@ -752,7 +1096,8 @@
     messages.forEach(msg => {
       if (msg.id === 'typingIndicator') return;
       const isBot = msg.classList.contains('bot');
-      const sender = isBot ? 'HallandGPT' : 'Du';
+      const isHuman = msg.classList.contains('human');
+      const sender = isBot ? 'HallandGPT' : isHuman ? 'Mänsklig kundservice' : 'Du';
       const bubble = msg.querySelector('.msg-bubble');
       if (!bubble) return;
       let content = bubble.innerText || bubble.textContent;
@@ -842,7 +1187,7 @@
 
   let botMsgCounter = 0;
 
-  function addMessage(type, text, showStars) {
+  function addMessage(type, text, showStars, interactionId = null) {
     // showStars defaults to true for bot messages, false for user
     if (showStars === undefined) showStars = (type === 'bot');
 
@@ -850,7 +1195,7 @@
     msg.className = 'msg ' + type;
     const time = getTimeStr();
 
-    const formattedText = type === 'bot' ? formatMessage(text) : text;
+    const formattedText = (type === 'bot' || type === 'human') ? formatMessage(text) : text;
 
     if (type === 'bot') {
       botMsgCounter++;
@@ -863,13 +1208,26 @@
           <div class="msg-bubble">${formattedText}</div>
           <span class="msg-time">${time}</span>
         </div>`;
-      
+
       // Add star rating only if showStars is true (not for welcome message)
       if (showStars) {
         const contentDiv = msg.querySelector('.msg-content');
-        const starRating = createStarRating(msgId);
+        const starRating = createStarRating(interactionId);
         contentDiv.appendChild(starRating);
       }
+    } else if (type === 'human') {
+      msg.innerHTML = `
+        <div class="msg-avatar">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#388e3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="msg-content">
+          <span class="msg-name">Mänsklig kundservice</span>
+          <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">${time}</span>
+        </div>`;
     } else {
       msg.innerHTML = `
         <div class="msg-avatar">DU</div>
@@ -882,10 +1240,10 @@
     chatMessages.appendChild(msg);
 
     /* ── SCROLL BEHAVIOR ──
-       For bot messages: scroll so the TOP of the new message is visible
+       For bot/human messages: scroll so the TOP of the new message is visible
        For user messages: scroll to bottom as before
     */
-    if (type === 'bot') {
+    if (type === 'bot' || type === 'human') {
       // Use requestAnimationFrame to ensure DOM has rendered
       requestAnimationFrame(() => {
         // Scroll the message element into view at the top of the container
@@ -916,66 +1274,212 @@
     if (el) el.remove();
   }
 
-  const WEBHOOK_URL = 'https://api.halmstadchattbot.se/Halland';
-  let sessionId = '';
+  /* ══════════════════════════════════════════
+     HUMAN AGENT HANDOVER
+  ══════════════════════════════════════════ */
+  let isHumanAgentMode = false;
 
-  function generateSessionId() {
-    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  // Set this value to show expected wait time, e.g. "ca 5 minuter"
+  const EXPECTED_WAIT_TIME = '';
+
+  // ── Configurable topic list ──
+  // Add, remove or rename topics here. They will appear in the dropdown.
+  const HANDOVER_TOPICS = [
+    'Omsorg, utbildning och livssituation',
+    'Byggnad, parkering och närmiljö',
+  ];
+
+  // Populate dropdown on load
+  (function populateHandoverTopics() {
+    const sel = document.getElementById('handoverTopic');
+    HANDOVER_TOPICS.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      sel.appendChild(opt);
+    });
+  })();
+
+  function updateHandoverBtn() {
+    const btn = document.getElementById('handoverStartBtn');
+    const sel = document.getElementById('handoverTopic');
+    btn.disabled = !sel.value;
   }
+
+  function connectToHumanAgent() {
+    if (isHumanAgentMode) return;
+    // Show the topic selector overlay
+    const overlay = document.getElementById('handoverOverlay');
+    overlay.classList.add('visible');
+    // Reset selection
+    document.getElementById('handoverTopic').selectedIndex = 0;
+    document.getElementById('handoverStartBtn').disabled = true;
+    // Show wait time if set
+    const waitEl = document.getElementById('handoverWait');
+    waitEl.textContent = EXPECTED_WAIT_TIME
+      ? 'Uppskattad väntetid: ' + EXPECTED_WAIT_TIME
+      : '';
+  }
+
+  function cancelHandover() {
+    document.getElementById('handoverOverlay').classList.remove('visible');
+  }
+
+  function confirmHandover() {
+    const topic = document.getElementById('handoverTopic').value;
+    if (!topic) return;
+
+    // Hide overlay
+    document.getElementById('handoverOverlay').classList.remove('visible');
+
+    isHumanAgentMode = true;
+
+    // Insert divider line
+    const divider = document.createElement('div');
+    divider.className = 'handover-divider';
+    const waitHtml = EXPECTED_WAIT_TIME
+      ? `<span class="wait-time">Förväntad väntetid: ${EXPECTED_WAIT_TIME}</span>`
+      : '<span class="wait-time" id="expectedWaitTime"></span>';
+    divider.innerHTML = `
+      <div class="line"></div>
+      <div class="label">
+        <strong>Du skriver nu med en mänsklig handläggare</strong>
+        <span class="wait-time">Ärende: ${topic}</span>
+        ${waitHtml}
+      </div>
+      <div class="line"></div>`;
+    chatMessages.appendChild(divider);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Update disclaimer
+    const disclaimer = document.querySelector('.chat-disclaimer');
+    if (disclaimer) {
+      disclaimer.textContent = 'Du är nu kopplad till en mänsklig handläggare.';
+      disclaimer.style.background = '#e8f5e9';
+    }
+
+    // Update header title and icon
+    document.getElementById('chatHeaderText').textContent = 'Mänsklig kundservice';
+    document.getElementById('chatHeaderIcon').innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>`;
+  }
+
+  /**
+   * Call this function to update the expected wait time in real-time.
+   * Example: updateWaitTime('ca 3 minuter');
+   */
+  function updateWaitTime(text) {
+    const el = document.getElementById('expectedWaitTime');
+    if (el) el.textContent = 'Förväntad väntetid: ' + text;
+  }
+
+  /**
+   * Call this function from your backend to display a message from the human agent.
+   * Example: addHumanAgentMessage('Hej! Hur kan jag hjälpa dig?');
+   */
+  function addHumanAgentMessage(text) {
+    addMessage('human', text, false);
+  }
+
+  const WEBHOOK_URL = 'https://api.halmstadchattbot.se/Halland';
+let sessionId = localStorage.getItem('halland_chat_session_id') || '';
+
+function generateSessionId() {
+  return 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+}
+
+function generateInteractionId() {
+  return 'interaction_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+}
+
+function ensureSessionId() {
+  if (!sessionId) {
+    sessionId = generateSessionId();
+    localStorage.setItem('halland_chat_session_id', sessionId);
+  }
+  return sessionId;
+}
 
   async function sendMessage() {
-    const text = chatInput.value.trim();
-    if (!text) return;
+  const text = chatInput.value.trim();
+  if (!text) return;
 
-    // Check rate limit BEFORE sending
-    if (isRateLimited()) {
-      showRateLimitToast();
-      return;
+  if (isRateLimited()) {
+    showRateLimitToast();
+    return;
+  }
+
+  recordMessage();
+
+  addMessage('user', text);
+  chatInput.value = '';
+  updateCharCount();
+
+  // In human agent mode, don't call AI webhook — message is sent to human agent
+  if (isHumanAgentMode) {
+    // TODO: send message to human agent backend here
+    chatInput.focus();
+    return;
+  }
+
+  const activeSessionId = ensureSessionId();
+  const interactionId = generateInteractionId();
+
+  chatInput.disabled = true;
+
+  showTyping();
+
+  const originSessionId = activeSessionId;
+
+  try {
+    const res = await fetch(WEBHOOK_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'message',
+        interactionId: interactionId,
+        sessionId: originSessionId,
+        message: text
+      })
+    });
+
+    if (sessionId !== originSessionId) return;
+
+    removeTyping();
+
+    if (!res.ok) {
+      throw new Error('Webhook svarade med status ' + res.status);
     }
 
-    // Record this message timestamp
-    recordMessage();
+    const data = await res.json();
 
-    addMessage('user', text);
-    chatInput.value = '';
-    updateCharCount();
-    chatInput.disabled = true;
+    if (sessionId !== originSessionId) return;
 
-    showTyping();
+    const reply =
+      data.answer ||
+      data.output ||
+      data.message ||
+      data.reply ||
+      data.response ||
+      data.text ||
+      JSON.stringify(data);
 
-    const originSessionId = sessionId;
-
-    try {
-      const res = await fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, sessionId: originSessionId })
-      });
-
-      if (sessionId !== originSessionId) return;
-
-      removeTyping();
-
-      if (!res.ok) throw new Error('Webhook svarade med status ' + res.status);
-
-      const data = await res.json();
-
-      if (sessionId !== originSessionId) return;
-
-      const reply = typeof data === 'string' ? data : (data.output || data.message || data.reply || data.response || data.text || JSON.stringify(data));
-      addMessage('bot', reply);
-    } catch (err) {
-      if (sessionId !== originSessionId) return;
-      removeTyping();
-      addMessage('bot', 'Oj, något gick fel. Försök igen om en stund.');
-      console.error('Webhook error:', err);
-    } finally {
-      if (sessionId === originSessionId) {
-        chatInput.disabled = false;
-        chatInput.focus();
-      }
+    addMessage('bot', reply, true, interactionId);
+  } catch (err) {
+    if (sessionId !== originSessionId) return;
+    removeTyping();
+    addMessage('bot', 'Oj, något gick fel. Försök igen om en stund.', false);
+    console.error('Webhook error:', err);
+  } finally {
+    if (sessionId === originSessionId) {
+      chatInput.disabled = false;
+      chatInput.focus();
     }
   }
+}
 </script>
 </body>
 </html>
