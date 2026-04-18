@@ -608,121 +608,109 @@
   }
   .human-agent-btn:active { transform: scale(0.95); }
 
-  /* ── Handover topic selector overlay ── */
-  .handover-overlay {
+  /* ── Contact info overlay ── */
+  .contact-overlay {
     position: absolute;
     inset: 0;
     z-index: 20;
     background: var(--white);
     display: none;
     flex-direction: column;
-    justify-content: center;
-    padding: 32px 24px;
-    gap: 18px;
     animation: msgIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .handover-overlay.visible {
+  .contact-overlay.visible {
     display: flex;
   }
-  .handover-overlay-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text);
-    text-align: center;
-  }
-  .handover-overlay-subtitle {
-    font-size: 13px;
-    color: var(--text-light);
-    text-align: center;
-    margin-top: -8px;
-  }
-  .handover-overlay select {
-    width: 100%;
-    padding: 12px 14px;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    background: var(--white);
-    cursor: pointer;
-    transition: border-color 0.2s;
-    appearance: auto;
-  }
-  .handover-overlay select:focus {
-    outline: none;
-    border-color: var(--yellow);
-  }
-  .handover-overlay .handover-start-btn {
+  .contact-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     background: var(--yellow);
+    border: none;
     color: var(--white);
-    border: none;
-    padding: 14px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
     cursor: pointer;
-    transition: background 0.2s, opacity 0.2s;
-    letter-spacing: 0.3px;
-  }
-  .handover-overlay .handover-start-btn:hover {
-    background: var(--yellow-hover);
-  }
-  .handover-overlay .handover-start-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .handover-overlay .handover-cancel-btn {
-    background: none;
-    border: none;
-    color: var(--text-light);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s;
-    text-align: center;
-  }
-  .handover-overlay .handover-cancel-btn:hover {
-    color: var(--text);
-  }
-  .handover-overlay .handover-wait {
-    text-align: center;
-    font-size: 13px;
-    color: var(--text-light);
-  }
-
-  /* ── Handover divider ── */
-  .handover-divider {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin: 18px 0;
-    animation: msgIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    justify-content: center;
+    transition: background 0.2s, transform 0.15s;
+    z-index: 2;
   }
-  .handover-divider .line {
+  .contact-close-btn:hover {
+    background: var(--yellow-hover);
+    transform: scale(1.05);
+  }
+  .contact-overlay-inner {
     flex: 1;
-    height: 1px;
-    background: #ccc;
+    overflow-y: auto;
+    padding: 22px 22px 18px 22px;
   }
-  .handover-divider .label {
-    font-size: 12px;
-    color: #999;
-    text-align: center;
+  .contact-overlay-inner::-webkit-scrollbar { width: 5px; }
+  .contact-overlay-inner::-webkit-scrollbar-track { background: transparent; }
+  .contact-overlay-inner::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+  .contact-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+    padding-right: 30px;
+  }
+  .contact-subtitle {
+    font-size: 12.5px;
+    color: var(--text-light);
     line-height: 1.4;
-    white-space: nowrap;
+    margin-bottom: 16px;
   }
-  .handover-divider .label strong {
-    display: block;
-    color: #777;
-    font-weight: 600;
+  .contact-section {
+    background: var(--yellow-light);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+  }
+  .contact-section-compact {
+    padding: 10px 14px;
+  }
+  .contact-section-title {
     font-size: 12px;
+    font-weight: 700;
+    color: var(--yellow-hover);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
   }
-  .handover-divider .wait-time {
-    font-size: 11px;
-    color: #aaa;
-    font-style: italic;
+  .contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+  .contact-row + .contact-row {
+    border-top: 1px solid rgba(0,0,0,0.05);
+  }
+  .contact-label {
+    color: var(--text-light);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .contact-value {
+    color: var(--text);
+    font-weight: 600;
+    text-decoration: none;
+    text-align: right;
+    transition: color 0.15s;
+  }
+  .contact-value:hover {
+    color: var(--yellow-hover);
+    text-decoration: underline;
+  }
+  .contact-address {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
   }
 
   /* ── Responsive ── */
@@ -799,15 +787,72 @@
       Du skickar för många meddelanden. Vänta 10 sekunder.
     </div>
 
-    <!-- Handover topic selector overlay -->
-    <div class="handover-overlay" id="handoverOverlay">
-      <div class="handover-overlay-title">Vad gäller ditt ärende?</div>
-      <select id="handoverTopic" onchange="updateHandoverBtn()">
-        <option value="" disabled selected>Välj ämne…</option>
-      </select>
-      <button class="handover-start-btn" id="handoverStartBtn" disabled onclick="confirmHandover()">Starta chatt med handläggare</button>
-      <div class="handover-wait" id="handoverWait"></div>
-      <button class="handover-cancel-btn" onclick="cancelHandover()">Avbryt</button>
+    <!-- Contact info overlay -->
+    <div class="contact-overlay" id="contactOverlay">
+      <button class="contact-close-btn" onclick="closeContactOverlay()" aria-label="Stäng">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="contact-overlay-inner">
+        <div class="contact-title">Kontakta Region Halland</div>
+        <div class="contact-subtitle">Har du frågor som chatten inte kan svara på? Här når du oss direkt.</div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Vård och hälsa</div>
+          <div class="contact-row">
+            <span class="contact-label">Sjukvårdsrådgivning:</span>
+            <a class="contact-value" href="tel:1177">1177</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Webbplats:</span>
+            <a class="contact-value" href="https://www.1177.se/Halland/" target="_blank" rel="noopener">1177.se</a>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Region Hallands växel</div>
+          <div class="contact-row">
+            <span class="contact-label">Telefon:</span>
+            <a class="contact-value" href="tel:035134800">035-13 48 00</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">E-post:</span>
+            <a class="contact-value" href="mailto:regionen@regionhalland.se">regionen@regionhalland.se</a>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Våra sjukhus</div>
+          <div class="contact-row">
+            <span class="contact-label">Sjukhus Halmstad:</span>
+            <a class="contact-value" href="tel:035131000">035-13 10 00</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Sjukhus Varberg:</span>
+            <a class="contact-value" href="tel:0340481000">0340-48 10 00</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Sjukhus Kungsbacka:</span>
+            <a class="contact-value" href="tel:0300565000">0300-56 50 00</a>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Fakturafrågor</div>
+          <div class="contact-row">
+            <span class="contact-label">Gem. adm. service:</span>
+            <a class="contact-value" href="tel:0104553970">010-45 53 970</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Sjukresor/ambulans:</span>
+            <a class="contact-value" href="tel:0104761950">010-47 61 950</a>
+          </div>
+        </div>
+
+        <div class="contact-section contact-section-compact">
+          <div class="contact-section-title">Besöksadress</div>
+          <div class="contact-address">Södra vägen 9, Halmstad</div>
+        </div>
+      </div>
     </div>
 
     <div class="chat-input-bar" style="padding-bottom:22px;">
@@ -816,7 +861,7 @@
           <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
         </svg>
       </button>
-      <button class="human-agent-btn" onclick="connectToHumanAgent()" data-tooltip="Mänsklig handläggare">
+      <button class="human-agent-btn" onclick="showContactInfo()" data-tooltip="Kontakta Region Halland">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
           <circle cx="12" cy="7" r="4"/>
@@ -1013,32 +1058,9 @@
 
   // Reset rate limiter
     messageTimes.length = 0;
-    isHumanAgentMode = false;
 
-    // Hide handover overlay if open
-    document.getElementById('handoverOverlay').classList.remove('visible');
-
-    // Reset disclaimer
-    const disclaimer = document.querySelector('.chat-disclaimer');
-    if (disclaimer) {
-      disclaimer.textContent = 'AI kan begå misstag. Kontrollera viktig information.';
-      disclaimer.style.background = '';
-    }
-
-    // Reset header title and icon
-    document.getElementById('chatHeaderText').textContent = 'HallandGPT';
-    document.getElementById('chatHeaderIcon').innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="4" y="8" rx="3" ry="3" width="16" height="11"/>
-        <path d="M4 19l-2 2"/>
-        <line x1="12" y1="8" x2="12" y2="5"/>
-        <circle cx="12" cy="4" r="1.2"/>
-        <rect x="1" y="11" width="2.5" height="4" rx="1"/>
-        <rect x="20.5" y="11" width="2.5" height="4" rx="1"/>
-        <circle cx="9.5" cy="13.5" r="1.5"/>
-        <circle cx="14.5" cy="13.5" r="1.5"/>
-        <path d="M9.5 17.2c0 0 1.2 1.2 2.5 1.2s2.5-1.2 2.5-1.2"/>
-      </svg>`;
+    // Hide contact overlay if open
+    document.getElementById('contactOverlay').classList.remove('visible');
   }
 
   function newSession() {
@@ -1049,32 +1071,9 @@
 
   // Reset rate limiter
   messageTimes.length = 0;
-  isHumanAgentMode = false;
 
-  // Hide handover overlay if open
-  document.getElementById('handoverOverlay').classList.remove('visible');
-
-  // Reset disclaimer
-  const disc = document.querySelector('.chat-disclaimer');
-  if (disc) {
-    disc.textContent = 'AI kan begå misstag. Kontrollera viktig information.';
-    disc.style.background = '';
-  }
-
-  // Reset header title and icon
-  document.getElementById('chatHeaderText').textContent = 'HallandGPT';
-  document.getElementById('chatHeaderIcon').innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="4" y="8" rx="3" ry="3" width="16" height="11"/>
-      <path d="M4 19l-2 2"/>
-      <line x1="12" y1="8" x2="12" y2="5"/>
-      <circle cx="12" cy="4" r="1.2"/>
-      <rect x="1" y="11" width="2.5" height="4" rx="1"/>
-      <rect x="20.5" y="11" width="2.5" height="4" rx="1"/>
-      <circle cx="9.5" cy="13.5" r="1.5"/>
-      <circle cx="14.5" cy="13.5" r="1.5"/>
-      <path d="M9.5 17.2c0 0 1.2 1.2 2.5 1.2s2.5-1.2 2.5-1.2"/>
-    </svg>`;
+  // Hide contact overlay if open
+  document.getElementById('contactOverlay').classList.remove('visible');
 
   setTimeout(() => {
     addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?', false);
@@ -1275,113 +1274,22 @@
   }
 
   /* ══════════════════════════════════════════
-     HUMAN AGENT HANDOVER
+     CONTACT INFO — Region Halland
   ══════════════════════════════════════════ */
-  let isHumanAgentMode = false;
 
-  // Set this value to show expected wait time, e.g. "ca 5 minuter"
-  const EXPECTED_WAIT_TIME = '';
-
-  // ── Configurable topic list ──
-  // Add, remove or rename topics here. They will appear in the dropdown.
-  const HANDOVER_TOPICS = [
-    'Omsorg, utbildning och livssituation',
-    'Byggnad, parkering och närmiljö',
-  ];
-
-  // Populate dropdown on load
-  (function populateHandoverTopics() {
-    const sel = document.getElementById('handoverTopic');
-    HANDOVER_TOPICS.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t;
-      opt.textContent = t;
-      sel.appendChild(opt);
-    });
-  })();
-
-  function updateHandoverBtn() {
-    const btn = document.getElementById('handoverStartBtn');
-    const sel = document.getElementById('handoverTopic');
-    btn.disabled = !sel.value;
-  }
-
-  function connectToHumanAgent() {
-    if (isHumanAgentMode) return;
-    // Show the topic selector overlay
-    const overlay = document.getElementById('handoverOverlay');
-    overlay.classList.add('visible');
-    // Reset selection
-    document.getElementById('handoverTopic').selectedIndex = 0;
-    document.getElementById('handoverStartBtn').disabled = true;
-    // Show wait time if set
-    const waitEl = document.getElementById('handoverWait');
-    waitEl.textContent = EXPECTED_WAIT_TIME
-      ? 'Uppskattad väntetid: ' + EXPECTED_WAIT_TIME
-      : '';
-  }
-
-  function cancelHandover() {
-    document.getElementById('handoverOverlay').classList.remove('visible');
-  }
-
-  function confirmHandover() {
-    const topic = document.getElementById('handoverTopic').value;
-    if (!topic) return;
-
-    // Hide overlay
-    document.getElementById('handoverOverlay').classList.remove('visible');
-
-    isHumanAgentMode = true;
-
-    // Insert divider line
-    const divider = document.createElement('div');
-    divider.className = 'handover-divider';
-    const waitHtml = EXPECTED_WAIT_TIME
-      ? `<span class="wait-time">Förväntad väntetid: ${EXPECTED_WAIT_TIME}</span>`
-      : '<span class="wait-time" id="expectedWaitTime"></span>';
-    divider.innerHTML = `
-      <div class="line"></div>
-      <div class="label">
-        <strong>Du skriver nu med en mänsklig handläggare</strong>
-        <span class="wait-time">Ärende: ${topic}</span>
-        ${waitHtml}
-      </div>
-      <div class="line"></div>`;
-    chatMessages.appendChild(divider);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-
-    // Update disclaimer
-    const disclaimer = document.querySelector('.chat-disclaimer');
-    if (disclaimer) {
-      disclaimer.textContent = 'Du är nu kopplad till en mänsklig handläggare.';
-      disclaimer.style.background = '#e8f5e9';
-    }
-
-    // Update header title and icon
-    document.getElementById('chatHeaderText').textContent = 'Mänsklig kundservice';
-    document.getElementById('chatHeaderIcon').innerHTML = `
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-      </svg>`;
+  /**
+   * Show the Region Halland contact information overlay.
+   * Triggered from the "Kontakta Region Halland" button in the input bar.
+   */
+  function showContactInfo() {
+    document.getElementById('contactOverlay').classList.add('visible');
   }
 
   /**
-   * Call this function to update the expected wait time in real-time.
-   * Example: updateWaitTime('ca 3 minuter');
+   * Close the contact info overlay.
    */
-  function updateWaitTime(text) {
-    const el = document.getElementById('expectedWaitTime');
-    if (el) el.textContent = 'Förväntad väntetid: ' + text;
-  }
-
-  /**
-   * Call this function from your backend to display a message from the human agent.
-   * Example: addHumanAgentMessage('Hej! Hur kan jag hjälpa dig?');
-   */
-  function addHumanAgentMessage(text) {
-    addMessage('human', text, false);
+  function closeContactOverlay() {
+    document.getElementById('contactOverlay').classList.remove('visible');
   }
 
   const WEBHOOK_URL = 'https://api.halmstadchattbot.se/Halland';
@@ -1417,13 +1325,6 @@ function ensureSessionId() {
   addMessage('user', text);
   chatInput.value = '';
   updateCharCount();
-
-  // In human agent mode, don't call AI webhook — message is sent to human agent
-  if (isHumanAgentMode) {
-    // TODO: send message to human agent backend here
-    chatInput.focus();
-    return;
-  }
 
   const activeSessionId = ensureSessionId();
   const interactionId = generateInteractionId();
