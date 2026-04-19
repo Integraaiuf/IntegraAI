@@ -97,11 +97,7 @@
     font-weight: 600;
     cursor: pointer;
     box-shadow: 0 6px 20px rgba(31,163,114,0.28), 0 2px 6px rgba(31,163,114,0.14);
-    transition:
-      background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     letter-spacing: 0.1px;
   }
   .chat-toggle:hover {
@@ -119,7 +115,7 @@
   .chat-toggle.hidden {
     opacity: 0;
     pointer-events: none;
-    transform: scale(0.9) translateY(10px);
+    transform: scale(0.8) translateY(10px);
   }
   .chat-toggle svg {
     flex-shrink: 0;
@@ -144,10 +140,8 @@
     box-shadow: var(--shadow-lg);
     opacity: 0;
     pointer-events: none;
-    transform: translateY(20px) scale(0.96);
-    transition:
-      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--border);
   }
   .chat-window.open {
@@ -246,7 +240,7 @@
 
   /* ── Disclaimer ── */
   .chat-disclaimer {
-    padding: 9px 16px;
+    padding: 14px 16px;
     font-size: 11.5px;
     color: var(--text-muted);
     text-align: center;
@@ -256,8 +250,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    line-height: 1.4;
+    gap: 8px;
+    line-height: 1.45;
   }
   .chat-disclaimer svg {
     flex-shrink: 0;
@@ -920,25 +914,11 @@
     border-radius: var(--radius-md);
     padding: 12px 14px;
     margin-bottom: 10px;
-    opacity: 0;
-    transform: translateY(8px);
     transition:
-      opacity 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-      transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
       border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .contact-section:last-child { margin-bottom: 0; }
-
-  .contact-overlay.visible .contact-section {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .contact-overlay.visible .contact-section:nth-child(1) { transition-delay: 0.1s; }
-  .contact-overlay.visible .contact-section:nth-child(2) { transition-delay: 0.17s; }
-  .contact-overlay.visible .contact-section:nth-child(3) { transition-delay: 0.24s; }
-  .contact-overlay.visible .contact-section:nth-child(4) { transition-delay: 0.31s; }
-  .contact-overlay.visible .contact-section:nth-child(5) { transition-delay: 0.38s; }
 
   .contact-section:hover {
     background: #DFF0E4;
@@ -1361,7 +1341,7 @@
       sessionId = '';
       localStorage.removeItem('halland_chat_session_id');
       messageTimes.length = 0;
-    }, 320);
+    }, 400);
   }
 
   function newSession() {
@@ -1564,7 +1544,11 @@
   }
 
   function showContactInfo() {
-    document.getElementById('contactOverlay').classList.add('visible');
+    const overlay = document.getElementById('contactOverlay');
+    overlay.classList.add('visible');
+    // Säkerställ att användaren landar högst upp, inte längst ner
+    const inner = overlay.querySelector('.contact-overlay-inner');
+    if (inner) inner.scrollTop = 0;
   }
   function closeContactOverlay() {
     document.getElementById('contactOverlay').classList.remove('visible');
