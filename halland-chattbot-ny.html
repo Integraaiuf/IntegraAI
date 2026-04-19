@@ -1,52 +1,83 @@
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HallandGPT</title>
+<title>Fråga Halland — Region Halland</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    /* Region Halland greens */
-    --green: #16A34A;          /* primary brand green (from lighter blob) */
-    --green-dark: #0F7A38;     /* deeper green for hover/borders */
-    --green-light: #E3F4E8;    /* very light tint for subtle backgrounds */
-    --green-hover: #0B5F2C;    /* deepest shade (from darker blob) for hover */
-    --header-bg: #0F7A38;      /* header uses deeper green for contrast */
-    --bg: #FAFAFA;
-    --white: #FFFFFF;
-    --text: #333333;
-    --text-light: #777777;
-    --border: #E5E5E5;
-    --bot-bubble: #F0F0F0;
-    --user-bubble: #16A34A;
-    --shadow: 0 8px 32px rgba(0,0,0,0.18);
-    --radius: 14px;
+    /* ─────────── Region Halland — livlig teal + mint-palett ─────────── */
+    /* Matchar Region Hallands webbplats: djup teal för text, livlig mint för accenter */
+    --rh-teal-deep:     #0E5F55;   /* rubriker, header, viktig text — djup teal */
+    --rh-teal:          #12776A;   /* primär brand-färg */
+    --rh-teal-hover:    #0B4B43;   /* hover/active på djup teal */
+
+    --rh-green:         #1FA372;   /* LIVLIG primär grön — för knappar och interaktion */
+    --rh-green-hover:   #178659;   /* hover-state */
+    --rh-green-bright:  #2BB881;   /* extra livlig — send-knapp, CTA */
+
+    --rh-mint:          #C4EBCA;   /* mint bakgrund, som på regionhalland.se */
+    --rh-mint-light:    #DFF2E3;   /* ljusare mint */
+    --rh-mint-softer:   #F0F9F2;   /* subtil mint-tonad bakgrund */
+    --rh-mint-bubble:   #E8F5EC;   /* för meddelandebubblor */
+
+    --text:             #10332C;   /* djup teal-svart */
+    --text-muted:       #4F6760;   /* hjälptext — god kontrast mot vit (5.5:1) */
+    --text-soft:        #7A8F87;   /* minst viktiga texter */
+    --border:           #D8E6DC;
+    --border-strong:    #B8CEC1;
+    --bg:               #FFFFFF;
+    --bot-bubble:       #EFF7F1;   /* mjuk mint-tonad bot-bubbla */
+    --user-bubble:      #1FA372;   /* livlig grön användarbubbla */
+
+    --shadow-sm:  0 2px 6px rgba(14,95,85,0.08);
+    --shadow-md:  0 8px 24px rgba(14,95,85,0.12), 0 2px 6px rgba(14,95,85,0.06);
+    --shadow-lg:  0 16px 48px rgba(14,95,85,0.16), 0 4px 12px rgba(14,95,85,0.08);
+
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  16px;
+    --radius-xl:  20px;
+
+    --focus-ring: 0 0 0 3px rgba(31,163,114,0.35);
   }
 
   body {
-    font-family: 'DM Sans', sans-serif;
-    background: #E8F4F8;
+    font-family: 'Mulish', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--rh-mint);
     min-height: 100vh;
     color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* ── Demo background to simulate a page ── */
+  /* ── Demo sida — simulerar regionhalland.se ── */
   .demo-page {
     padding: 60px 40px;
     max-width: 800px;
     margin: 0 auto;
-    opacity: 0.5;
   }
-  .demo-page h1 { font-size: 28px; color: #1a5276; margin-bottom: 12px; }
-  .demo-page p { color: #555; line-height: 1.7; }
+  .demo-page h1 {
+    font-size: 44px;
+    color: var(--rh-teal-deep);
+    margin-bottom: 18px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+  }
+  .demo-page p {
+    color: var(--rh-teal-deep);
+    line-height: 1.6;
+    font-size: 17px;
+    max-width: 560px;
+  }
 
   /* ══════════════════════════════════════════
-     CHAT TOGGLE BUTTON (closed state)
+     CHAT TOGGLE BUTTON
   ══════════════════════════════════════════ */
   .chat-toggle {
     position: fixed;
@@ -55,29 +86,33 @@
     z-index: 9999;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: var(--green);
-    color: var(--white);
+    gap: 10px;
+    background: var(--rh-green);
+    color: #FFFFFF;
     border: none;
     padding: 14px 22px;
-    border-radius: 50px;
-    font-family: 'DM Sans', sans-serif;
+    border-radius: 999px;
+    font-family: inherit;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(22,163,74,0.45);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 0.3px;
+    box-shadow: 0 6px 20px rgba(31,163,114,0.28), 0 2px 6px rgba(31,163,114,0.14);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    letter-spacing: 0.1px;
   }
   .chat-toggle:hover {
-    background: var(--green-hover);
-    box-shadow: 0 6px 24px rgba(22,163,74,0.55);
+    background: var(--rh-green-hover);
+    box-shadow: 0 8px 28px rgba(31,163,114,0.35), 0 3px 8px rgba(31,163,114,0.2);
     transform: translateY(-2px);
+  }
+  .chat-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 6px 20px rgba(31,163,114,0.28), var(--focus-ring);
   }
   .chat-toggle.hidden {
     opacity: 0;
     pointer-events: none;
-    transform: scale(0.8) translateY(10px);
+    transform: scale(0.85) translateY(10px);
   }
   .chat-toggle svg { flex-shrink: 0; }
 
@@ -88,21 +123,21 @@
     position: fixed;
     bottom: 24px;
     right: 24px;
-    width: 380px;
-    max-height: 540px;
-    height: 540px;
+    width: 400px;
+    max-height: 620px;
+    height: 620px;
     z-index: 10000;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background: var(--white);
-    box-shadow: var(--shadow);
+    background: var(--bg);
+    box-shadow: var(--shadow-lg);
     opacity: 0;
     pointer-events: none;
-    transform: translateY(20px) scale(0.95);
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid var(--green);
+    transform: translateY(20px) scale(0.96);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--border);
   }
   .chat-window.open {
     opacity: 1;
@@ -112,150 +147,141 @@
 
   /* ── Header ── */
   .chat-header {
-    background: var(--header-bg);
-    color: var(--white);
+    background:
+      radial-gradient(ellipse 130% 100% at 110% 130%,
+        rgba(43, 184, 129, 0.45) 0%,
+        rgba(43, 184, 129, 0.18) 40%,
+        transparent 70%),
+      linear-gradient(160deg, #15855E 0%, #1A9970 100%);
+    color: #FFFFFF;
     padding: 14px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    position: relative;
   }
   .chat-header-title {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 0.3px;
+    gap: 11px;
+    min-width: 0;
   }
   .chat-header-icon {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.16);
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    overflow: hidden;
+    border: 1.5px solid rgba(255,255,255,0.22);
   }
-  .chat-header-icon img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 50%;
+  .chat-header-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .chat-header-name {
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    line-height: 1.2;
+  }
+  .chat-header-subtitle {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+    margin-top: 1px;
   }
   .chat-header-actions {
     display: flex;
-    gap: 6px;
+    gap: 4px;
   }
   .chat-header-actions button {
-    background: rgba(255,255,255,0.25);
+    background: transparent;
     border: none;
-    color: var(--white);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
+    color: #FFFFFF;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    transition: background 0.15s;
+    opacity: 0.85;
   }
   .chat-header-actions button:hover {
-    background: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.14);
+    opacity: 1;
   }
-
-  /* ── Pre-chat form (topic selector) ── */
-  .chat-prechat {
-    padding: 28px 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    background: var(--white);
-  }
-  .chat-prechat.hidden { display: none; }
-
-  .chat-prechat label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-  }
-  .chat-prechat select {
-    width: 100%;
-    padding: 12px 14px;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    background: var(--white);
-    cursor: pointer;
-    transition: border-color 0.2s;
-    appearance: auto;
-  }
-  .chat-prechat select:focus {
+  .chat-header-actions button:focus-visible {
     outline: none;
-    border-color: var(--green);
-  }
-  .chat-prechat .start-btn {
-    background: var(--green);
-    color: var(--white);
-    border: none;
-    padding: 14px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s;
-    letter-spacing: 0.3px;
-  }
-  .chat-prechat .start-btn:hover {
-    background: var(--green-hover);
-  }
-  .chat-prechat .wait-time {
-    text-align: center;
-    font-size: 13px;
-    color: var(--text-light);
+    background: rgba(255,255,255,0.14);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
   }
 
-  /* ── Chat area ── */
+  /* ── Disclaimer ── */
+  .chat-disclaimer {
+    padding: 9px 16px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-align: center;
+    background: var(--rh-mint-softer);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    line-height: 1.4;
+  }
+  .chat-disclaimer svg {
+    flex-shrink: 0;
+    color: var(--rh-green);
+  }
+  .chat-disclaimer a {
+    color: var(--rh-green-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 600;
+  }
+  .chat-disclaimer a:hover {
+    color: var(--rh-teal-deep);
+  }
+
+  /* ── Chat body ── */
   .chat-body {
     flex: 1;
-    display: none;
+    display: flex;
     flex-direction: column;
     overflow: hidden;
     position: relative;
-  }
-  .chat-body.active {
-    display: flex;
-  }
-
-  .chat-disclaimer {
-    padding: 10px 16px;
-    font-size: 12px;
-    color: var(--text-light);
-    text-align: center;
-    background: var(--green-light);
-    border-bottom: 1px solid var(--border);
-    flex-shrink: 0;
+    background: linear-gradient(180deg, var(--rh-mint-softer) 0%, #FFFFFF 40%, #FFFFFF 100%);
   }
 
   .chat-messages {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 16px;
+    padding: 18px 16px 8px 16px;
     display: flex;
     flex-direction: column;
     gap: 14px;
     scroll-behavior: smooth;
   }
-  .chat-messages::-webkit-scrollbar { width: 5px; }
+  .chat-messages::-webkit-scrollbar { width: 6px; }
   .chat-messages::-webkit-scrollbar-track { background: transparent; }
-  .chat-messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: #D4DED8;
+    border-radius: 10px;
+  }
+  .chat-messages::-webkit-scrollbar-thumb:hover { background: #B8C6BD; }
 
   /* ── Message bubbles ── */
   .msg {
@@ -263,10 +289,10 @@
     gap: 10px;
     max-width: 88%;
     min-width: 0;
-    animation: msgIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: msgIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   @keyframes msgIn {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
@@ -274,224 +300,390 @@
   .msg.user { align-self: flex-end; flex-direction: row-reverse; }
 
   .msg-avatar {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    background: var(--green-light);
-    border: 2px solid var(--green);
-  }
-  .msg.user .msg-avatar {
-    background: var(--user-bubble);
-    border-color: var(--green-dark);
-    color: var(--white);
     font-size: 13px;
     font-weight: 700;
+    background: var(--rh-mint-bubble);
+    color: var(--rh-green-hover);
+  }
+  .msg.user .msg-avatar {
+    background: var(--rh-green);
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .msg.human .msg-avatar {
+    background: #FFF4E0;
+    color: #8B5A1A;
   }
 
   .msg-content {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
     min-width: 0;
     overflow: hidden;
   }
-  .msg-name {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-light);
-    padding-left: 2px;
-  }
-  .msg.user .msg-name { text-align: right; padding-right: 2px; }
-
-  .msg-time {
-    font-size: 10px;
-    color: #aaa;
-    margin-top: 2px;
-  }
-  .msg.user .msg-time { text-align: right; }
-
-  .chat-input-wrap {
-    position: relative;
-    flex: 1;
-  }
-  .chat-input-wrap input {
-    width: 100%;
-  }
-  .char-counter {
-    position: absolute;
-    bottom: -14px;
-    right: 12px;
-    font-size: 10px;
-    font-family: 'DM Sans', sans-serif;
-    color: #aaa;
-    pointer-events: none;
-    transition: color 0.2s;
-  }
-  .char-counter.warning { color: #e67e22; }
-  .char-counter.limit { color: #e74c3c; font-weight: 600; }
 
   .msg-bubble {
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 14px;
-    line-height: 1.5;
+    padding: 11px 14px;
+    border-radius: var(--radius-md);
+    font-size: 14.5px;
+    line-height: 1.55;
     word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-word;
     max-width: 100%;
     overflow: hidden;
+    color: var(--text);
   }
   .msg.bot .msg-bubble {
     background: var(--bot-bubble);
-    color: var(--text);
     border-bottom-left-radius: 4px;
   }
   .msg.user .msg-bubble {
     background: var(--user-bubble);
-    color: var(--white);
+    color: #FFFFFF;
     border-bottom-right-radius: 4px;
   }
+  .msg.human .msg-bubble {
+    background: #FFF4E0;
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
 
-  .chat-link {
-    color: #1a73e8;
-    text-decoration: none;
+  .msg-time {
+    font-size: 10.5px;
+    color: var(--text-soft);
+    padding: 0 2px;
     font-weight: 500;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s;
+  }
+  .msg.user .msg-time { text-align: right; }
+
+  /* ── Länk i meddelandet — matchar paletten ── */
+  .chat-link {
+    color: var(--rh-green-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1.2px;
+    font-weight: 600;
+    transition: color 0.15s;
   }
   .chat-link:hover {
-    border-bottom-color: #1a73e8;
+    color: var(--rh-teal-deep);
+    text-decoration-thickness: 2px;
+  }
+  .msg.user .chat-link {
+    color: #FFFFFF;
+    text-decoration-color: rgba(255,255,255,0.7);
   }
   .msg-bubble ul {
-    margin: 4px 0;
-    padding-left: 18px;
+    margin: 6px 0 2px 0;
+    padding-left: 20px;
     list-style: disc;
   }
-  .msg-bubble li {
-    margin-bottom: 4px;
+  .msg-bubble li { margin-bottom: 4px; }
+  .msg-bubble strong { font-weight: 700; }
+
+  /* ── Tumme upp/ner feedback (ersätter stjärnor) ── */
+  .msg-feedback {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+    padding-left: 2px;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.3s 0.6s, transform 0.3s 0.6s;
   }
-  .msg-bubble strong {
-    font-weight: 700;
+  .msg-feedback.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .feedback-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    padding: 5px 8px;
+    border-radius: 7px;
+    color: var(--text-soft);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .feedback-btn:hover {
+    background: var(--rh-mint-bubble);
+    border-color: var(--rh-green-bright);
+    color: var(--rh-green-hover);
+  }
+  .feedback-btn.active {
+    background: var(--rh-green);
+    border-color: var(--rh-green);
+    color: #FFFFFF;
+  }
+  .feedback-btn.active-neg {
+    background: #8B3A3A;
+    border-color: #8B3A3A;
+    color: #FFFFFF;
+  }
+  .feedback-btn.locked {
+    cursor: default;
+    opacity: 0.55;
+  }
+  .feedback-btn.locked.active,
+  .feedback-btn.locked.active-neg {
+    opacity: 1;
+  }
+  .feedback-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+  .feedback-thanks {
+    font-size: 11px;
+    color: var(--text-soft);
+    font-style: italic;
+    align-self: center;
+    margin-left: 4px;
   }
 
-  /* typing indicator */
+  /* ── Typing indicator ── */
   .typing-indicator {
     display: flex;
     gap: 4px;
-    padding: 12px 16px;
+    padding: 8px 4px;
     align-items: center;
   }
   .typing-indicator span {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #bbb;
-    animation: typeDot 1.2s infinite;
+    background: var(--rh-green-bright);
+    animation: typeDot 1.3s infinite;
+    opacity: 0.5;
   }
-  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.18s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.36s; }
   @keyframes typeDot {
-    0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
+    0%, 60%, 100% { opacity: 0.3; transform: scale(0.85); }
     30% { opacity: 1; transform: scale(1); }
   }
 
-  /* ── Input bar ── */
+  /* ══════════════════════════════════════════
+     INPUT BAR
+  ══════════════════════════════════════════ */
   .chat-input-bar {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 14px;
+    padding: 12px 14px 14px 14px;
     border-top: 1px solid var(--border);
-    background: var(--white);
+    background: var(--bg);
     flex-shrink: 0;
+    position: relative;
   }
-  .chat-input-bar input {
+
+  .chat-input-wrap {
+    position: relative;
     flex: 1;
-    border: 2px solid var(--border);
-    border-radius: 24px;
-    padding: 10px 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
+    min-width: 0;
+  }
+  .chat-input-wrap input {
+    width: 100%;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 999px;
+    padding: 11px 44px 11px 16px;
+    font-family: inherit;
+    font-size: 14.5px;
     color: var(--text);
-    transition: border-color 0.2s;
+    transition: all 0.15s;
+    background: #FFFFFF;
   }
-  .chat-input-bar input:focus {
+  .chat-input-wrap input:focus {
     outline: none;
-    border-color: var(--green);
+    border-color: var(--rh-green);
+    box-shadow: var(--focus-ring);
   }
-  .chat-input-bar input::placeholder { color: #aaa; }
+  .chat-input-wrap input::placeholder {
+    color: var(--text-soft);
+  }
+  .chat-input-wrap input:disabled {
+    background: #F5F5F5;
+    cursor: not-allowed;
+  }
 
-  .new-session-btn {
-    background: var(--green);
+  /* Inbäddad send-knapp i input */
+  .send-btn-inline {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--rh-green);
     border: none;
-    color: var(--white);
-    width: 40px;
-    height: 40px;
+    color: #FFFFFF;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
+    transition: all 0.15s;
   }
-  .new-session-btn:hover {
-    background: var(--green-hover);
-    transform: scale(1.05);
+  .send-btn-inline:hover {
+    background: var(--rh-green-hover);
+    transform: translateY(-50%) scale(1.05);
   }
-  .new-session-btn:active { transform: scale(0.95); }
+  .send-btn-inline:active { transform: translateY(-50%) scale(0.95); }
+  .send-btn-inline:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  .send-btn-inline:disabled {
+    background: #C9D4CE;
+    cursor: not-allowed;
+  }
 
-  .send-btn {
-    background: var(--green);
-    border: none;
-    color: var(--white);
-    width: 40px;
-    height: 40px;
+  .char-counter {
+    position: absolute;
+    bottom: -16px;
+    right: 14px;
+    font-size: 10.5px;
+    font-family: inherit;
+    color: var(--text-soft);
+    pointer-events: none;
+    transition: opacity 0.2s, color 0.2s;
+    opacity: 0;
+    font-weight: 500;
+  }
+  .char-counter.visible { opacity: 1; }
+  .char-counter.warning { color: #B87820; opacity: 1; }
+  .char-counter.limit { color: #A84040; font-weight: 700; opacity: 1; }
+
+  /* Utility-knappar — diskreta, ikonbaserade med tooltips */
+  .util-btn {
+    background: transparent;
+    border: 1.5px solid var(--border-strong);
+    color: var(--rh-green-hover);
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all 0.15s;
     flex-shrink: 0;
   }
-  .send-btn:hover { background: var(--green-hover); transform: scale(1.05); }
-  .send-btn:active { transform: scale(0.95); }
+  .util-btn:hover {
+    background: var(--rh-mint-bubble);
+    border-color: var(--rh-green);
+  }
+  .util-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  .util-btn:active { transform: scale(0.95); }
 
   /* ══════════════════════════════════════════
-     STAR RATING SYSTEM
+     TOOLTIPS — mer diskreta, neutral grå
   ══════════════════════════════════════════ */
-  .star-rating {
-    display: flex;
-    gap: 2px;
-    margin-top: 4px;
-    padding-left: 2px;
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--rh-teal-deep);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
   }
-  .star-rating .star-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    font-size: 16px;
-    color: #ccc;
-    transition: color 0.15s, transform 0.15s;
+  [data-tooltip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    border: 5px solid transparent;
+    border-top-color: var(--rh-teal-deep);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s, transform 0.15s;
+    z-index: 100;
   }
-  .star-rating .star-btn:hover {
-    transform: scale(1.2);
+  [data-tooltip]:hover::after,
+  [data-tooltip]:hover::before,
+  [data-tooltip]:focus-visible::after,
+  [data-tooltip]:focus-visible::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
   }
-  .star-rating .star-btn.active {
-    color: var(--green);
+  .chat-header-actions [data-tooltip]::after {
+    bottom: auto;
+    top: calc(100% + 8px);
   }
-  .star-rating .star-btn svg {
-    width: 16px;
-    height: 16px;
-    display: block;
+  .chat-header-actions [data-tooltip]::before {
+    bottom: auto;
+    top: calc(100% + 2px);
+    border-top-color: transparent;
+    border-bottom-color: var(--rh-teal-deep);
+  }
+
+  /* Vänsterjusterad tooltip — för knappar nära vänsterkanten så texten inte klipps av */
+  [data-tooltip-align="left"]::after {
+    left: 0;
+    transform: translateX(0) translateY(4px);
+  }
+  [data-tooltip-align="left"]:hover::after,
+  [data-tooltip-align="left"]:focus-visible::after {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="left"]::before {
+    left: 18px;
+    transform: translateX(0) translateY(4px);
+  }
+  [data-tooltip-align="left"]:hover::before,
+  [data-tooltip-align="left"]:focus-visible::before {
+    transform: translateX(0) translateY(0);
+  }
+
+  /* Högerjusterad tooltip — för knappar nära högerkanten så texten inte klipps av */
+  [data-tooltip-align="right"]::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(4px);
+  }
+  [data-tooltip-align="right"]:hover::after,
+  [data-tooltip-align="right"]:focus-visible::after {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="right"]::before {
+    left: auto;
+    right: 12px;
+    transform: translateX(0) translateY(4px);
+  }
+  [data-tooltip-align="right"]:hover::before,
+  [data-tooltip-align="right"]:focus-visible::before {
+    transform: translateX(0) translateY(0);
   }
 
   /* ══════════════════════════════════════════
@@ -499,20 +691,20 @@
   ══════════════════════════════════════════ */
   .rate-limit-toast {
     position: absolute;
-    bottom: 70px;
+    bottom: 78px;
     left: 50%;
     transform: translateX(-50%) translateY(10px);
-    background: #e74c3c;
-    color: #fff;
-    padding: 10px 18px;
+    background: #7A3030;
+    color: #FFFFFF;
+    padding: 10px 16px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    box-shadow: 0 4px 16px rgba(231,76,60,0.35);
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(122,48,48,0.35);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s, transform 0.3s;
+    transition: opacity 0.25s, transform 0.25s;
     z-index: 10;
     white-space: nowrap;
   }
@@ -522,164 +714,148 @@
     transform: translateX(-50%) translateY(0);
   }
 
-  /* ── Custom Tooltips ── */
-  [data-tooltip] {
-    position: relative;
-  }
-  [data-tooltip]::after {
-    content: attr(data-tooltip);
+  /* ══════════════════════════════════════════
+     ACTIONS MENU (dropdown)
+  ══════════════════════════════════════════ */
+  .actions-menu {
     position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%) translateY(4px);
-    background: var(--green);
-    color: var(--white);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 8px;
-    white-space: nowrap;
-    pointer-events: none;
+    top: 58px;
+    right: 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    min-width: 200px;
     opacity: 0;
-    transition: opacity 0.2s, transform 0.2s;
-    z-index: 100;
-    box-shadow: 0 3px 12px rgba(22,163,74,0.3);
-    letter-spacing: 0.2px;
-  }
-  [data-tooltip]::before {
-    content: '';
-    position: absolute;
-    bottom: calc(100% + 2px);
-    left: 50%;
-    transform: translateX(-50%) translateY(4px);
-    border: 6px solid transparent;
-    border-top-color: var(--green);
     pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s, transform 0.2s;
-    z-index: 100;
+    transform: translateY(-6px) scale(0.97);
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 50;
+    overflow: hidden;
   }
-  [data-tooltip]:hover::after,
-  [data-tooltip]:hover::before {
+  .actions-menu.open {
     opacity: 1;
-    transform: translateX(-50%) translateY(0);
+    pointer-events: all;
+    transform: translateY(0) scale(1);
   }
-  /* Header buttons: tooltip below instead */
-  .chat-header-actions [data-tooltip]::after {
-    bottom: auto;
-    top: calc(100% + 8px);
-  }
-  .chat-header-actions [data-tooltip]::before {
-    bottom: auto;
-    top: calc(100% + 2px);
-    border-top-color: transparent;
-    border-bottom-color: var(--green);
-  }
-
-  /* ── Human agent message avatar ── */
-  .msg.human .msg-avatar {
-    background: #e8f5e9;
-    border: 2px solid #66bb6a;
-    color: #388e3c;
-  }
-  .msg.human .msg-bubble {
-    background: #e8f5e9;
-    color: var(--text);
-    border-bottom-left-radius: 4px;
-  }
-
-  /* ── Human agent button ── */
-  .human-agent-btn {
-    background: var(--green);
+  .actions-menu button {
+    width: 100%;
+    background: transparent;
     border: none;
-    color: var(--white);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    cursor: pointer;
+    padding: 11px 14px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
+    gap: 10px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s;
+  }
+  .actions-menu button:hover {
+    background: var(--rh-mint-softer);
+    color: var(--rh-green-hover);
+  }
+  .actions-menu button:focus-visible {
+    outline: none;
+    background: var(--rh-mint-bubble);
+  }
+  .actions-menu button + button {
+    border-top: 1px solid var(--border);
+  }
+  .actions-menu svg {
     flex-shrink: 0;
+    color: var(--rh-green);
   }
-  .human-agent-btn:hover {
-    background: var(--green-hover);
-    transform: scale(1.05);
-  }
-  .human-agent-btn:active { transform: scale(0.95); }
 
-  /* ── Contact info overlay ── */
+  /* ══════════════════════════════════════════
+     CONTACT OVERLAY
+  ══════════════════════════════════════════ */
   .contact-overlay {
     position: absolute;
     inset: 0;
     z-index: 20;
-    background: var(--white);
+    background: #FFFFFF;
     display: none;
     flex-direction: column;
-    animation: msgIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: msgIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .contact-overlay.visible {
+  .contact-overlay.visible { display: flex; }
+
+  .contact-header {
+    padding: 14px 16px;
+    background: var(--rh-mint-softer);
+    border-bottom: 1px solid var(--border);
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .contact-header-text {
+    min-width: 0;
+  }
+  .contact-header-title-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--rh-teal-deep);
+    line-height: 1.2;
+  }
+  .contact-header-sub {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.35;
   }
   .contact-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background: var(--green);
+    background: transparent;
     border: none;
-    color: var(--white);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    color: var(--rh-green-hover);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s, transform 0.15s;
-    z-index: 2;
+    transition: background 0.15s;
+    flex-shrink: 0;
   }
   .contact-close-btn:hover {
-    background: var(--green-hover);
-    transform: scale(1.05);
+    background: rgba(15,94,60,0.1);
   }
+  .contact-close-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
   .contact-overlay-inner {
     flex: 1;
     overflow-y: auto;
-    padding: 22px 22px 18px 22px;
+    padding: 16px 16px 20px 16px;
   }
-  .contact-overlay-inner::-webkit-scrollbar { width: 5px; }
+  .contact-overlay-inner::-webkit-scrollbar { width: 6px; }
   .contact-overlay-inner::-webkit-scrollbar-track { background: transparent; }
-  .contact-overlay-inner::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-  .contact-title {
-    font-size: 17px;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 4px;
-    padding-right: 30px;
-  }
-  .contact-subtitle {
-    font-size: 12.5px;
-    color: var(--text-light);
-    line-height: 1.4;
-    margin-bottom: 16px;
-  }
+  .contact-overlay-inner::-webkit-scrollbar-thumb { background: #D4DED8; border-radius: 10px; }
+
   .contact-section {
-    background: var(--green-light);
-    border-radius: 10px;
+    background: var(--rh-mint-bubble);
+    border: 1px solid rgba(31,163,114,0.12);
+    border-radius: var(--radius-md);
     padding: 12px 14px;
     margin-bottom: 10px;
+    transition: background 0.15s, border-color 0.15s;
   }
-  .contact-section-compact {
-    padding: 10px 14px;
-  }
+  .contact-section:last-child { margin-bottom: 0; }
+
   .contact-section-title {
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--green-hover);
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--rh-teal-deep);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     margin-bottom: 8px;
   }
   .contact-row {
@@ -687,125 +863,188 @@
     justify-content: space-between;
     align-items: center;
     gap: 8px;
-    padding: 4px 0;
-    font-size: 13px;
+    padding: 5px 0;
+    font-size: 13.5px;
   }
   .contact-row + .contact-row {
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(31,163,114,0.12);
   }
   .contact-label {
-    color: var(--text-light);
+    color: var(--text-muted);
     font-weight: 500;
     flex-shrink: 0;
   }
   .contact-value {
-    color: var(--text);
-    font-weight: 600;
+    color: var(--rh-teal-deep);
+    font-weight: 700;
     text-decoration: none;
     text-align: right;
     transition: color 0.15s;
   }
-  .contact-value:hover {
-    color: var(--green-hover);
+  .contact-value:hover,
+  .contact-value:focus-visible {
+    color: var(--rh-green-hover);
     text-decoration: underline;
+    outline: none;
   }
   .contact-address {
-    font-size: 13px;
-    color: var(--text);
-    font-weight: 500;
+    font-size: 13.5px;
+    color: var(--rh-teal-deep);
+    font-weight: 600;
   }
 
-  /* ── Responsive ── */
-  @media (max-width: 420px) {
+  /* Visuellt gömt men läsbart för skärmläsare */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── Responsivt ── */
+  @media (max-width: 440px) {
     .chat-window {
       width: calc(100vw - 16px);
-      height: calc(100vh - 80px);
-      max-height: calc(100vh - 80px);
+      height: calc(100vh - 16px);
+      max-height: calc(100vh - 16px);
       bottom: 8px;
       right: 8px;
+      border-radius: var(--radius-md);
+    }
+  }
+
+  /* Reduced motion — respektera tillgänglighetspreferens */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
     }
   }
 </style>
 </head>
 <body>
 
-<!-- Demo background page content -->
+<!-- Demo-bakgrund -->
 <div class="demo-page">
   <h1>Hej, vad kan vi hjälpa dig med?</h1>
-  <p>Det här är en demo-sida för att visa chatt-popup-widgeten. Klicka på den gröna "Chatt"-knappen längst ner till höger för att öppna chatten.</p>
+  <p>Det här är en demo-sida för att visa chattwidgeten. Klicka på knappen längst ner till höger för att öppna chatten.</p>
 </div>
 
 <!-- ════════ CHAT TOGGLE BUTTON ════════ -->
-<button class="chat-toggle" id="chatToggle" onclick="openChat()">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+<button class="chat-toggle" id="chatToggle" onclick="openChat()" aria-label="Öppna chatt med Fråga Halland">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
   </svg>
-  Chatt
+  Fråga Halland
 </button>
 
 <!-- ════════ CHAT WINDOW ════════ -->
-<div class="chat-window" id="chatWindow">
+<div class="chat-window" id="chatWindow" role="dialog" aria-label="Chatt med Fråga Halland">
 
   <!-- Header -->
   <div class="chat-header">
-    <div class="chat-header-title" id="chatHeaderTitle">
-      <div class="chat-header-icon" id="chatHeaderIcon">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4" y="8" rx="3" ry="3" width="16" height="11"/>
-          <path d="M4 19l-2 2"/>
-          <line x1="12" y1="8" x2="12" y2="5"/>
-          <circle cx="12" cy="4" r="1.2"/>
-          <rect x="1" y="11" width="2.5" height="4" rx="1"/>
-          <rect x="20.5" y="11" width="2.5" height="4" rx="1"/>
-          <circle cx="9.5" cy="13.5" r="1.5"/>
-          <circle cx="14.5" cy="13.5" r="1.5"/>
-          <path d="M9.5 17.2c0 0 1.2 1.2 2.5 1.2s2.5-1.2 2.5-1.2"/>
+    <div class="chat-header-title">
+      <div class="chat-header-icon" aria-hidden="true">
+        <!-- Ren, geometrisk chatt-bubbla som logomärke -->
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
         </svg>
       </div>
-      <span id="chatHeaderText">HallandGPT</span>
+      <div class="chat-header-text">
+        <div class="chat-header-name">Fråga Halland</div>
+        <div class="chat-header-subtitle">AI-assistent · Region Halland</div>
+      </div>
     </div>
     <div class="chat-header-actions">
-      <button onclick="downloadChat()" data-tooltip="Ladda ner chatt">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <button onclick="toggleActionsMenu(event)" data-tooltip="Fler alternativ" aria-label="Fler alternativ" id="menuBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <circle cx="5" cy="12" r="2"/>
+          <circle cx="12" cy="12" r="2"/>
+          <circle cx="19" cy="12" r="2"/>
+        </svg>
       </button>
-      <button onclick="minimizeChat()" data-tooltip="Minimera">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      <button onclick="minimizeChat()" data-tooltip="Minimera" aria-label="Minimera chatt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
       </button>
-      <button onclick="closeChat()" data-tooltip="Stäng">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      <button onclick="closeChat()" data-tooltip="Avsluta chatt" data-tooltip-align="right" aria-label="Avsluta chatt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
       </button>
     </div>
   </div>
 
+  <!-- Actions dropdown menu -->
+  <div class="actions-menu" id="actionsMenu" role="menu">
+    <button onclick="newSession(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M23 4v6h-6"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Börja om chatten
+    </button>
+    <button onclick="downloadChat(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Ladda ner konversation
+    </button>
+    <button onclick="showContactInfo(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      Kontakta oss direkt
+    </button>
+  </div>
+
   <!-- Chat body -->
-  <div class="chat-body active" id="chatBody">
+  <div class="chat-body" id="chatBody">
     <div class="chat-disclaimer">
-      AI kan begå misstag. Kontrollera viktig information.
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span>Svaren är AI-genererade. Kontrollera alltid viktig information. <a href="https://www.regionhalland.se/om-region-halland/sa-behandlar-vi-personuppgifter/dina-personuppgifter-i-vara-vardregister" target="_blank" rel="noopener">Så hanterar vi dina uppgifter</a></span>
     </div>
-    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-messages" id="chatMessages" aria-live="polite" aria-atomic="false"></div>
 
     <!-- Rate limit toast -->
-    <div class="rate-limit-toast" id="rateLimitToast">
-      Du skickar för många meddelanden. Vänta 10 sekunder.
+    <div class="rate-limit-toast" id="rateLimitToast" role="alert">
+      Vänta några sekunder innan du skickar fler meddelanden.
     </div>
 
     <!-- Contact info overlay -->
-    <div class="contact-overlay" id="contactOverlay">
-      <button class="contact-close-btn" onclick="closeContactOverlay()" aria-label="Stäng">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
+    <div class="contact-overlay" id="contactOverlay" role="dialog" aria-label="Kontakta Region Halland">
+      <div class="contact-header">
+        <div class="contact-header-text">
+          <div class="contact-header-title-text">Kontakta Region Halland</div>
+          <div class="contact-header-sub">Frågor som chatten inte kan svara på? Här når du oss direkt.</div>
+        </div>
+        <button class="contact-close-btn" onclick="closeContactOverlay()" aria-label="Stäng kontaktinformation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
       <div class="contact-overlay-inner">
-        <div class="contact-title">Kontakta Region Halland</div>
-        <div class="contact-subtitle">Har du frågor som chatten inte kan svara på? Här når du oss direkt.</div>
-
         <div class="contact-section">
           <div class="contact-section-title">Vård och hälsa</div>
           <div class="contact-row">
-            <span class="contact-label">Sjukvårdsrådgivning:</span>
+            <span class="contact-label">Sjukvårdsrådgivning</span>
             <a class="contact-value" href="tel:1177">1177</a>
           </div>
           <div class="contact-row">
-            <span class="contact-label">Webbplats:</span>
+            <span class="contact-label">Webbplats</span>
             <a class="contact-value" href="https://www.1177.se/Halland/" target="_blank" rel="noopener">1177.se</a>
           </div>
         </div>
@@ -813,11 +1052,11 @@
         <div class="contact-section">
           <div class="contact-section-title">Region Hallands växel</div>
           <div class="contact-row">
-            <span class="contact-label">Telefon:</span>
+            <span class="contact-label">Telefon</span>
             <a class="contact-value" href="tel:035134800">035-13 48 00</a>
           </div>
           <div class="contact-row">
-            <span class="contact-label">E-post:</span>
+            <span class="contact-label">E-post</span>
             <a class="contact-value" href="mailto:regionen@regionhalland.se">regionen@regionhalland.se</a>
           </div>
         </div>
@@ -825,15 +1064,15 @@
         <div class="contact-section">
           <div class="contact-section-title">Våra sjukhus</div>
           <div class="contact-row">
-            <span class="contact-label">Sjukhus Halmstad:</span>
+            <span class="contact-label">Halmstad</span>
             <a class="contact-value" href="tel:035131000">035-13 10 00</a>
           </div>
           <div class="contact-row">
-            <span class="contact-label">Sjukhus Varberg:</span>
+            <span class="contact-label">Varberg</span>
             <a class="contact-value" href="tel:0340481000">0340-48 10 00</a>
           </div>
           <div class="contact-row">
-            <span class="contact-label">Sjukhus Kungsbacka:</span>
+            <span class="contact-label">Kungsbacka</span>
             <a class="contact-value" href="tel:0300565000">0300-56 50 00</a>
           </div>
         </div>
@@ -841,190 +1080,154 @@
         <div class="contact-section">
           <div class="contact-section-title">Fakturafrågor</div>
           <div class="contact-row">
-            <span class="contact-label">Gem. adm. service:</span>
+            <span class="contact-label">Gem. adm. service</span>
             <a class="contact-value" href="tel:0104553970">010-45 53 970</a>
           </div>
           <div class="contact-row">
-            <span class="contact-label">Sjukresor/ambulans:</span>
+            <span class="contact-label">Sjukresor/ambulans</span>
             <a class="contact-value" href="tel:0104761950">010-47 61 950</a>
           </div>
         </div>
 
-        <div class="contact-section contact-section-compact">
+        <div class="contact-section">
           <div class="contact-section-title">Besöksadress</div>
           <div class="contact-address">Södra vägen 9, Halmstad</div>
         </div>
       </div>
     </div>
 
-    <div class="chat-input-bar" style="padding-bottom:22px;">
-      <button class="new-session-btn" onclick="newSession()" data-tooltip="Ny chatt">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
-        </svg>
-      </button>
-      <button class="human-agent-btn" onclick="showContactInfo()" data-tooltip="Kontakta Region Halland">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Input -->
+    <div class="chat-input-bar">
+      <button class="util-btn" onclick="showContactInfo()" data-tooltip="Kontakta en människa" data-tooltip-align="left" aria-label="Kontakta en människa på Region Halland">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
           <circle cx="12" cy="7" r="4"/>
-          <path d="M6 7h-.5A2.5 2.5 0 0 0 3 9.5v.5"/>
-          <path d="M18 7h.5A2.5 2.5 0 0 1 21 9.5v.5"/>
-          <path d="M3 10v2"/><path d="M21 10v2"/>
-          <path d="M6 7c0-1 .5-2 1.5-2.5"/><path d="M18 7c0-1-.5-2-1.5-2.5"/>
         </svg>
       </button>
       <div class="chat-input-wrap">
-        <input type="text" id="chatInput" placeholder="Skriv din fråga här..." maxlength="1000" oninput="updateCharCount()" onkeydown="if(event.key==='Enter')sendMessage()">
-        <span class="char-counter" id="charCounter">0 / 1000</span>
+        <input type="text" id="chatInput" placeholder="Skriv din fråga..." maxlength="1000" oninput="updateCharCount()" onkeydown="if(event.key==='Enter')sendMessage()" aria-label="Skriv din fråga till Fråga Halland">
+        <button class="send-btn-inline" onclick="sendMessage()" aria-label="Skicka meddelande" id="sendBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+        <span class="char-counter" id="charCounter" aria-live="polite">0 / 1000</span>
       </div>
-      <button class="send-btn" onclick="sendMessage()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"/>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>
-      </button>
     </div>
   </div>
 </div>
 
 <script>
-  const chatWindow  = document.getElementById('chatWindow');
-  const chatToggle  = document.getElementById('chatToggle');
-  const chatBody    = document.getElementById('chatBody');
-  const chatMessages= document.getElementById('chatMessages');
-  const chatInput   = document.getElementById('chatInput');
+  const chatWindow   = document.getElementById('chatWindow');
+  const chatToggle   = document.getElementById('chatToggle');
+  const chatBody     = document.getElementById('chatBody');
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput    = document.getElementById('chatInput');
   const rateLimitToast = document.getElementById('rateLimitToast');
+  const actionsMenu    = document.getElementById('actionsMenu');
 
   /* ══════════════════════════════════════════
-     RATE LIMITING — max 2 messages per 10 seconds
+     RATE LIMITING — max 2 meddelanden per 10 sek
   ══════════════════════════════════════════ */
   const messageTimes = [];
   const RATE_LIMIT_COUNT = 2;
-  const RATE_LIMIT_WINDOW = 10000; // 10 seconds in ms
+  const RATE_LIMIT_WINDOW = 10000;
   let rateLimitTimeout = null;
 
   function isRateLimited() {
     const now = Date.now();
-    // Remove timestamps older than the window
     while (messageTimes.length > 0 && now - messageTimes[0] > RATE_LIMIT_WINDOW) {
       messageTimes.shift();
     }
     return messageTimes.length >= RATE_LIMIT_COUNT;
   }
-
-  function recordMessage() {
-    messageTimes.push(Date.now());
-  }
-
+  function recordMessage() { messageTimes.push(Date.now()); }
   function showRateLimitToast() {
     rateLimitToast.classList.add('show');
     if (rateLimitTimeout) clearTimeout(rateLimitTimeout);
     rateLimitTimeout = setTimeout(() => {
       rateLimitToast.classList.remove('show');
-    }, 4000);
+    }, 3500);
   }
 
   /* ══════════════════════════════════════════
-     STAR RATING SVG HELPER
+     ACTIONS MENU
   ══════════════════════════════════════════ */
-  const starFilledSVG = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>`;
-  const starEmptySVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>`;
+  function toggleActionsMenu(e) {
+    if (e) e.stopPropagation();
+    actionsMenu.classList.toggle('open');
+  }
+  function closeActionsMenu() {
+    actionsMenu.classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!actionsMenu.contains(e.target) && e.target.closest('#menuBtn') === null) {
+      closeActionsMenu();
+    }
+  });
 
-  function createStarRating(interactionId) {
+  /* ══════════════════════════════════════════
+     THUMBS FEEDBACK (ersätter stjärnsystem)
+  ══════════════════════════════════════════ */
+  function createFeedback(interactionId) {
     const container = document.createElement('div');
-    container.className = 'star-rating';
-    container.dataset.rating = '0';
+    container.className = 'msg-feedback';
     container.dataset.locked = 'false';
     container.dataset.interactionId = interactionId || '';
 
-    for (let i = 1; i <= 5; i++) {
+    const makeBtn = (value, label, svgPath, isPositive) => {
       const btn = document.createElement('button');
-      btn.className = 'star-btn';
-      btn.dataset.value = i;
-      btn.innerHTML = starEmptySVG;
-      btn.title = i + ' av 5 stjärnor';
+      btn.className = 'feedback-btn';
+      btn.dataset.value = value;
+      btn.setAttribute('aria-label', label);
+      btn.setAttribute('type', 'button');
+      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${svgPath}</svg>`;
 
       btn.addEventListener('click', async function() {
         if (container.dataset.locked === 'true') return;
-
-        const rating = parseInt(this.dataset.value, 10);
         const currentInteractionId = container.dataset.interactionId;
-
-        if (!currentInteractionId) {
-          console.error('Saknar interactionId för rating.');
-          return;
-        }
+        if (!currentInteractionId) return;
 
         try {
-          const res = await fetch(WEBHOOK_URL, {
+          await fetch(WEBHOOK_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               type: 'rating',
               interactionId: currentInteractionId,
               sessionId: ensureSessionId(),
-              rating: rating
+              rating: value === 'up' ? 5 : 1,
+              feedback: value
             })
           });
 
-          if (!res.ok) {
-            throw new Error('Webhook svarade med status ' + res.status);
-          }
-
-          container.dataset.rating = String(rating);
           container.dataset.locked = 'true';
-
-          const stars = container.querySelectorAll('.star-btn');
-          stars.forEach((s, idx) => {
-            if (idx < rating) {
-              s.classList.add('active');
-              s.innerHTML = starFilledSVG;
-            } else {
-              s.classList.remove('active');
-              s.innerHTML = starEmptySVG;
+          const buttons = container.querySelectorAll('.feedback-btn');
+          buttons.forEach(b => {
+            b.classList.add('locked');
+            if (b.dataset.value === value) {
+              b.classList.add(isPositive ? 'active' : 'active-neg');
             }
-            s.style.cursor = 'default';
           });
 
-          console.log('Rating skickad för interactionId ' + currentInteractionId + ': ' + rating + ' stjärnor');
+          // Tacktext
+          const thanks = document.createElement('span');
+          thanks.className = 'feedback-thanks';
+          thanks.textContent = 'Tack för din feedback';
+          container.appendChild(thanks);
         } catch (err) {
-          console.error('Rating webhook error:', err);
+          console.error('Feedback webhook error:', err);
         }
       });
+      return btn;
+    };
 
-      // Hover preview (only when not locked)
-      btn.addEventListener('mouseenter', function() {
-        if (container.dataset.locked === 'true') return;
-        const hoverVal = parseInt(this.dataset.value);
-        const stars = container.querySelectorAll('.star-btn');
-        stars.forEach((s, idx) => {
-          if (idx < hoverVal) {
-            s.classList.add('active');
-            s.innerHTML = starFilledSVG;
-          } else {
-            s.classList.remove('active');
-            s.innerHTML = starEmptySVG;
-          }
-        });
-      });
+    container.appendChild(makeBtn('up',   'Svaret var hjälpsamt',    '<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7V10l4.34-9.66a1.93 1.93 0 0 1 3.66.94z"/>', true));
+    container.appendChild(makeBtn('down', 'Svaret var inte hjälpsamt','<path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H17v12l-4.34 9.66a1.93 1.93 0 0 1-3.66-.94z"/>', false));
 
-      container.addEventListener('mouseleave', function() {
-        if (container.dataset.locked === 'true') return;
-        const currentRating = parseInt(container.dataset.rating);
-        const stars = container.querySelectorAll('.star-btn');
-        stars.forEach((s, idx) => {
-          if (idx < currentRating) {
-            s.classList.add('active');
-            s.innerHTML = starFilledSVG;
-          } else {
-            s.classList.remove('active');
-            s.innerHTML = starEmptySVG;
-          }
-        });
-      });
-
-      container.appendChild(btn);
-    }
+    // Visas med liten fördröjning efter att meddelandet renderats
+    setTimeout(() => container.classList.add('visible'), 50);
     return container;
   }
 
@@ -1035,19 +1238,19 @@
     chatWindow.classList.add('open');
     chatToggle.classList.add('hidden');
 
-  if (chatMessages.children.length === 0) {
-    ensureSessionId();
-    setTimeout(() => {
-      addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?', false);
-    }, 400);
+    if (chatMessages.children.length === 0) {
+      ensureSessionId();
+      setTimeout(() => {
+        addMessage('bot', 'Hej! Jag är Region Hallands AI-assistent. Vad kan jag hjälpa dig med idag?', false);
+      }, 300);
+    }
+    setTimeout(() => chatInput.focus(), 350);
   }
-
-  chatInput.focus();
-}
 
   function minimizeChat() {
     chatWindow.classList.remove('open');
     chatToggle.classList.remove('hidden');
+    closeActionsMenu();
   }
 
   function closeChat() {
@@ -1057,32 +1260,24 @@
     chatInput.disabled = false;
     sessionId = '';
     localStorage.removeItem('halland_chat_session_id');
-
-  // Reset rate limiter
     messageTimes.length = 0;
-
-    // Hide contact overlay if open
     document.getElementById('contactOverlay').classList.remove('visible');
+    closeActionsMenu();
   }
 
   function newSession() {
-  chatMessages.innerHTML = '';
-  chatInput.disabled = false;
-  sessionId = generateSessionId();
-  localStorage.setItem('halland_chat_session_id', sessionId);
+    chatMessages.innerHTML = '';
+    chatInput.disabled = false;
+    sessionId = generateSessionId();
+    localStorage.setItem('halland_chat_session_id', sessionId);
+    messageTimes.length = 0;
+    document.getElementById('contactOverlay').classList.remove('visible');
 
-  // Reset rate limiter
-  messageTimes.length = 0;
-
-  // Hide contact overlay if open
-  document.getElementById('contactOverlay').classList.remove('visible');
-
-  setTimeout(() => {
-    addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?', false);
-  }, 200);
-
-  chatInput.focus();
-}
+    setTimeout(() => {
+      addMessage('bot', 'Chatten har startats om. Vad kan jag hjälpa dig med?', false);
+    }, 150);
+    chatInput.focus();
+  }
 
   function downloadChat() {
     const messages = chatMessages.querySelectorAll('.msg');
@@ -1090,26 +1285,19 @@
 
     const now = new Date();
     const dateStr = now.toLocaleString('sv-SE');
-    let text = 'HallandGPT — Konversation\n';
+    let text = 'Fråga Halland — Konversation\n';
+    text += 'Region Halland\n';
     text += 'Datum: ' + dateStr + '\n';
-    text += '═'.repeat(50) + '\n\n';
+    text += '─'.repeat(50) + '\n\n';
 
     messages.forEach(msg => {
       if (msg.id === 'typingIndicator') return;
       const isBot = msg.classList.contains('bot');
       const isHuman = msg.classList.contains('human');
-      const sender = isBot ? 'HallandGPT' : isHuman ? 'Mänsklig kundservice' : 'Du';
+      const sender = isBot ? 'Fråga Halland (AI)' : isHuman ? 'Kundservice' : 'Du';
       const bubble = msg.querySelector('.msg-bubble');
       if (!bubble) return;
       let content = bubble.innerText || bubble.textContent;
-      // Include star rating if present
-      const starContainer = msg.querySelector('.star-rating');
-      if (starContainer) {
-        const rating = starContainer.dataset.rating;
-        if (rating && parseInt(rating) > 0) {
-          content += '\n[Betyg: ' + '★'.repeat(parseInt(rating)) + '☆'.repeat(5 - parseInt(rating)) + ']';
-        }
-      }
       text += sender + ':\n' + content + '\n\n';
     });
 
@@ -1117,7 +1305,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'HallandGPT_chatt_' + now.toISOString().slice(0,10) + '.txt';
+    a.download = 'fraga-halland_' + now.toISOString().slice(0,10) + '.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1126,19 +1314,11 @@
 
   function formatMessage(text) {
     let formatted = text;
-
-    // Bold: **text** or __text__
     formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
-
-    // Italic: *text* or _text_
     formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
     formatted = formatted.replace(/_(.+?)_/g, '<em>$1</em>');
-
-    // Markdown links: [text](url)
-    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" class="chat-link">$1</a>');
-
-    // Plain URLs (not already in an <a> tag)
+    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="chat-link">$1</a>');
     formatted = formatted.replace(/(?<!href="|">)(https?:\/\/[^\s<>"]+)/g, function(url) {
       let title = url;
       try {
@@ -1157,19 +1337,12 @@
         } else {
           title = urlObj.hostname.replace('www.', '');
         }
-      } catch(e) {
-        title = 'Läs mer';
-      }
-      return '<a href="' + url + '" target="_blank" class="chat-link">' + title + '</a>';
+      } catch(e) { title = 'Läs mer'; }
+      return '<a href="' + url + '" target="_blank" rel="noopener" class="chat-link">' + title + '</a>';
     });
-
-    // Bullet lists: lines starting with - or •
     formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
     formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
-
-    // Line breaks
     formatted = formatted.replace(/\n/g, '<br>');
-
     return formatted;
   }
 
@@ -1181,73 +1354,74 @@
     const counter = document.getElementById('charCounter');
     const len = chatInput.value.length;
     counter.textContent = len + ' / 1000';
-    counter.classList.remove('warning', 'limit');
-    if (len >= 1000) counter.classList.add('limit');
-    else if (len >= 800) counter.classList.add('warning');
+    counter.classList.remove('warning', 'limit', 'visible');
+    // Visas först när användaren närmar sig gränsen — rensar UI
+    if (len >= 1000) counter.classList.add('limit', 'visible');
+    else if (len >= 800) counter.classList.add('warning', 'visible');
+    else if (len >= 700) counter.classList.add('visible');
   }
 
   let botMsgCounter = 0;
 
-  function addMessage(type, text, showStars, interactionId = null) {
-    // showStars defaults to true for bot messages, false for user
-    if (showStars === undefined) showStars = (type === 'bot');
+  function addMessage(type, text, showFeedback, interactionId = null) {
+    if (showFeedback === undefined) showFeedback = (type === 'bot');
 
     const msg = document.createElement('div');
     msg.className = 'msg ' + type;
     const time = getTimeStr();
-
     const formattedText = (type === 'bot' || type === 'human') ? formatMessage(text) : text;
+
+    let avatarHTML;
+    if (type === 'bot') {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+      </div>`;
+    } else if (type === 'human') {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>`;
+    } else {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">DU</div>`;
+    }
 
     if (type === 'bot') {
       botMsgCounter++;
-      const msgId = 'bot-msg-' + botMsgCounter;
-      msg.id = msgId;
+      msg.id = 'bot-msg-' + botMsgCounter;
       msg.innerHTML = `
-        <div class="msg-avatar"><img src="data:image/jpeg;base64,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" alt="Halland" style="width:100%;height:100%;object-fit:contain;border-radius:50%;background:#fff;"></div>
+        ${avatarHTML}
         <div class="msg-content">
-          <span class="msg-name">HallandGPT</span>
           <div class="msg-bubble">${formattedText}</div>
           <span class="msg-time">${time}</span>
         </div>`;
 
-      // Add star rating only if showStars is true (not for welcome message)
-      if (showStars) {
+      if (showFeedback) {
         const contentDiv = msg.querySelector('.msg-content');
-        const starRating = createStarRating(interactionId);
-        contentDiv.appendChild(starRating);
+        contentDiv.appendChild(createFeedback(interactionId));
       }
     } else if (type === 'human') {
       msg.innerHTML = `
-        <div class="msg-avatar">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#388e3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-        </div>
+        ${avatarHTML}
         <div class="msg-content">
-          <span class="msg-name">Mänsklig kundservice</span>
           <div class="msg-bubble">${formattedText}</div>
-          <span class="msg-time">${time}</span>
+          <span class="msg-time">Kundservice · ${time}</span>
         </div>`;
     } else {
       msg.innerHTML = `
-        <div class="msg-avatar">DU</div>
+        ${avatarHTML}
         <div class="msg-content">
-          <span class="msg-name">Du</span>
           <div class="msg-bubble">${formattedText}</div>
           <span class="msg-time">${time}</span>
         </div>`;
     }
     chatMessages.appendChild(msg);
 
-    /* ── SCROLL BEHAVIOR ──
-       For bot/human messages: scroll so the TOP of the new message is visible
-       For user messages: scroll to bottom as before
-    */
     if (type === 'bot' || type === 'human') {
-      // Use requestAnimationFrame to ensure DOM has rendered
       requestAnimationFrame(() => {
-        // Scroll the message element into view at the top of the container
         msg.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     } else {
@@ -1260,10 +1434,14 @@
     el.className = 'msg bot';
     el.id = 'typingIndicator';
     el.innerHTML = `
-      <div class="msg-avatar"><img src="data:image/jpeg;base64,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" alt="Halland" style="width:100%;height:100%;object-fit:contain;border-radius:50%;background:#fff;"></div>
+      <div class="msg-avatar" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+      </div>
       <div class="msg-content">
         <div class="msg-bubble">
-          <div class="typing-indicator"><span></span><span></span><span></span></div>
+          <div class="typing-indicator" aria-label="AI-assistenten skriver"><span></span><span></span><span></span></div>
         </div>
       </div>`;
     chatMessages.appendChild(el);
@@ -1275,114 +1453,96 @@
     if (el) el.remove();
   }
 
-  /* ══════════════════════════════════════════
-     CONTACT INFO — Region Halland
-  ══════════════════════════════════════════ */
-
-  /**
-   * Show the Region Halland contact information overlay.
-   * Triggered from the "Kontakta Region Halland" button in the input bar.
-   */
   function showContactInfo() {
     document.getElementById('contactOverlay').classList.add('visible');
   }
-
-  /**
-   * Close the contact info overlay.
-   */
   function closeContactOverlay() {
     document.getElementById('contactOverlay').classList.remove('visible');
   }
 
+  /* ══════════════════════════════════════════
+     SESSION + WEBHOOK
+  ══════════════════════════════════════════ */
   const WEBHOOK_URL = 'https://api.halmstadchattbot.se/Halland';
-let sessionId = localStorage.getItem('halland_chat_session_id') || '';
+  let sessionId = localStorage.getItem('halland_chat_session_id') || '';
 
-function generateSessionId() {
-  return 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
-}
-
-function generateInteractionId() {
-  return 'interaction_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
-}
-
-function ensureSessionId() {
-  if (!sessionId) {
-    sessionId = generateSessionId();
-    localStorage.setItem('halland_chat_session_id', sessionId);
+  function generateSessionId() {
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
   }
-  return sessionId;
-}
+  function generateInteractionId() {
+    return 'interaction_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+  }
+  function ensureSessionId() {
+    if (!sessionId) {
+      sessionId = generateSessionId();
+      localStorage.setItem('halland_chat_session_id', sessionId);
+    }
+    return sessionId;
+  }
 
   async function sendMessage() {
-  const text = chatInput.value.trim();
-  if (!text) return;
+    const text = chatInput.value.trim();
+    if (!text) return;
+    if (isRateLimited()) { showRateLimitToast(); return; }
+    recordMessage();
 
-  if (isRateLimited()) {
-    showRateLimitToast();
-    return;
-  }
+    addMessage('user', text);
+    chatInput.value = '';
+    updateCharCount();
 
-  recordMessage();
+    const activeSessionId = ensureSessionId();
+    const interactionId = generateInteractionId();
+    chatInput.disabled = true;
+    showTyping();
+    const originSessionId = activeSessionId;
 
-  addMessage('user', text);
-  chatInput.value = '';
-  updateCharCount();
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'message',
+          interactionId: interactionId,
+          sessionId: originSessionId,
+          message: text
+        })
+      });
 
-  const activeSessionId = ensureSessionId();
-  const interactionId = generateInteractionId();
+      if (sessionId !== originSessionId) return;
+      removeTyping();
 
-  chatInput.disabled = true;
+      if (!res.ok) throw new Error('Webhook svarade med status ' + res.status);
+      const data = await res.json();
+      if (sessionId !== originSessionId) return;
 
-  showTyping();
+      const reply =
+        data.answer || data.output || data.message ||
+        data.reply  || data.response || data.text ||
+        JSON.stringify(data);
 
-  const originSessionId = activeSessionId;
-
-  try {
-    const res = await fetch(WEBHOOK_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'message',
-        interactionId: interactionId,
-        sessionId: originSessionId,
-        message: text
-      })
-    });
-
-    if (sessionId !== originSessionId) return;
-
-    removeTyping();
-
-    if (!res.ok) {
-      throw new Error('Webhook svarade med status ' + res.status);
-    }
-
-    const data = await res.json();
-
-    if (sessionId !== originSessionId) return;
-
-    const reply =
-      data.answer ||
-      data.output ||
-      data.message ||
-      data.reply ||
-      data.response ||
-      data.text ||
-      JSON.stringify(data);
-
-    addMessage('bot', reply, true, interactionId);
-  } catch (err) {
-    if (sessionId !== originSessionId) return;
-    removeTyping();
-    addMessage('bot', 'Oj, något gick fel. Försök igen om en stund.', false);
-    console.error('Webhook error:', err);
-  } finally {
-    if (sessionId === originSessionId) {
-      chatInput.disabled = false;
-      chatInput.focus();
+      addMessage('bot', reply, true, interactionId);
+    } catch (err) {
+      if (sessionId !== originSessionId) return;
+      removeTyping();
+      addMessage('bot', 'Tyvärr gick något fel. Försök igen om en stund, eller kontakta oss direkt via menyn.', false);
+      console.error('Webhook error:', err);
+    } finally {
+      if (sessionId === originSessionId) {
+        chatInput.disabled = false;
+        chatInput.focus();
+      }
     }
   }
-}
+
+  // Stäng meny med Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeActionsMenu();
+      if (document.getElementById('contactOverlay').classList.contains('visible')) {
+        closeContactOverlay();
+      }
+    }
+  });
 </script>
 </body>
 </html>
