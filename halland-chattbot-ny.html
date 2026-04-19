@@ -97,13 +97,20 @@
     font-weight: 600;
     cursor: pointer;
     box-shadow: 0 6px 20px rgba(31,163,114,0.28), 0 2px 6px rgba(31,163,114,0.14);
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      background 0.2s,
+      box-shadow 0.25s,
+      transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 0.25s;
     letter-spacing: 0.1px;
   }
   .chat-toggle:hover {
     background: var(--rh-green-hover);
-    box-shadow: 0 8px 28px rgba(31,163,114,0.35), 0 3px 8px rgba(31,163,114,0.2);
-    transform: translateY(-2px);
+    box-shadow: 0 10px 32px rgba(31,163,114,0.40), 0 4px 10px rgba(31,163,114,0.22);
+    transform: translateY(-3px);
+  }
+  .chat-toggle:active:not(.hidden) {
+    transform: translateY(-1px) scale(0.98);
   }
   .chat-toggle:focus-visible {
     outline: none;
@@ -114,7 +121,13 @@
     pointer-events: none;
     transform: scale(0.85) translateY(10px);
   }
-  .chat-toggle svg { flex-shrink: 0; }
+  .chat-toggle svg {
+    flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .chat-toggle:hover svg {
+    transform: rotate(-8deg) scale(1.08);
+  }
 
   /* ══════════════════════════════════════════
      CHAT WINDOW
@@ -136,7 +149,9 @@
     opacity: 0;
     pointer-events: none;
     transform: translateY(20px) scale(0.96);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: 1px solid var(--border);
   }
   .chat-window.open {
@@ -161,6 +176,7 @@
     flex-shrink: 0;
     border-bottom: 1px solid rgba(0,0,0,0.06);
     position: relative;
+    z-index: 15;
   }
   .chat-header-title {
     display: flex;
@@ -213,12 +229,21 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s;
-    opacity: 0.85;
+    transition:
+      background 0.2s,
+      transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.15s;
+    opacity: 0.82;
+    position: relative;
   }
   .chat-header-actions button:hover {
-    background: rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.18);
     opacity: 1;
+    transform: scale(1.08);
+    z-index: 20;
+  }
+  .chat-header-actions button:active {
+    transform: scale(0.92);
   }
   .chat-header-actions button:focus-visible {
     outline: none;
@@ -289,11 +314,16 @@
     gap: 10px;
     max-width: 88%;
     min-width: 0;
-    animation: msgIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: msgIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transition: opacity 0.25s, transform 0.25s;
   }
   @keyframes msgIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
+    0%   { opacity: 0; transform: translateY(12px) scale(0.94); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .msg.fading-out {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.96);
   }
 
   .msg.bot { align-self: flex-start; }
@@ -429,11 +459,18 @@
     background: var(--rh-green);
     border-color: var(--rh-green);
     color: #FFFFFF;
+    animation: feedbackBump 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .feedback-btn.active-neg {
     background: #8B3A3A;
     border-color: #8B3A3A;
     color: #FFFFFF;
+    animation: feedbackBump 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes feedbackBump {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.18); }
+    100% { transform: scale(1); }
   }
   .feedback-btn.locked {
     cursor: default;
@@ -453,6 +490,11 @@
     font-style: italic;
     align-self: center;
     margin-left: 4px;
+    animation: thanksIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  @keyframes thanksIn {
+    0%   { opacity: 0; transform: translateX(-8px); }
+    100% { opacity: 1; transform: translateX(0); }
   }
 
   /* ── Typing indicator ── */
@@ -536,13 +578,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s;
+    transition:
+      background 0.2s,
+      transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.2s;
+    box-shadow: 0 2px 6px rgba(31,163,114,0.25);
+  }
+  .send-btn-inline svg {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
   .send-btn-inline:hover {
     background: var(--rh-green-hover);
-    transform: translateY(-50%) scale(1.05);
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 4px 12px rgba(31,163,114,0.40);
   }
-  .send-btn-inline:active { transform: translateY(-50%) scale(0.95); }
+  .send-btn-inline:hover svg {
+    transform: translate(1px, -1px);
+  }
+  .send-btn-inline:active {
+    transform: translateY(-50%) scale(0.92);
+  }
   .send-btn-inline:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
@@ -550,6 +605,7 @@
   .send-btn-inline:disabled {
     background: #C9D4CE;
     cursor: not-allowed;
+    box-shadow: none;
   }
 
   .char-counter {
@@ -580,18 +636,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.15s;
+    transition:
+      background 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+      color 0.2s;
     flex-shrink: 0;
   }
   .util-btn:hover {
     background: var(--rh-mint-bubble);
     border-color: var(--rh-green);
+    transform: translateY(-2px) scale(1.05);
+    color: var(--rh-green);
   }
   .util-btn:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
   }
-  .util-btn:active { transform: scale(0.95); }
+  .util-btn:active {
+    transform: translateY(0) scale(0.92);
+  }
 
   /* ══════════════════════════════════════════
      TOOLTIPS — mer diskreta, neutral grå
@@ -614,7 +678,7 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s, transform 0.15s;
-    z-index: 100;
+    z-index: 1000;
     box-shadow: var(--shadow-sm);
   }
   [data-tooltip]::before {
@@ -628,7 +692,7 @@
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s, transform 0.15s;
-    z-index: 100;
+    z-index: 1000;
   }
   [data-tooltip]:hover::after,
   [data-tooltip]:hover::before,
@@ -771,18 +835,27 @@
   }
 
   /* ══════════════════════════════════════════
-     CONTACT OVERLAY
+     CONTACT OVERLAY — smooth fade in/out
   ══════════════════════════════════════════ */
   .contact-overlay {
     position: absolute;
     inset: 0;
     z-index: 20;
     background: #FFFFFF;
-    display: none;
+    display: flex;
     flex-direction: column;
-    animation: msgIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(14px) scale(0.98);
+    transition:
+      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .contact-overlay.visible { display: flex; }
+  .contact-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
 
   .contact-header {
     padding: 14px 16px;
@@ -820,11 +893,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s;
+    transition:
+      background 0.2s,
+      transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     flex-shrink: 0;
   }
   .contact-close-btn:hover {
-    background: rgba(15,94,60,0.1);
+    background: rgba(31,163,114,0.12);
+    transform: scale(1.08) rotate(90deg);
+  }
+  .contact-close-btn:active {
+    transform: scale(0.92) rotate(90deg);
   }
   .contact-close-btn:focus-visible {
     outline: none;
@@ -846,9 +925,30 @@
     border-radius: var(--radius-md);
     padding: 12px 14px;
     margin-bottom: 10px;
-    transition: background 0.15s, border-color 0.15s;
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+      background 0.2s,
+      border-color 0.2s;
   }
   .contact-section:last-child { margin-bottom: 0; }
+
+  .contact-overlay.visible .contact-section {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .contact-overlay.visible .contact-section:nth-child(1) { transition-delay: 0.08s; }
+  .contact-overlay.visible .contact-section:nth-child(2) { transition-delay: 0.14s; }
+  .contact-overlay.visible .contact-section:nth-child(3) { transition-delay: 0.20s; }
+  .contact-overlay.visible .contact-section:nth-child(4) { transition-delay: 0.26s; }
+  .contact-overlay.visible .contact-section:nth-child(5) { transition-delay: 0.32s; }
+
+  .contact-section:hover {
+    background: #DFF0E4;
+    border-color: rgba(31,163,114,0.22);
+  }
 
   .contact-section-title {
     font-size: 11px;
@@ -1256,27 +1356,38 @@
   function closeChat() {
     chatWindow.classList.remove('open');
     chatToggle.classList.remove('hidden');
-    chatMessages.innerHTML = '';
-    chatInput.disabled = false;
-    sessionId = '';
-    localStorage.removeItem('halland_chat_session_id');
-    messageTimes.length = 0;
-    document.getElementById('contactOverlay').classList.remove('visible');
     closeActionsMenu();
+    document.getElementById('contactOverlay').classList.remove('visible');
+
+    // Vänta tills chattfönstret har glidit ut innan vi rensar innehåll
+    setTimeout(() => {
+      chatMessages.innerHTML = '';
+      chatInput.disabled = false;
+      sessionId = '';
+      localStorage.removeItem('halland_chat_session_id');
+      messageTimes.length = 0;
+    }, 320);
   }
 
   function newSession() {
-    chatMessages.innerHTML = '';
-    chatInput.disabled = false;
-    sessionId = generateSessionId();
-    localStorage.setItem('halland_chat_session_id', sessionId);
-    messageTimes.length = 0;
+    // Fade ut befintliga meddelanden först
+    const existingMessages = chatMessages.querySelectorAll('.msg');
+    existingMessages.forEach(msg => msg.classList.add('fading-out'));
     document.getElementById('contactOverlay').classList.remove('visible');
+    closeActionsMenu();
 
     setTimeout(() => {
-      addMessage('bot', 'Chatten har startats om. Vad kan jag hjälpa dig med?', false);
-    }, 150);
-    chatInput.focus();
+      chatMessages.innerHTML = '';
+      chatInput.disabled = false;
+      sessionId = generateSessionId();
+      localStorage.setItem('halland_chat_session_id', sessionId);
+      messageTimes.length = 0;
+
+      setTimeout(() => {
+        addMessage('bot', 'Chatten har startats om. Vad kan jag hjälpa dig med?', false);
+      }, 80);
+      chatInput.focus();
+    }, 240);
   }
 
   function downloadChat() {
@@ -1450,7 +1561,11 @@
 
   function removeTyping() {
     const el = document.getElementById('typingIndicator');
-    if (el) el.remove();
+    if (el) {
+      el.classList.add('fading-out');
+      el.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+      setTimeout(() => el.remove(), 200);
+    }
   }
 
   function showContactInfo() {
