@@ -859,9 +859,10 @@
     cursor: pointer;
     text-align: left;
     transition:
-      background 0.3s var(--ease-spring),
-      color      0.3s var(--ease-spring),
-      transform  0.2s var(--ease-spring);
+      background   0.3s var(--ease-spring),
+      color        0.3s var(--ease-spring),
+      padding-left 0.28s var(--ease-spring),
+      transform    0.2s var(--ease-spring);
   }
   .actions-menu button:hover {
     background: var(--rh-mint-softer);
@@ -1236,6 +1237,12 @@
 
     <!-- Input -->
     <div class="chat-input-bar">
+      <button class="util-btn" onclick="newSession()" data-tooltip="Ny chatt" data-tooltip-align="left" aria-label="Starta en ny chatt">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M23 4v6h-6"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+      </button>
       <button class="util-btn" onclick="showContactInfo()" data-tooltip="Kontakta en människa" data-tooltip-align="left" aria-label="Kontakta en människa på Region Halland">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
