@@ -156,7 +156,7 @@
       opacity   0.6s var(--ease-spring),
       transform 0.6s var(--ease-spring);
     border: 1px solid var(--border);
-    /* will-change förbättrar GPU-kompositing för jämnare animering */
+    transform-origin: bottom right;
     will-change: transform, opacity;
   }
   .chat-window.open {
@@ -305,6 +305,7 @@
 
   .chat-messages {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
     padding: 18px 16px 8px 16px;
@@ -549,20 +550,19 @@
     height: 7px;
     border-radius: 50%;
     background: var(--rh-green-bright);
-    /* Organisk rörelse: kombinerar opacity och Y-förflyttning */
-    animation: typeDot 1.6s var(--ease-spring) infinite;
+    animation: typeDot 1.2s ease-in-out infinite;
     opacity: 0.3;
   }
-  .typing-indicator span:nth-child(2) { animation-delay: 0.22s; }
-  .typing-indicator span:nth-child(3) { animation-delay: 0.44s; }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
   @keyframes typeDot {
-    0%, 65%, 100% {
-      opacity: 0.25;
-      transform: scale(0.82) translateY(0px);
+    0%, 60%, 100% {
+      opacity: 0.3;
+      transform: translateY(0);
     }
-    32% {
+    30% {
       opacity: 1;
-      transform: scale(1.15) translateY(-4px);
+      transform: translateY(-5px);
     }
   }
 
