@@ -149,14 +149,16 @@
     box-shadow: var(--shadow-lg);
     opacity: 0;
     pointer-events: none;
-    /* Stängt läge: mer rörelse + subtil scale ger premium "dyker upp ur knappen"-känsla */
-    transform: translateY(32px) scale(0.92);
-    /* Längre duration + spring-easing för ett flytande, organiskt öppnande */
+    /* Mildare scale (0.97 istället för 0.92) och mindre translate ger ett lugnare öppnande
+       där det inre innehållet (disclaimer, input-bar) inte syns förskjutet under animationen. */
+    transform: translateY(16px) scale(0.97);
     transition:
-      opacity   0.6s var(--ease-spring),
-      transform 0.6s var(--ease-spring);
+      opacity   0.45s var(--ease-spring),
+      transform 0.45s var(--ease-spring);
     border: 1px solid var(--border);
-    transform-origin: bottom right;
+    /* Skala från mitten-botten istället för bottom-right → symmetriskt växande
+       som inte förskjuter topp-vänster-innehållet visuellt. */
+    transform-origin: center bottom;
     will-change: transform, opacity;
   }
   .chat-window.open {
@@ -296,6 +298,7 @@
   /* ── Chat body ── */
   .chat-body {
     flex: 1;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -449,15 +452,15 @@
   .msg-bubble li { margin-bottom: 4px; }
   .msg-bubble strong { font-weight: 700; }
 
-  /* ── Tumme upp/ner feedback ── */
+  /* ── Stjärnbetyg ── */
   .msg-feedback {
     display: flex;
-    gap: 4px;
+    align-items: center;
+    gap: 1px;
     margin-top: 2px;
     padding-left: 2px;
     opacity: 0;
     transform: translateY(-6px);
-    /* Längre delay + spring-easing → feedbacken glider mjukt in efter svaret */
     transition:
       opacity   0.55s var(--ease-spring) 0.85s,
       transform 0.55s var(--ease-spring) 0.85s;
@@ -466,70 +469,49 @@
     opacity: 1;
     transform: translateY(0);
   }
-  .feedback-btn {
+  .star-btn {
     background: transparent;
-    border: 1px solid var(--border);
+    border: none;
     cursor: pointer;
-    padding: 5px 8px;
-    border-radius: 7px;
-    color: var(--text-soft);
+    padding: 3px 2px;
+    color: var(--border-strong);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     transition:
-      background    0.3s var(--ease-spring),
-      border-color  0.3s var(--ease-spring),
-      color         0.3s var(--ease-spring),
-      transform     0.25s var(--ease-spring);
-    font-family: inherit;
-    font-size: 11px;
-    font-weight: 500;
+      color     0.15s var(--ease-standard),
+      transform 0.2s  var(--ease-spring);
   }
-  .feedback-btn:hover {
-    background: var(--rh-mint-bubble);
-    border-color: var(--rh-green-bright);
-    color: var(--rh-green-hover);
-    transform: translateY(-1px) scale(1.04);
+  .star-btn svg {
+    width: 18px;
+    height: 18px;
   }
-  .feedback-btn.active {
-    background: var(--rh-green);
-    border-color: var(--rh-green);
-    color: #FFFFFF;
-    /* Överdämpad spring: lätt överskott → faller tillbaka → ro */
-    animation: feedbackBump 0.7s var(--ease-spring);
+  .star-btn.hovered {
+    color: var(--rh-green-bright);
+    transform: scale(1.18) translateY(-1px);
   }
-  .feedback-btn.active-neg {
-    background: #8B3A3A;
-    border-color: #8B3A3A;
-    color: #FFFFFF;
-    animation: feedbackBump 0.7s var(--ease-spring);
+  .star-btn.filled {
+    color: var(--rh-green);
   }
-  @keyframes feedbackBump {
-    0%   { transform: scale(1); }
-    35%  { transform: scale(1.18); }
-    65%  { transform: scale(0.94); }
-    85%  { transform: scale(1.04); }
-    100% { transform: scale(1); }
-  }
-  .feedback-btn.locked {
+  .star-btn.locked {
     cursor: default;
-    opacity: 0.55;
     transform: none !important;
   }
-  .feedback-btn.locked.active,
-  .feedback-btn.locked.active-neg {
-    opacity: 1;
+  @keyframes starPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.4); }
+    70%  { transform: scale(0.88); }
+    100% { transform: scale(1); }
   }
-  .feedback-btn svg {
-    width: 13px;
-    height: 13px;
+  .star-btn.pop {
+    animation: starPop 0.5s var(--ease-spring);
   }
   .feedback-thanks {
     font-size: 11px;
     color: var(--text-soft);
     font-style: italic;
     align-self: center;
-    margin-left: 4px;
+    margin-left: 6px;
     animation: thanksIn 0.55s var(--ease-spring);
   }
   @keyframes thanksIn {
@@ -1324,7 +1306,7 @@
   });
 
   /* ────────────────────────────────────────
-     THUMBS FEEDBACK
+     STAR RATING FEEDBACK
   ──────────────────────────────────────── */
   function createFeedback(interactionId) {
     const container = document.createElement('div');
@@ -1332,18 +1314,60 @@
     container.dataset.locked = 'false';
     container.dataset.interactionId = interactionId || '';
 
-    const makeBtn = (value, label, svgPath, isPositive) => {
+    const starOutline = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    const starFilled = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+    const stars = [];
+
+    const setHover = (upToIndex) => {
+      stars.forEach((s, i) => {
+        s.classList.toggle('hovered', i <= upToIndex);
+        s.classList.toggle('filled', false);
+      });
+    };
+
+    const clearHover = () => {
+      stars.forEach(s => s.classList.remove('hovered'));
+    };
+
+    for (let i = 1; i <= 5; i++) {
       const btn = document.createElement('button');
-      btn.className = 'feedback-btn';
-      btn.dataset.value = value;
-      btn.setAttribute('aria-label', label);
+      btn.className = 'star-btn';
+      btn.setAttribute('aria-label', `Ge ${i} stjärn${i === 1 ? 'a' : 'or'}`);
       btn.setAttribute('type', 'button');
-      btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${svgPath}</svg>`;
+      btn.innerHTML = starOutline;
+
+      btn.addEventListener('mouseenter', () => {
+        if (container.dataset.locked === 'true') return;
+        setHover(i - 1);
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        if (container.dataset.locked === 'true') return;
+        clearHover();
+      });
 
       btn.addEventListener('click', async function() {
         if (container.dataset.locked === 'true') return;
         const currentInteractionId = container.dataset.interactionId;
         if (!currentInteractionId) return;
+
+        container.dataset.locked = 'true';
+        clearHover();
+
+        stars.forEach((s, idx) => {
+          s.classList.add('locked');
+          if (idx < i) {
+            s.classList.add('filled');
+            s.innerHTML = starFilled;
+          }
+          if (idx === i - 1) s.classList.add('pop');
+        });
+
+        const thanks = document.createElement('span');
+        thanks.className = 'feedback-thanks';
+        thanks.textContent = 'Tack för din feedback';
+        container.appendChild(thanks);
 
         try {
           await fetch(WEBHOOK_URL, {
@@ -1353,33 +1377,18 @@
               type: 'rating',
               interactionId: currentInteractionId,
               sessionId: ensureSessionId(),
-              rating: value === 'up' ? 5 : 1,
-              feedback: value
+              rating: i,
+              feedback: i >= 4 ? 'up' : i <= 2 ? 'down' : 'neutral'
             })
           });
-
-          container.dataset.locked = 'true';
-          const buttons = container.querySelectorAll('.feedback-btn');
-          buttons.forEach(b => {
-            b.classList.add('locked');
-            if (b.dataset.value === value) {
-              b.classList.add(isPositive ? 'active' : 'active-neg');
-            }
-          });
-
-          const thanks = document.createElement('span');
-          thanks.className = 'feedback-thanks';
-          thanks.textContent = 'Tack för din feedback';
-          container.appendChild(thanks);
         } catch (err) {
           console.error('Feedback webhook error:', err);
         }
       });
-      return btn;
-    };
 
-    container.appendChild(makeBtn('up',   'Svaret var hjälpsamt',    '<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7V10l4.34-9.66a1.93 1.93 0 0 1 3.66.94z"/>', true));
-    container.appendChild(makeBtn('down', 'Svaret var inte hjälpsamt','<path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H17v12l-4.34 9.66a1.93 1.93 0 0 1-3.66-.94z"/>', false));
+      stars.push(btn);
+      container.appendChild(btn);
+    }
 
     setTimeout(() => container.classList.add('visible'), 50);
     return container;
@@ -1394,11 +1403,14 @@
 
     if (chatMessages.children.length === 0) {
       ensureSessionId();
+      // Vänta tills öppnings-animationen (600ms) är klar innan välkomstmeddelandet läggs till.
+      // Detta förhindrar att DOM-ändringar triggar en layout-omräkning medan chat-window:s
+      // scale-/translate-animation pågår, vilket annars skapade visuell förskjutning.
       setTimeout(() => {
         addMessage('bot', 'Hej! Jag är Region Hallands AI-assistent. Vad kan jag hjälpa dig med idag?', false);
-      }, 300);
+      }, 650);
     }
-    setTimeout(() => chatInput.focus(), 350);
+    setTimeout(() => chatInput.focus(), 700);
   }
 
   function minimizeChat() {
