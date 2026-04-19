@@ -523,7 +523,7 @@
   /* ── Typing indicator ── */
   .typing-indicator {
     display: flex;
-    gap: 4px;
+    gap: 5px;
     padding: 8px 4px;
     align-items: center;
   }
@@ -532,22 +532,23 @@
     height: 7px;
     border-radius: 50%;
     background: var(--rh-green-bright);
-    animation: typeDot 1.2s ease-in-out infinite;
-    opacity: 0.3;
-    /* Säkerställer att scale-animationen skalar från centrum av pricken */
+    /* 1.6 s cykel + plateau på både dim- och bright-läget ger varje prick
+       tydligt mätbar tid i varje tillstånd istället för ett snabbt flash. */
+    animation: typeDot 1.6s ease-in-out infinite both;
+    opacity: 0.35;
     transform-origin: center center;
-    will-change: transform, opacity;
   }
-  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-  /* Pulse-effekt via scale istället för translateY — prickarna stannar på
-     sin linje och "andas" i storlek. Det upplevs mjukare och hoppar inte. */
+  .typing-indicator span:nth-child(2) { animation-delay: 0.25s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.5s; }
+  /* Plateau-keyframes: 0–25 % dim-paus, 25–45 % fade in, 45–60 % bright-paus,
+     60–80 % fade out, 80–100 % dim-paus. Varje fas får dwell-time, så
+     rytmen blir metodisk istället för pulserande. */
   @keyframes typeDot {
-    0%, 60%, 100% {
-      opacity: 0.3;
+    0%, 25%, 80%, 100% {
+      opacity: 0.35;
       transform: scale(0.8);
     }
-    30% {
+    45%, 60% {
       opacity: 1;
       transform: scale(1);
     }
