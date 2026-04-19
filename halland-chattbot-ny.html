@@ -3,36 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fråga Halland — Region Halland</title>
+<title>Fråga Halland – Region Halland</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    /* ─────────── Region Halland — livlig teal + mint-palett ─────────── */
-    /* Matchar Region Hallands webbplats: djup teal för text, livlig mint för accenter */
-    --rh-teal-deep:     #0E5F55;   /* rubriker, header, viktig text — djup teal */
-    --rh-teal:          #12776A;   /* primär brand-färg */
-    --rh-teal-hover:    #0B4B43;   /* hover/active på djup teal */
+    --rh-teal-deep:     #0E5F55;
+    --rh-teal:          #12776A;
+    --rh-teal-hover:    #0B4B43;
 
-    --rh-green:         #1FA372;   /* LIVLIG primär grön — för knappar och interaktion */
-    --rh-green-hover:   #178659;   /* hover-state */
-    --rh-green-bright:  #2BB881;   /* extra livlig — send-knapp, CTA */
+    --rh-green:         #1FA372;
+    --rh-green-hover:   #178659;
+    --rh-green-bright:  #2BB881;
 
-    --rh-mint:          #C4EBCA;   /* mint bakgrund, som på regionhalland.se */
-    --rh-mint-light:    #DFF2E3;   /* ljusare mint */
-    --rh-mint-softer:   #F0F9F2;   /* subtil mint-tonad bakgrund */
-    --rh-mint-bubble:   #E8F5EC;   /* för meddelandebubblor */
+    --rh-mint:          #C4EBCA;
+    --rh-mint-light:    #DFF2E3;
+    --rh-mint-softer:   #F0F9F2;
+    --rh-mint-bubble:   #E8F5EC;
 
-    --text:             #10332C;   /* djup teal-svart */
-    --text-muted:       #4F6760;   /* hjälptext — god kontrast mot vit (5.5:1) */
-    --text-soft:        #7A8F87;   /* minst viktiga texter */
+    --text:             #10332C;
+    --text-muted:       #4F6760;
+    --text-soft:        #7A8F87;
     --border:           #D8E6DC;
     --border-strong:    #B8CEC1;
     --bg:               #FFFFFF;
-    --bot-bubble:       #EFF7F1;   /* mjuk mint-tonad bot-bubbla */
-    --user-bubble:      #1FA372;   /* livlig grön användarbubbla */
+    --bot-bubble:       #EFF7F1;
+    --user-bubble:      #1FA372;
 
     --shadow-sm:  0 2px 6px rgba(14,95,85,0.08);
     --shadow-md:  0 8px 24px rgba(14,95,85,0.12), 0 2px 6px rgba(14,95,85,0.06);
@@ -44,6 +42,11 @@
     --radius-xl:  20px;
 
     --focus-ring: 0 0 0 3px rgba(31,163,114,0.35);
+
+    /* Centrala easing-kurvor – definieras en gång, används konsekvent */
+    --ease-spring:  cubic-bezier(0.16, 1, 0.3, 1);   /* mjuk spring för enter */
+    --ease-out:     cubic-bezier(0.22, 1, 0.36, 1);   /* smooth exit */
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);    /* generell övergång */
   }
 
   body {
@@ -55,7 +58,7 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* ── Demo sida — simulerar regionhalland.se ── */
+  /* ── Demo sida ── */
   .demo-page {
     padding: 60px 40px;
     max-width: 800px;
@@ -76,9 +79,9 @@
     max-width: 560px;
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      CHAT TOGGLE BUTTON
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   .chat-toggle {
     position: fixed;
     bottom: 24px;
@@ -97,7 +100,12 @@
     font-weight: 600;
     cursor: pointer;
     box-shadow: 0 6px 20px rgba(31,163,114,0.28), 0 2px 6px rgba(31,163,114,0.14);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Separata egenskaper ger mjukare, oberoende övergångar */
+    transition:
+      opacity   0.55s var(--ease-spring),
+      transform 0.55s var(--ease-spring),
+      background-color 0.25s var(--ease-standard),
+      box-shadow 0.35s var(--ease-standard);
     letter-spacing: 0.1px;
   }
   .chat-toggle:hover {
@@ -115,15 +123,16 @@
   .chat-toggle.hidden {
     opacity: 0;
     pointer-events: none;
-    transform: scale(0.8) translateY(10px);
+    /* Mer rörelse och djupare scale för tydlig försvinnande-känsla */
+    transform: scale(0.72) translateY(20px);
   }
   .chat-toggle svg {
     flex-shrink: 0;
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      CHAT WINDOW
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   .chat-window {
     position: fixed;
     bottom: 24px;
@@ -140,9 +149,15 @@
     box-shadow: var(--shadow-lg);
     opacity: 0;
     pointer-events: none;
-    transform: translateY(20px) scale(0.95);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Stängt läge: mer rörelse + subtil scale ger premium "dyker upp ur knappen"-känsla */
+    transform: translateY(32px) scale(0.92);
+    /* Längre duration + spring-easing för ett flytande, organiskt öppnande */
+    transition:
+      opacity   0.6s var(--ease-spring),
+      transform 0.6s var(--ease-spring);
     border: 1px solid var(--border);
+    /* will-change förbättrar GPU-kompositing för jämnare animering */
+    will-change: transform, opacity;
   }
   .chat-window.open {
     opacity: 1;
@@ -164,8 +179,10 @@
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
-    position: relative;
+    /* Starkare nederkant + z-index säkerställer att disclaimern aldrig hamnar bakom headern */
+    border-bottom: 1.5px solid rgba(0,0,0,0.12);
+    position: sticky;
+    top: 0;
     z-index: 15;
   }
   .chat-header-title {
@@ -178,12 +195,19 @@
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.16);
+    background: #FFFFFF;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    border: 1.5px solid rgba(255,255,255,0.22);
+    border: 1.5px solid rgba(255,255,255,0.5);
+    overflow: hidden;
+  }
+  .chat-header-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
   }
   .chat-header-text {
     display: flex;
@@ -219,18 +243,22 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Länge nog för en mjuk fade, men inte trög */
     transition:
-      background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background  0.3s var(--ease-spring),
+      opacity     0.3s var(--ease-spring),
+      transform   0.25s var(--ease-spring);
     opacity: 0.82;
     position: relative;
   }
   .chat-header-actions button:hover {
     background: rgba(255,255,255,0.18);
     opacity: 1;
+    transform: scale(1.08);
   }
   .chat-header-actions button:active {
     background: rgba(255,255,255,0.28);
+    transform: scale(0.94);
   }
   .chat-header-actions button:focus-visible {
     outline: none;
@@ -262,6 +290,7 @@
     text-decoration: underline;
     text-underline-offset: 2px;
     font-weight: 600;
+    transition: color 0.25s var(--ease-standard);
   }
   .chat-disclaimer a:hover {
     color: var(--rh-teal-deep);
@@ -301,16 +330,23 @@
     gap: 10px;
     max-width: 88%;
     min-width: 0;
-    animation: msgIn 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Spring-easing + scale ger bubblan ett organiskt "poppar upp"-intryck */
+    animation: msgIn 0.65s var(--ease-spring) both;
+    /* Transition behövs för fading-out-klassen */
+    transition:
+      opacity   0.45s var(--ease-out),
+      transform 0.45s var(--ease-out);
+    will-change: transform, opacity;
   }
   @keyframes msgIn {
-    0%   { opacity: 0; transform: translateY(10px); }
-    100% { opacity: 1; transform: translateY(0); }
+    0%   { opacity: 0; transform: translateY(18px) scale(0.95); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
   }
   .msg.fading-out {
     opacity: 0;
-    transform: translateY(-4px);
+    /* Skapar en tydligare rörelse uppåt och lite komprimering vid fade-ut */
+    transform: translateY(-8px) scale(0.96);
   }
 
   .msg.bot { align-self: flex-start; }
@@ -326,8 +362,16 @@
     justify-content: center;
     font-size: 13px;
     font-weight: 700;
-    background: var(--rh-mint-bubble);
+    background: #FFFFFF;
     color: var(--rh-green-hover);
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+  }
+  .msg-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
   }
   .msg.user .msg-avatar {
     background: var(--rh-green);
@@ -383,14 +427,14 @@
   }
   .msg.user .msg-time { text-align: right; }
 
-  /* ── Länk i meddelandet — matchar paletten ── */
+  /* ── Länk i meddelandet ── */
   .chat-link {
     color: var(--rh-green-hover);
     text-decoration: underline;
     text-underline-offset: 2px;
     text-decoration-thickness: 1.2px;
     font-weight: 600;
-    transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 0.3s var(--ease-spring);
   }
   .chat-link:hover {
     color: var(--rh-teal-deep);
@@ -408,15 +452,18 @@
   .msg-bubble li { margin-bottom: 4px; }
   .msg-bubble strong { font-weight: 700; }
 
-  /* ── Tumme upp/ner feedback (ersätter stjärnor) ── */
+  /* ── Tumme upp/ner feedback ── */
   .msg-feedback {
     display: flex;
     gap: 4px;
     margin-top: 2px;
     padding-left: 2px;
     opacity: 0;
-    transform: translateY(-4px);
-    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.6s, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.6s;
+    transform: translateY(-6px);
+    /* Längre delay + spring-easing → feedbacken glider mjukt in efter svaret */
+    transition:
+      opacity   0.55s var(--ease-spring) 0.85s,
+      transform 0.55s var(--ease-spring) 0.85s;
   }
   .msg-feedback.visible {
     opacity: 1;
@@ -433,9 +480,10 @@
     align-items: center;
     justify-content: center;
     transition:
-      background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background    0.3s var(--ease-spring),
+      border-color  0.3s var(--ease-spring),
+      color         0.3s var(--ease-spring),
+      transform     0.25s var(--ease-spring);
     font-family: inherit;
     font-size: 11px;
     font-weight: 500;
@@ -444,27 +492,32 @@
     background: var(--rh-mint-bubble);
     border-color: var(--rh-green-bright);
     color: var(--rh-green-hover);
+    transform: translateY(-1px) scale(1.04);
   }
   .feedback-btn.active {
     background: var(--rh-green);
     border-color: var(--rh-green);
     color: #FFFFFF;
-    animation: feedbackBump 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    /* Överdämpad spring: lätt överskott → faller tillbaka → ro */
+    animation: feedbackBump 0.7s var(--ease-spring);
   }
   .feedback-btn.active-neg {
     background: #8B3A3A;
     border-color: #8B3A3A;
     color: #FFFFFF;
-    animation: feedbackBump 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: feedbackBump 0.7s var(--ease-spring);
   }
   @keyframes feedbackBump {
     0%   { transform: scale(1); }
-    50%  { transform: scale(1.08); }
+    35%  { transform: scale(1.18); }
+    65%  { transform: scale(0.94); }
+    85%  { transform: scale(1.04); }
     100% { transform: scale(1); }
   }
   .feedback-btn.locked {
     cursor: default;
     opacity: 0.55;
+    transform: none !important;
   }
   .feedback-btn.locked.active,
   .feedback-btn.locked.active-neg {
@@ -480,10 +533,11 @@
     font-style: italic;
     align-self: center;
     margin-left: 4px;
-    animation: thanksIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: thanksIn 0.55s var(--ease-spring);
   }
   @keyframes thanksIn {
-    0%   { opacity: 0; transform: translateX(-8px); }
+    0%   { opacity: 0; transform: translateX(-10px); }
+    60%  { opacity: 1; }
     100% { opacity: 1; transform: translateX(0); }
   }
 
@@ -499,19 +553,26 @@
     height: 7px;
     border-radius: 50%;
     background: var(--rh-green-bright);
-    animation: typeDot 1.3s infinite;
-    opacity: 0.5;
+    /* Organisk rörelse: kombinerar opacity och Y-förflyttning */
+    animation: typeDot 1.6s var(--ease-spring) infinite;
+    opacity: 0.3;
   }
-  .typing-indicator span:nth-child(2) { animation-delay: 0.18s; }
-  .typing-indicator span:nth-child(3) { animation-delay: 0.36s; }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.22s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.44s; }
   @keyframes typeDot {
-    0%, 60%, 100% { opacity: 0.3; transform: scale(0.85); }
-    30% { opacity: 1; transform: scale(1); }
+    0%, 65%, 100% {
+      opacity: 0.25;
+      transform: scale(0.82) translateY(0px);
+    }
+    32% {
+      opacity: 1;
+      transform: scale(1.15) translateY(-4px);
+    }
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      INPUT BAR
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   .chat-input-bar {
     display: flex;
     align-items: center;
@@ -537,9 +598,9 @@
     font-size: 14.5px;
     color: var(--text);
     transition:
-      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-color 0.35s var(--ease-spring),
+      box-shadow   0.35s var(--ease-spring),
+      background   0.35s var(--ease-spring);
     background: #FFFFFF;
   }
   .chat-input-wrap input:focus {
@@ -572,18 +633,20 @@
     align-items: center;
     justify-content: center;
     transition:
-      background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background   0.3s var(--ease-spring),
+      transform    0.35s var(--ease-spring),
+      box-shadow   0.35s var(--ease-spring);
     box-shadow: 0 2px 6px rgba(31,163,114,0.25);
   }
   .send-btn-inline:hover {
     background: var(--rh-green-hover);
-    transform: translateY(-50%) scale(1.05);
-    box-shadow: 0 4px 12px rgba(31,163,114,0.35);
+    /* Kombinera translateY(-50%) med scale för hover-lyft */
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 5px 14px rgba(31,163,114,0.38);
   }
   .send-btn-inline:active {
-    transform: translateY(-50%) scale(0.95);
+    transform: translateY(-50%) scale(0.93);
+    box-shadow: 0 2px 6px rgba(31,163,114,0.2);
   }
   .send-btn-inline:focus-visible {
     outline: none;
@@ -603,7 +666,9 @@
     font-family: inherit;
     color: var(--text-soft);
     pointer-events: none;
-    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      opacity 0.4s var(--ease-spring),
+      color   0.4s var(--ease-spring);
     opacity: 0;
     font-weight: 500;
   }
@@ -611,7 +676,7 @@
   .char-counter.warning { color: #B87820; opacity: 1; }
   .char-counter.limit { color: #A84040; font-weight: 700; opacity: 1; }
 
-  /* Utility-knappar — diskreta, ikonbaserade med tooltips */
+  /* Utility-knappar */
   .util-btn {
     background: transparent;
     border: 1.5px solid var(--border-strong);
@@ -624,36 +689,39 @@
     align-items: center;
     justify-content: center;
     transition:
-      background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background    0.35s var(--ease-spring),
+      border-color  0.35s var(--ease-spring),
+      transform     0.35s var(--ease-spring),
+      color         0.35s var(--ease-spring),
+      box-shadow    0.35s var(--ease-spring);
     flex-shrink: 0;
   }
   .util-btn:hover {
     background: var(--rh-mint-bubble);
     border-color: var(--rh-green);
-    transform: translateY(-1px);
+    transform: translateY(-2px) scale(1.06);
     color: var(--rh-green);
+    box-shadow: 0 4px 12px rgba(31,163,114,0.18);
+  }
+  .util-btn:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: none;
   }
   .util-btn:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
   }
-  .util-btn:active {
-    transform: translateY(0);
-  }
 
-  /* ══════════════════════════════════════════
-     TOOLTIPS — mer diskreta, neutral grå
-  ══════════════════════════════════════════ */
+  /* ────────────────────────────────────────
+     TOOLTIPS
+  ──────────────────────────────────────── */
   [data-tooltip] { position: relative; }
   [data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
     bottom: calc(100% + 8px);
     left: 50%;
-    transform: translateX(-50%) translateY(4px);
+    transform: translateX(-50%) translateY(6px);
     background: var(--rh-teal-deep);
     color: #FFFFFF;
     font-family: inherit;
@@ -664,7 +732,10 @@
     white-space: nowrap;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Lite längre duration + spring → tooltips glider in istället för att blixtuppträda */
+    transition:
+      opacity   0.3s var(--ease-spring),
+      transform 0.3s var(--ease-spring);
     z-index: 1000;
     box-shadow: var(--shadow-sm);
   }
@@ -673,12 +744,14 @@
     position: absolute;
     bottom: calc(100% + 2px);
     left: 50%;
-    transform: translateX(-50%) translateY(4px);
+    transform: translateX(-50%) translateY(6px);
     border: 5px solid transparent;
     border-top-color: var(--rh-teal-deep);
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      opacity   0.3s var(--ease-spring),
+      transform 0.3s var(--ease-spring);
     z-index: 1000;
   }
   [data-tooltip]:hover::after,
@@ -699,10 +772,9 @@
     border-bottom-color: var(--rh-teal-deep);
   }
 
-  /* Vänsterjusterad tooltip — för knappar nära vänsterkanten så texten inte klipps av */
   [data-tooltip-align="left"]::after {
     left: 0;
-    transform: translateX(0) translateY(4px);
+    transform: translateX(0) translateY(6px);
   }
   [data-tooltip-align="left"]:hover::after,
   [data-tooltip-align="left"]:focus-visible::after {
@@ -710,18 +782,17 @@
   }
   [data-tooltip-align="left"]::before {
     left: 18px;
-    transform: translateX(0) translateY(4px);
+    transform: translateX(0) translateY(6px);
   }
   [data-tooltip-align="left"]:hover::before,
   [data-tooltip-align="left"]:focus-visible::before {
     transform: translateX(0) translateY(0);
   }
 
-  /* Högerjusterad tooltip — för knappar nära högerkanten så texten inte klipps av */
   [data-tooltip-align="right"]::after {
     left: auto;
     right: 0;
-    transform: translateX(0) translateY(4px);
+    transform: translateX(0) translateY(6px);
   }
   [data-tooltip-align="right"]:hover::after,
   [data-tooltip-align="right"]:focus-visible::after {
@@ -730,21 +801,21 @@
   [data-tooltip-align="right"]::before {
     left: auto;
     right: 12px;
-    transform: translateX(0) translateY(4px);
+    transform: translateX(0) translateY(6px);
   }
   [data-tooltip-align="right"]:hover::before,
   [data-tooltip-align="right"]:focus-visible::before {
     transform: translateX(0) translateY(0);
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      RATE LIMIT TOAST
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   .rate-limit-toast {
     position: absolute;
     bottom: 78px;
     left: 50%;
-    transform: translateX(-50%) translateY(10px);
+    transform: translateX(-50%) translateY(12px);
     background: #7A3030;
     color: #FFFFFF;
     padding: 10px 16px;
@@ -755,7 +826,9 @@
     box-shadow: 0 6px 20px rgba(122,48,48,0.35);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      opacity   0.4s var(--ease-spring),
+      transform 0.4s var(--ease-spring);
     z-index: 10;
     white-space: nowrap;
   }
@@ -765,9 +838,9 @@
     transform: translateX(-50%) translateY(0);
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      ACTIONS MENU (dropdown)
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   .actions-menu {
     position: absolute;
     top: 58px;
@@ -779,17 +852,19 @@
     min-width: 200px;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(-6px);
+    /* Stängt: lite mer rörelse + lätt scale → menuyn glider naturligt ner */
+    transform: translateY(-12px) scale(0.96);
+    transform-origin: top right;
     transition:
-      opacity 0.28s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity   0.4s var(--ease-spring),
+      transform 0.4s var(--ease-spring);
     z-index: 50;
     overflow: hidden;
   }
   .actions-menu.open {
     opacity: 1;
     pointer-events: all;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
   .actions-menu button {
     width: 100%;
@@ -805,11 +880,16 @@
     color: var(--text);
     cursor: pointer;
     text-align: left;
-    transition: background 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    transition:
+      background 0.3s var(--ease-spring),
+      color      0.3s var(--ease-spring),
+      transform  0.2s var(--ease-spring);
   }
   .actions-menu button:hover {
     background: var(--rh-mint-softer);
     color: var(--rh-green-hover);
+    /* Subtil indragning ger känsla av interaktivitet utan att störa layouten */
+    padding-left: 18px;
   }
   .actions-menu button:focus-visible {
     outline: none;
@@ -823,9 +903,9 @@
     color: var(--rh-green);
   }
 
-  /* ══════════════════════════════════════════
-     CONTACT OVERLAY — smooth fade in/out
-  ══════════════════════════════════════════ */
+  /* ────────────────────────────────────────
+     CONTACT OVERLAY – smooth fade in/out
+  ──────────────────────────────────────── */
   .contact-overlay {
     position: absolute;
     inset: 0;
@@ -835,10 +915,11 @@
     flex-direction: column;
     opacity: 0;
     pointer-events: none;
-    transform: translateY(12px);
+    /* Mer rörelse + spring-easing → overlayns inträde känns luftigt och mjukt */
+    transform: translateY(20px);
     transition:
-      opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-      transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity   0.5s var(--ease-spring),
+      transform 0.5s var(--ease-spring);
   }
   .contact-overlay.visible {
     opacity: 1;
@@ -883,16 +964,19 @@
     align-items: center;
     justify-content: center;
     transition:
-      background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background 0.3s var(--ease-spring),
+      color      0.3s var(--ease-spring),
+      transform  0.25s var(--ease-spring);
     flex-shrink: 0;
   }
   .contact-close-btn:hover {
     background: rgba(31,163,114,0.14);
     color: var(--rh-green);
+    transform: scale(1.1) rotate(5deg);
   }
   .contact-close-btn:active {
     background: rgba(31,163,114,0.22);
+    transform: scale(0.92);
   }
   .contact-close-btn:focus-visible {
     outline: none;
@@ -915,14 +999,18 @@
     padding: 12px 14px;
     margin-bottom: 10px;
     transition:
-      background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      background    0.35s var(--ease-spring),
+      border-color  0.35s var(--ease-spring),
+      transform     0.35s var(--ease-spring),
+      box-shadow    0.35s var(--ease-spring);
   }
   .contact-section:last-child { margin-bottom: 0; }
 
   .contact-section:hover {
     background: #DFF0E4;
     border-color: rgba(31,163,114,0.22);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(14,95,85,0.1);
   }
 
   .contact-section-title {
@@ -954,7 +1042,7 @@
     font-weight: 700;
     text-decoration: none;
     text-align: right;
-    transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: color 0.3s var(--ease-spring);
   }
   .contact-value:hover,
   .contact-value:focus-visible {
@@ -993,7 +1081,7 @@
     }
   }
 
-  /* Reduced motion — respektera tillgänglighetspreferens */
+  /* Reduced motion – respektera tillgänglighetspreferens */
   @media (prefers-reduced-motion: reduce) {
     * {
       animation-duration: 0.01ms !important;
@@ -1010,7 +1098,7 @@
   <p>Det här är en demo-sida för att visa chattwidgeten. Klicka på knappen längst ner till höger för att öppna chatten.</p>
 </div>
 
-<!-- ════════ CHAT TOGGLE BUTTON ════════ -->
+<!-- ──────── CHAT TOGGLE BUTTON ──────── -->
 <button class="chat-toggle" id="chatToggle" onclick="openChat()" aria-label="Öppna chatt med Fråga Halland">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
@@ -1018,17 +1106,14 @@
   Fråga Halland
 </button>
 
-<!-- ════════ CHAT WINDOW ════════ -->
+<!-- ──────── CHAT WINDOW ──────── -->
 <div class="chat-window" id="chatWindow" role="dialog" aria-label="Chatt med Fråga Halland">
 
   <!-- Header -->
   <div class="chat-header">
     <div class="chat-header-title">
       <div class="chat-header-icon" aria-hidden="true">
-        <!-- Ren, geometrisk chatt-bubbla som logomärke -->
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-        </svg>
+        <img src="Pictures/IntegraAI/390394.jpg" alt="Region Halland logotyp">
       </div>
       <div class="chat-header-text">
         <div class="chat-header-name">Fråga Halland</div>
@@ -1202,9 +1287,9 @@
   const rateLimitToast = document.getElementById('rateLimitToast');
   const actionsMenu    = document.getElementById('actionsMenu');
 
-  /* ══════════════════════════════════════════
-     RATE LIMITING — max 2 meddelanden per 10 sek
-  ══════════════════════════════════════════ */
+  /* ────────────────────────────────────────
+     RATE LIMITING – max 2 meddelanden per 10 sek
+  ──────────────────────────────────────── */
   const messageTimes = [];
   const RATE_LIMIT_COUNT = 2;
   const RATE_LIMIT_WINDOW = 10000;
@@ -1226,9 +1311,9 @@
     }, 3500);
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      ACTIONS MENU
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   function toggleActionsMenu(e) {
     if (e) e.stopPropagation();
     actionsMenu.classList.toggle('open');
@@ -1242,9 +1327,9 @@
     }
   });
 
-  /* ══════════════════════════════════════════
-     THUMBS FEEDBACK (ersätter stjärnsystem)
-  ══════════════════════════════════════════ */
+  /* ────────────────────────────────────────
+     THUMBS FEEDBACK
+  ──────────────────────────────────────── */
   function createFeedback(interactionId) {
     const container = document.createElement('div');
     container.className = 'msg-feedback';
@@ -1286,7 +1371,6 @@
             }
           });
 
-          // Tacktext
           const thanks = document.createElement('span');
           thanks.className = 'feedback-thanks';
           thanks.textContent = 'Tack för din feedback';
@@ -1301,14 +1385,13 @@
     container.appendChild(makeBtn('up',   'Svaret var hjälpsamt',    '<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H7V10l4.34-9.66a1.93 1.93 0 0 1 3.66.94z"/>', true));
     container.appendChild(makeBtn('down', 'Svaret var inte hjälpsamt','<path d="M17 14V2"/><path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H17v12l-4.34 9.66a1.93 1.93 0 0 1-3.66-.94z"/>', false));
 
-    // Visas med liten fördröjning efter att meddelandet renderats
     setTimeout(() => container.classList.add('visible'), 50);
     return container;
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      CORE CHAT FUNCTIONS
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   function openChat() {
     chatWindow.classList.add('open');
     chatToggle.classList.add('hidden');
@@ -1334,7 +1417,6 @@
     closeActionsMenu();
     document.getElementById('contactOverlay').classList.remove('visible');
 
-    // Vänta tills chattfönstret har glidit ut innan vi rensar innehåll
     setTimeout(() => {
       chatMessages.innerHTML = '';
       chatInput.disabled = false;
@@ -1345,7 +1427,6 @@
   }
 
   function newSession() {
-    // Fade ut befintliga meddelanden först
     const existingMessages = chatMessages.querySelectorAll('.msg');
     existingMessages.forEach(msg => msg.classList.add('fading-out'));
     document.getElementById('contactOverlay').classList.remove('visible');
@@ -1371,7 +1452,7 @@
 
     const now = new Date();
     const dateStr = now.toLocaleString('sv-SE');
-    let text = 'Fråga Halland — Konversation\n';
+    let text = 'Fråga Halland – Konversation\n';
     text += 'Region Halland\n';
     text += 'Datum: ' + dateStr + '\n';
     text += '─'.repeat(50) + '\n\n';
@@ -1441,7 +1522,6 @@
     const len = chatInput.value.length;
     counter.textContent = len + ' / 1000';
     counter.classList.remove('warning', 'limit', 'visible');
-    // Visas först när användaren närmar sig gränsen — rensar UI
     if (len >= 1000) counter.classList.add('limit', 'visible');
     else if (len >= 800) counter.classList.add('warning', 'visible');
     else if (len >= 700) counter.classList.add('visible');
@@ -1460,9 +1540,7 @@
     let avatarHTML;
     if (type === 'bot') {
       avatarHTML = `<div class="msg-avatar" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-        </svg>
+        <img src="Pictures/IntegraAI/390394.jpg" alt="Region Halland logotyp">
       </div>`;
     } else if (type === 'human') {
       avatarHTML = `<div class="msg-avatar" aria-hidden="true">
@@ -1521,9 +1599,7 @@
     el.id = 'typingIndicator';
     el.innerHTML = `
       <div class="msg-avatar" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-        </svg>
+        <img src="Pictures/IntegraAI/390394.jpg" alt="Region Halland logotyp">
       </div>
       <div class="msg-content">
         <div class="msg-bubble">
@@ -1538,15 +1614,13 @@
     const el = document.getElementById('typingIndicator');
     if (el) {
       el.classList.add('fading-out');
-      el.style.transition = 'opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-      setTimeout(() => el.remove(), 300);
+      setTimeout(() => el.remove(), 450);
     }
   }
 
   function showContactInfo() {
     const overlay = document.getElementById('contactOverlay');
     overlay.classList.add('visible');
-    // Säkerställ att användaren landar högst upp, inte längst ner
     const inner = overlay.querySelector('.contact-overlay-inner');
     if (inner) inner.scrollTop = 0;
   }
@@ -1554,9 +1628,9 @@
     document.getElementById('contactOverlay').classList.remove('visible');
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      SESSION + WEBHOOK
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   const WEBHOOK_URL = 'https://api.halmstadchattbot.se/Halland';
   let sessionId = localStorage.getItem('halland_chat_session_id') || '';
 
