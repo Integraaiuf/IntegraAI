@@ -534,17 +534,22 @@
     background: var(--rh-green-bright);
     animation: typeDot 1.2s ease-in-out infinite;
     opacity: 0.3;
+    /* Säkerställer att scale-animationen skalar från centrum av pricken */
+    transform-origin: center center;
+    will-change: transform, opacity;
   }
   .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
   .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  /* Pulse-effekt via scale istället för translateY — prickarna stannar på
+     sin linje och "andas" i storlek. Det upplevs mjukare och hoppar inte. */
   @keyframes typeDot {
     0%, 60%, 100% {
       opacity: 0.3;
-      transform: translateY(0);
+      transform: scale(0.8);
     }
     30% {
       opacity: 1;
-      transform: translateY(-5px);
+      transform: scale(1);
     }
   }
 
