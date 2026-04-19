@@ -1594,7 +1594,17 @@
 
     if (type === 'bot' || type === 'human') {
       requestAnimationFrame(() => {
-        msg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        /* scrollIntoView({block:'start'}) propagerar uppåt i DOM-trädet och
+           skrollar även `.chat-body` (som trots `overflow: hidden` kan få
+           scrollTop ändrat via JS). Det drar disclaimern uppåt in bakom
+           headern vid ca 650 ms efter öppning. Vi räknar därför ut scroll-
+           positionen manuellt och skrollar ENDAST `.chat-messages`. */
+        const msgRect = msg.getBoundingClientRect();
+        const containerRect = chatMessages.getBoundingClientRect();
+        const delta = msgRect.top - containerRect.top;
+        const maxScroll = chatMessages.scrollHeight - chatMessages.clientHeight;
+        const target = Math.min(Math.max(0, chatMessages.scrollTop + delta), maxScroll);
+        chatMessages.scrollTo({ top: target, behavior: 'smooth' });
       });
     } else {
       chatMessages.scrollTop = chatMessages.scrollHeight;
