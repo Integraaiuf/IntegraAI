@@ -79,25 +79,13 @@
   .nav:not(.is-scrolled) .bot-toggle { color: #ffffff; opacity: 0.95; }
   .nav:not(.is-scrolled) .bot-toggle:hover { opacity: 1; }
   .nav-inner {
-    max-width: var(--max); margin: 0 auto;
-    padding: 18px var(--pad-x);
+    max-width: none; margin: 0;
+    padding: 18px clamp(24px, 4vw, 56px);
     display: flex; align-items: center; gap: 32px;
   }
   .brand {
     display: inline-flex; align-items: center; gap: 10px;
     font-weight: 600; letter-spacing: -0.01em; font-size: 17px;
-  }
-  .brand-mark { width: 22px; height: 22px; position: relative; }
-  .brand-mark::before {
-    content: ""; position: absolute; inset: 0;
-    background: var(--fg);
-    clip-path: polygon(50% 8%, 92% 92%, 8% 92%);
-  }
-  .brand-mark::after {
-    content: ""; position: absolute; inset: 0;
-    background: var(--bg);
-    clip-path: polygon(50% 32%, 72% 92%, 28% 92%);
-    opacity: 0.35;
   }
   .nav-links { display: flex; align-items: center; gap: 6px; margin-left: auto; }
   .nav-link {
@@ -729,7 +717,6 @@
 <header class="nav" id="nav" role="banner">
   <div class="nav-inner">
     <a href="#" class="brand" aria-label="Integra AI startsida">
-      <span class="brand-mark" aria-hidden="true"></span>
       <span>Integra&nbsp;AI</span>
     </a>
 
