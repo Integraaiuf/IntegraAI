@@ -708,9 +708,12 @@
     .card:hover { transform: none; box-shadow: none; border-color: transparent; }
   }
 
+  .hero-photo { will-change: transform; }
+
   @media (prefers-reduced-motion: reduce) {
     .fade-up { opacity: 1 !important; transform: none !important; transition: none !important; }
     .btn-primary, .nav-cta, .card { transition: none; }
+    .hero-photo { transform: none !important; }
   }
 </style>
 </head>
@@ -807,35 +810,35 @@
   <section class="tjanster" id="tjanster" aria-labelledby="tjanster-title">
     <div class="tjanster-inner">
       <div class="sec-intro">
-        <div>
+        <div class="fade-up" data-delay="0">
           <div class="sec-eyebrow">Våra tjänster</div>
           <h2 class="sec-h2" id="tjanster-title">Fyra sätt att integrera AI i er verksamhet</h2>
         </div>
-        <p class="sec-lede">
+        <p class="sec-lede fade-up" data-delay="120">
           Från första samtal till AI som faktiskt arbetar. Vi bygger det som passar just ert företag.
         </p>
       </div>
 
       <div class="cards">
-        <article class="card">
+        <article class="card fade-up" data-delay="0">
           <span class="card-index">01</span>
           <div class="card-icon" aria-hidden="true"><i data-lucide="workflow"></i></div>
           <h3 class="card-title">AI-agenter</h3>
           <p class="card-desc">Skräddarsydda AI-agenter som automatiserar era arbetsflöden och frigör tid till det som faktiskt driver företaget framåt.</p>
         </article>
-        <article class="card">
+        <article class="card fade-up" data-delay="100">
           <span class="card-index">02</span>
           <div class="card-icon" aria-hidden="true"><i data-lucide="message-circle"></i></div>
           <h3 class="card-title">AI-chattbotar</h3>
           <p class="card-desc">Intelligenta chattbotar tränade på ert företags egen data — tillgängliga för kunder och medarbetare dygnet runt.</p>
         </article>
-        <article class="card">
+        <article class="card fade-up" data-delay="200">
           <span class="card-index">03</span>
           <div class="card-icon" aria-hidden="true"><i data-lucide="layout"></i></div>
           <h3 class="card-title">Webbutveckling</h3>
           <p class="card-desc">Moderna, snabba hemsidor byggda för att konvertera besökare till kunder — med AI integrerat där det gör skillnad.</p>
         </article>
-        <article class="card">
+        <article class="card fade-up" data-delay="300">
           <span class="card-index">04</span>
           <div class="card-icon" aria-hidden="true"><i data-lucide="trending-up"></i></div>
           <h3 class="card-title">Marknadsföring</h3>
@@ -847,14 +850,14 @@
 
   <section class="om" id="om" aria-labelledby="om-title">
     <div class="om-inner">
-      <div class="om-head">
+      <div class="om-head fade-up" data-delay="0">
         <div class="om-eyebrow">Om oss</div>
         <h2 class="om-h2" id="om-title">Ett ungt team <span class="soft">med stor nyfikenhet</span></h2>
         <p class="om-lede">
           Integra AI är ett UF-företag från Halmstad. Vi är en liten grupp studenter som bygger det vi själva saknade: en AI-partner som talar klarspråk och levererar verkligt värde.
         </p>
       </div>
-      <div class="om-body">
+      <div class="om-body fade-up" data-delay="120">
         <p>
           Vi startade Integra AI för att hjälpa företag runt omkring oss att ta steget in i AI-eran — utan jargong, utan onödig komplexitet och utan långa bindningstider.
         </p>
@@ -865,9 +868,9 @@
           Varje uppdrag börjar med ett samtal. Vi lyssnar mer än vi pratar, förstår hur ni arbetar idag och föreslår bara det som gör verklig skillnad. Inga paketlösningar — bara arbete som bär.
         </p>
       </div>
-      <div class="om-stats">
+      <div class="om-stats fade-up" data-delay="0">
         <div class="om-stat">
-          <span class="om-stat-num">24h</span>
+          <span class="om-stat-num" data-count-to="24" data-count-suffix="h">24h</span>
           <span class="om-stat-label">Svarstid på förfrågningar</span>
         </div>
         <div class="om-stat">
@@ -884,14 +887,14 @@
 
   <section class="faq" id="faq" aria-labelledby="faq-title">
     <div class="faq-inner">
-      <div class="faq-head">
+      <div class="faq-head fade-up" data-delay="0">
         <div class="sec-eyebrow">Vanliga frågor</div>
         <h2 class="faq-h2" id="faq-title">Svar på det ni <span class="soft">brukar undra</span></h2>
         <p class="faq-lede">
           Har ni en fråga som inte står här? Skicka ett mail — vi svarar inom 24 timmar.
         </p>
       </div>
-      <div class="faq-list" role="list">
+      <div class="faq-list fade-up" data-delay="120" role="list">
         <div class="faq-item" role="listitem">
           <button class="faq-q" aria-expanded="false">
             <span>Vad kostar det att börja med AI?</span>
@@ -969,12 +972,12 @@
 
   <section class="kontakt" id="kontakt" aria-labelledby="kontakt-title">
     <div class="kontakt-inner">
-      <h2 class="kontakt-h2" id="kontakt-title">Kontakta oss</h2>
-      <a class="kontakt-email" href="mailto:integraaiuf@gmail.com">
+      <h2 class="kontakt-h2 fade-up" id="kontakt-title" data-delay="0">Kontakta oss</h2>
+      <a class="kontakt-email fade-up" data-delay="120" href="mailto:integraaiuf@gmail.com">
         integraaiuf@gmail.com
         <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M3 9 H15 M10 4 L15 9 L10 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <p class="kontakt-note">Svar inom 24 timmar. Första samtalet är alltid kostnadsfritt.</p>
+      <p class="kontakt-note fade-up" data-delay="200">Svar inom 24 timmar. Första samtalet är alltid kostnadsfritt.</p>
     </div>
   </section>
 </main>
@@ -995,11 +998,76 @@
   window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.fade-up').forEach(el => {
+    const fadeEls = document.querySelectorAll('.fade-up');
+    const heroEls = document.querySelectorAll('.hero .fade-up');
+    heroEls.forEach(el => {
       const d = parseInt(el.getAttribute('data-delay') || '0', 10);
       setTimeout(() => el.classList.add('in'), 120 + d);
     });
+
+    const fadeObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const d = parseInt(el.getAttribute('data-delay') || '0', 10);
+        setTimeout(() => el.classList.add('in'), d);
+        fadeObserver.unobserve(el);
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
+
+    fadeEls.forEach(el => {
+      if (el.closest('.hero')) return;
+      fadeObserver.observe(el);
+    });
+
+    const heroPhoto = document.querySelector('.hero-photo');
+    const heroSection = document.querySelector('.hero');
+    if (heroPhoto && heroSection && !reduceMotion) {
+      let ticking = false;
+      const updateParallax = () => {
+        const y = window.scrollY;
+        const h = heroSection.offsetHeight;
+        if (y < h) {
+          heroPhoto.style.transform = `translate3d(0, ${y * 0.35}px, 0)`;
+        }
+        ticking = false;
+      };
+      window.addEventListener('scroll', () => {
+        if (!ticking) { requestAnimationFrame(updateParallax); ticking = true; }
+      }, { passive: true });
+      updateParallax();
+    }
+
+    const animateCount = (el, target, suffix, duration = 1400) => {
+      const start = performance.now();
+      const step = (now) => {
+        const t = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - t, 3);
+        el.textContent = Math.round(target * eased) + suffix;
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    };
+    const countObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const el = entry.target;
+        const target = parseInt(el.getAttribute('data-count-to'), 10);
+        const suffix = el.getAttribute('data-count-suffix') || '';
+        if (reduceMotion) {
+          el.textContent = target + suffix;
+        } else {
+          el.textContent = '0' + suffix;
+          animateCount(el, target, suffix);
+        }
+        countObserver.unobserve(el);
+      });
+    }, { threshold: 0.4 });
+    document.querySelectorAll('[data-count-to]').forEach(el => countObserver.observe(el));
+
     if (window.lucide && window.lucide.createIcons) {
       try { window.lucide.createIcons(); } catch (e) {}
     }
