@@ -34,10 +34,10 @@
     --heading-scale: 1;
     --heading-weight: 500;
     --density: 1.25;
-    --grad: 0.44;
+    --grad: 0.5;
     --img-focus: 70% 80%;
-    --img-sat: 115%;
-    --img-bri: 100%;
+    --img-sat: 85%;
+    --img-bri: 96%;
   }
 
   * { box-sizing: border-box; }
@@ -56,15 +56,28 @@
   /* Nav */
   .nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 60;
-    transition: background 220ms ease, backdrop-filter 220ms ease, border-color 220ms ease;
+    transition: background 220ms ease, backdrop-filter 220ms ease, border-color 220ms ease, color 220ms ease;
     border-bottom: 1px solid transparent;
+    color: #ffffff;
+    text-shadow: 0 1px 24px rgba(0,0,0,0.35);
   }
   .nav.is-scrolled {
     background: rgba(250, 251, 252, 0.78);
     backdrop-filter: saturate(140%) blur(12px);
     -webkit-backdrop-filter: saturate(140%) blur(12px);
     border-bottom-color: var(--line);
+    color: var(--fg);
+    text-shadow: none;
   }
+  .nav:not(.is-scrolled) .nav-cta {
+    background: #ffffff; color: #0A0E1A;
+    border-color: #ffffff; text-shadow: none;
+    box-shadow: 0 8px 24px -10px rgba(0,0,0,0.35);
+  }
+  .nav:not(.is-scrolled) .nav-link { opacity: 0.95; }
+  .nav:not(.is-scrolled) .nav-link:hover { opacity: 1; }
+  .nav:not(.is-scrolled) .bot-toggle { color: #ffffff; opacity: 0.95; }
+  .nav:not(.is-scrolled) .bot-toggle:hover { opacity: 1; }
   .nav-inner {
     max-width: var(--max); margin: 0 auto;
     padding: 18px var(--pad-x);
@@ -149,7 +162,24 @@
   .nav-cta:active { transform: translateY(0) scale(0.98); }
   .nav-menu-toggle {
     display: none; background: transparent; border: 1px solid var(--line);
-    border-radius: 8px; padding: 8px; color: var(--fg);
+    border-radius: 8px; padding: 10px; color: var(--fg);
+    min-width: 44px; min-height: 44px;
+    align-items: center; justify-content: center;
+  }
+  .nav:not(.is-scrolled) .nav-menu-toggle {
+    border-color: rgba(255,255,255,0.35);
+    color: #ffffff;
+  }
+  body.menu-open .nav {
+    z-index: 90;
+    background: var(--bg);
+    color: var(--fg);
+    text-shadow: none;
+    border-bottom-color: var(--line);
+  }
+  body.menu-open .nav .nav-menu-toggle {
+    border-color: var(--line);
+    color: var(--fg);
   }
 
   /* Hero */
@@ -318,7 +348,7 @@
     background: var(--bg-alt);
     transition: transform 200ms cubic-bezier(.2,.7,.2,1), box-shadow 200ms ease, border-color 200ms ease, background 200ms ease;
     display: flex; flex-direction: column;
-    min-height: 280px;
+    min-height: 220px;
   }
   .card:hover {
     transform: translateY(-2px);
@@ -371,6 +401,145 @@
     font-feature-settings: "tnum";
   }
 
+  /* Om oss */
+  .om {
+    padding: clamp(80px, 10vw, 120px) 0;
+    border-top: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .om-inner {
+    max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x);
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+  .om-eyebrow {
+    font-size: 12px; font-weight: 500; letter-spacing: 0.12em;
+    text-transform: uppercase; color: var(--fg-muted);
+    margin-bottom: 18px;
+  }
+  h2.om-h2 {
+    margin: 0 0 24px;
+    font-family: var(--font-heading);
+    font-size: calc(clamp(32px, 4.4vw, 56px) * var(--heading-scale));
+    line-height: 1.02;
+    letter-spacing: -0.022em;
+    font-weight: var(--heading-weight);
+  }
+  .om-h2 .soft {
+    color: var(--fg-soft);
+    font-style: italic;
+    font-weight: 300;
+  }
+  .om-lede {
+    font-size: clamp(18px, 1.6vw, 21px);
+    line-height: 1.5;
+    color: var(--fg-soft);
+    max-width: 44ch;
+    margin: 0;
+  }
+  .om-body { font-size: 16px; line-height: 1.7; color: var(--fg); }
+  .om-body p { margin: 0 0 18px; }
+  .om-body p:last-child { margin-bottom: 0; }
+  .om-stats {
+    margin-top: clamp(48px, 6vw, 72px);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(20px, 3vw, 40px);
+    padding-top: clamp(32px, 4vw, 48px);
+    border-top: 1px solid var(--line);
+    grid-column: 1 / -1;
+  }
+  .om-stat { display: flex; flex-direction: column; gap: 6px; }
+  .om-stat-num {
+    font-family: var(--font-heading);
+    font-size: clamp(32px, 4vw, 48px);
+    font-weight: var(--heading-weight);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    color: var(--fg);
+  }
+  .om-stat-label { font-size: 13px; color: var(--fg-muted); letter-spacing: 0.01em; }
+
+  /* FAQ */
+  .faq {
+    padding: clamp(80px, 10vw, 120px) 0;
+    border-top: 1px solid var(--line);
+    background: var(--bg-alt);
+  }
+  .faq-inner {
+    max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x);
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+    gap: clamp(32px, 5vw, 80px);
+    align-items: start;
+  }
+  .faq-head .sec-eyebrow { margin-bottom: 18px; }
+  h2.faq-h2 {
+    margin: 0 0 20px;
+    font-family: var(--font-heading);
+    font-size: calc(clamp(32px, 4.4vw, 56px) * var(--heading-scale));
+    line-height: 1.02;
+    letter-spacing: -0.022em;
+    font-weight: var(--heading-weight);
+  }
+  .faq-h2 .soft { color: var(--fg-soft); font-style: italic; font-weight: 300; }
+  .faq-lede {
+    font-size: 16px; color: var(--fg-soft);
+    line-height: 1.55; max-width: 36ch;
+  }
+  .faq-list {
+    display: flex; flex-direction: column;
+    border-top: 1px solid var(--line-strong);
+  }
+  .faq-item { border-bottom: 1px solid var(--line-strong); }
+  .faq-q {
+    width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px;
+    padding: 22px 0;
+    background: transparent; border: 0;
+    font-family: inherit;
+    font-size: clamp(17px, 1.4vw, 19px);
+    font-weight: 500;
+    color: var(--fg);
+    text-align: left;
+    cursor: pointer;
+    letter-spacing: -0.005em;
+    transition: color 160ms ease;
+  }
+  .faq-q:hover { color: var(--fg-soft); }
+  .faq-icon {
+    flex: 0 0 auto;
+    width: 28px; height: 28px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--fg);
+    transition: background 160ms ease, border-color 160ms ease, color 160ms ease;
+  }
+  .faq-icon svg { transition: transform 260ms cubic-bezier(.2,.7,.2,1); }
+  .faq-item.open .faq-icon { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .faq-item.open .faq-icon svg { transform: rotate(45deg); }
+  .faq-a {
+    max-height: 0; overflow: hidden;
+    transition: max-height 320ms cubic-bezier(.2,.7,.2,1);
+  }
+  .faq-a-inner {
+    padding: 0 64px 24px 0;
+    font-size: 15.5px; line-height: 1.65;
+    color: var(--fg-soft);
+  }
+  .faq-a-inner p { margin: 0 0 12px; }
+  .faq-a-inner p:last-child { margin-bottom: 0; }
+
+  @media (max-width: 900px) {
+    .om-inner { grid-template-columns: 1fr; gap: 32px; }
+    .faq-inner { grid-template-columns: 1fr; gap: 24px; }
+    .om-stats { grid-template-columns: 1fr; gap: 20px; }
+  }
+
   /* Kontakt */
   .kontakt {
     padding: clamp(80px, 10vw, 120px) 0;
@@ -412,17 +581,78 @@
     max-width: var(--max); margin: 0 auto;
   }
 
+  /* Mobile menu panel */
+  .mobile-menu {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: min(86vw, 360px);
+    background: var(--bg);
+    border-left: 1px solid var(--line);
+    box-shadow: -20px 0 60px -20px rgba(10,14,26,0.3);
+    transform: translateX(100%);
+    transition: transform 280ms cubic-bezier(.2,.7,.2,1);
+    z-index: 80;
+    display: flex; flex-direction: column;
+    padding: 88px 28px 28px;
+    overflow-y: auto;
+  }
+  body.menu-open .mobile-menu { transform: translateX(0); }
+  .mobile-menu a {
+    display: block;
+    padding: 14px 0;
+    font-size: 18px; font-weight: 500;
+    color: var(--fg);
+    border-bottom: 1px solid var(--line);
+  }
+  .mobile-menu a:last-of-type { border-bottom: none; }
+  .mm-group-title {
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--fg-muted);
+    margin: 24px 0 4px;
+  }
+  .mobile-menu .mm-bot {
+    padding: 12px 0; font-size: 16px; font-weight: 500;
+    color: var(--fg); opacity: 0.85;
+  }
+  .mobile-menu .mm-cta {
+    margin-top: 28px;
+    padding: 16px 20px;
+    background: var(--fg); color: var(--bg);
+    border: 1px solid var(--fg);
+    border-radius: var(--radius);
+    text-align: center;
+    font-size: 16px; font-weight: 500;
+  }
+  .menu-scrim {
+    position: fixed; inset: 0;
+    background: rgba(10,14,26,0.45);
+    backdrop-filter: blur(2px);
+    opacity: 0; visibility: hidden;
+    transition: opacity 240ms ease, visibility 240ms ease;
+    z-index: 75;
+  }
+  body.menu-open .menu-scrim { opacity: 1; visibility: visible; }
+  body.menu-open { overflow: hidden; }
+
   /* Responsive */
   @media (max-width: 900px) {
-    .nav-links .nav-link { display: none; }
+    .nav-links .nav-link, .nav-links .nav-cta { display: none; }
     .nav-menu-toggle { display: inline-flex; align-items: center; justify-content: center; }
+    .bot-dropdown { display: none; }
+  }
+  @media (min-width: 901px) {
+    .mobile-menu, .menu-scrim { display: none; }
   }
   @media (max-width: 768px) {
+    .nav-inner { padding: 14px 20px; gap: 16px; }
+    .brand { font-size: 16px; }
+
     .hero-inner {
       grid-template-columns: 1fr;
-      padding-top: 96px; padding-bottom: 40px;
+      padding: 88px 20px 48px;
       align-items: end;
-      min-height: 92vh; min-height: 92svh;
+      min-height: 88vh; min-height: 88svh;
+      gap: 16px;
     }
     .hero-copy { grid-column: 1 / -1; max-width: none; }
     .hero-photo { background-position: 78% 18% !important; }
@@ -435,12 +665,57 @@
         rgba(250, 251, 252, 0) 82%
       );
     }
-    h1.hero-h1 { font-size: calc(clamp(44px, 11vw, 64px) * var(--heading-scale)); }
-    .hero-sub { font-size: 16px; }
-    .btn-primary { padding: 14px 18px; }
-    .sec-intro { grid-template-columns: 1fr; gap: 24px; margin-bottom: 48px; }
-    .cards { grid-template-columns: 1fr; gap: 16px; }
-    .card { padding: 28px; min-height: 0; }
+    h1.hero-h1 {
+      font-size: clamp(40px, 10vw, 56px);
+      line-height: 1.1;
+    }
+    .hero-sub { font-size: 15.5px; margin-top: 20px; }
+    .hero-actions { margin-top: 28px; gap: 14px; width: 100%; }
+    .btn-primary {
+      padding: 14px 20px;
+      width: 100%; justify-content: center;
+      min-height: 48px;
+    }
+    .link-secondary {
+      padding: 10px 0; min-height: 44px;
+      align-items: center;
+    }
+    .scroll-hint { display: none; }
+
+    .tjanster { padding: 72px 0; }
+    .sec-intro { grid-template-columns: 1fr; gap: 20px; margin-bottom: 40px; }
+    h2.sec-h2, h2.om-h2, h2.faq-h2, h2.kontakt-h2 {
+      font-size: clamp(28px, 7vw, 36px);
+    }
+    .cards { grid-template-columns: 1fr; gap: 14px; }
+    .card { padding: 24px; min-height: 0; }
+    .card-icon { margin-bottom: 16px; }
+    .card-desc { font-size: 15px; }
+
+    .om { padding: 72px 0; }
+    .om-lede { font-size: 17px; }
+    .om-body { font-size: 15.5px; }
+    .om-stats { margin-top: 40px; padding-top: 28px; }
+    .om-stat-num { font-size: 30px; }
+
+    .faq { padding: 72px 0; }
+    .faq-q { padding: 18px 0; font-size: 16px; min-height: 56px; }
+    .faq-a-inner { padding: 0 0 20px 0; font-size: 15px; }
+
+    .kontakt { padding: 72px 0; }
+    .kontakt-email { font-size: 20px; }
+
+    .footer {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 24px 20px;
+    }
+  }
+
+  /* Touch target safety */
+  @media (hover: none) and (pointer: coarse) {
+    .nav-link, .bot-menu a, .card-link { min-height: 44px; display: flex; align-items: center; }
+    .card:hover { transform: none; box-shadow: none; border-color: transparent; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -481,12 +756,31 @@
         Boka rådgivning
         <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6 H10 M7 3 L10 6 L7 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <button class="nav-menu-toggle" aria-label="Öppna meny">
-        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5 H16 M2 9 H16 M2 13 H16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <button class="nav-menu-toggle" id="menu-toggle" aria-label="Öppna meny" aria-expanded="false" aria-controls="mobile-menu">
+        <svg class="icon-menu" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6 H17 M3 10 H17 M3 14 H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <svg class="icon-close" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" style="display:none"><path d="M5 5 L15 15 M15 5 L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
     </nav>
   </div>
 </header>
+
+<div class="menu-scrim" id="menu-scrim" aria-hidden="true"></div>
+
+<aside class="mobile-menu" id="mobile-menu" aria-label="Mobilmeny">
+  <a href="#tjanster">Tjänster</a>
+  <a href="#om">Om oss</a>
+  <a href="#faq">FAQ</a>
+  <a href="#kontakt">Kontakta oss</a>
+
+  <div class="mm-group-title">Chattbotar</div>
+  <a class="mm-bot" href="halland-chattbot-ny.html">HallandGPT</a>
+  <a class="mm-bot" href="laholm-chattbot-ny.html">LaholmGPT</a>
+  <a class="mm-bot" href="hylte-chattbot-ny.html">HylteGPT</a>
+  <a class="mm-bot" href="halmstad-chattbot.html">HalmstadGPT</a>
+  <a class="mm-bot" href="hallandstrafiken-chattbot-ny.html">Hallandstrafiken</a>
+
+  <a class="mm-cta" href="#kontakt">Boka kostnadsfri rådgivning</a>
+</aside>
 
 <main>
   <section class="hero" aria-labelledby="hero-title">
@@ -539,37 +833,147 @@
           <div class="card-icon" aria-hidden="true"><i data-lucide="workflow"></i></div>
           <h3 class="card-title">AI-agenter</h3>
           <p class="card-desc">Skräddarsydda AI-agenter som automatiserar era arbetsflöden och frigör tid till det som faktiskt driver företaget framåt.</p>
-          <a class="card-link" href="#kontakt">Läs mer
-            <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6 H10 M7 3 L10 6 L7 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
         </article>
         <article class="card">
           <span class="card-index">02</span>
           <div class="card-icon" aria-hidden="true"><i data-lucide="message-circle"></i></div>
           <h3 class="card-title">AI-chattbotar</h3>
           <p class="card-desc">Intelligenta chattbotar tränade på ert företags egen data — tillgängliga för kunder och medarbetare dygnet runt.</p>
-          <a class="card-link" href="#kontakt">Läs mer
-            <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6 H10 M7 3 L10 6 L7 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
         </article>
         <article class="card">
           <span class="card-index">03</span>
           <div class="card-icon" aria-hidden="true"><i data-lucide="layout"></i></div>
           <h3 class="card-title">Webbutveckling</h3>
           <p class="card-desc">Moderna, snabba hemsidor byggda för att konvertera besökare till kunder — med AI integrerat där det gör skillnad.</p>
-          <a class="card-link" href="#kontakt">Läs mer
-            <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6 H10 M7 3 L10 6 L7 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
         </article>
         <article class="card">
           <span class="card-index">04</span>
           <div class="card-icon" aria-hidden="true"><i data-lucide="trending-up"></i></div>
           <h3 class="card-title">Marknadsföring</h3>
           <p class="card-desc">AI-driven marknadsföring och innehållsproduktion som når rätt målgrupp med rätt budskap vid rätt tillfälle.</p>
-          <a class="card-link" href="#kontakt">Läs mer
-            <svg class="arrow" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6 H10 M7 3 L10 6 L7 9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </a>
         </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="om" id="om" aria-labelledby="om-title">
+    <div class="om-inner">
+      <div class="om-head">
+        <div class="om-eyebrow">Om oss</div>
+        <h2 class="om-h2" id="om-title">Ett ungt team <span class="soft">med stor nyfikenhet</span></h2>
+        <p class="om-lede">
+          Integra AI är ett UF-företag från Halmstad. Vi är en liten grupp studenter som bygger det vi själva saknade: en AI-partner som talar klarspråk och levererar verkligt värde.
+        </p>
+      </div>
+      <div class="om-body">
+        <p>
+          Vi startade Integra AI för att hjälpa företag runt omkring oss att ta steget in i AI-eran — utan jargong, utan onödig komplexitet och utan långa bindningstider.
+        </p>
+        <p>
+          Det vi saknar i erfarenhet kompenserar vi med energi, djup nyfikenhet och en arbetsetik som säger ja till att lära oss det som krävs. Vi testar, mäter och justerar tills lösningen faktiskt fungerar i er vardag.
+        </p>
+        <p>
+          Varje uppdrag börjar med ett samtal. Vi lyssnar mer än vi pratar, förstår hur ni arbetar idag och föreslår bara det som gör verklig skillnad. Inga paketlösningar — bara arbete som bär.
+        </p>
+      </div>
+      <div class="om-stats">
+        <div class="om-stat">
+          <span class="om-stat-num">24h</span>
+          <span class="om-stat-label">Svarstid på förfrågningar</span>
+        </div>
+        <div class="om-stat">
+          <span class="om-stat-num">0 kr</span>
+          <span class="om-stat-label">Första rådgivningen</span>
+        </div>
+        <div class="om-stat">
+          <span class="om-stat-num">Halmstad</span>
+          <span class="om-stat-label">Lokalt förankrade</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq" id="faq" aria-labelledby="faq-title">
+    <div class="faq-inner">
+      <div class="faq-head">
+        <div class="sec-eyebrow">Vanliga frågor</div>
+        <h2 class="faq-h2" id="faq-title">Svar på det ni <span class="soft">brukar undra</span></h2>
+        <p class="faq-lede">
+          Har ni en fråga som inte står här? Skicka ett mail — vi svarar inom 24 timmar.
+        </p>
+      </div>
+      <div class="faq-list" role="list">
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false">
+            <span>Vad kostar det att börja med AI?</span>
+            <span class="faq-icon" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>Första samtalet är alltid kostnadsfritt. Där kartlägger vi vad ni vill uppnå och vad som är rimligt att börja med. Därefter får ni en tydlig offert — inga dolda avgifter, inga långa bindningstider.</p>
+          </div></div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false">
+            <span>Vi har ingen teknisk kunskap internt — fungerar det ändå?</span>
+            <span class="faq-icon" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>Ja, det är faktiskt de flesta vi jobbar med. Vi tar hand om allt tekniskt och ser till att lösningen är enkel att använda. Vi lämnar aldrig över något som kräver en utvecklare för att fungera.</p>
+          </div></div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false">
+            <span>Hur lång tid tar ett typiskt projekt?</span>
+            <span class="faq-icon" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>En enklare chattbot eller automatisering kan vara igång på två till fyra veckor. Större integrationer tar längre tid — men vi jobbar iterativt så ni ser resultat löpande, inte först vid leverans.</p>
+          </div></div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false">
+            <span>Vad händer med vår data?</span>
+            <span class="faq-icon" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>Er data är er data. Vi använder GDPR-kompatibla lösningar, tränar inte publika modeller på ert innehåll och är transparenta med var informationen lagras. Tveka inte att fråga om detaljerna.</p>
+          </div></div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false">
+            <span>Är ni inte lite unga för det här?</span>
+            <span class="faq-icon" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>Fråga rimlig. Vi är ett UF-företag, men AI är ett område där aktuell kunskap väger tyngre än år i branschen. Vi är ärliga om vad vi kan och inte kan — och vi levererar bara det vi vet att vi kan göra bra.</p>
+          </div></div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false">
+            <span>Jobbar ni bara med företag i Halmstad?</span>
+            <span class="faq-icon" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>Vi utgår från Halmstad men arbetar digitalt med företag i hela Sverige. Första samtalet kan vara på plats, över video eller telefon — vad som passar er bäst.</p>
+          </div></div>
+        </div>
       </div>
     </div>
   </section>
@@ -629,6 +1033,47 @@
         dropdown.classList.remove('open');
         toggle.setAttribute('aria-expanded', 'false');
       }
+    });
+
+    document.querySelectorAll('.faq-item').forEach(item => {
+      const btn = item.querySelector('.faq-q');
+      const panel = item.querySelector('.faq-a');
+      btn.addEventListener('click', () => {
+        const isOpen = item.classList.toggle('open');
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        panel.style.maxHeight = isOpen ? panel.scrollHeight + 'px' : '0';
+      });
+    });
+
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuScrim = document.getElementById('menu-scrim');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconMenu = menuToggle.querySelector('.icon-menu');
+    const iconClose = menuToggle.querySelector('.icon-close');
+
+    const closeMenu = () => {
+      document.body.classList.remove('menu-open');
+      menuToggle.setAttribute('aria-expanded', 'false');
+      menuToggle.setAttribute('aria-label', 'Öppna meny');
+      iconMenu.style.display = '';
+      iconClose.style.display = 'none';
+    };
+    const openMenu = () => {
+      document.body.classList.add('menu-open');
+      menuToggle.setAttribute('aria-expanded', 'true');
+      menuToggle.setAttribute('aria-label', 'Stäng meny');
+      iconMenu.style.display = 'none';
+      iconClose.style.display = '';
+    };
+
+    menuToggle.addEventListener('click', () => {
+      if (document.body.classList.contains('menu-open')) closeMenu();
+      else openMenu();
+    });
+    menuScrim.addEventListener('click', closeMenu);
+    mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && document.body.classList.contains('menu-open')) closeMenu();
     });
   });
 </script>
