@@ -96,6 +96,47 @@
   }
   .nav-link:hover { opacity: 1; }
 
+  /* Chattbotar dropdown */
+  .bot-dropdown { position: relative; margin-left: 24px; }
+  .bot-toggle {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 14px;
+    background: transparent; border: none;
+    font-size: 14px; font-weight: 500;
+    color: var(--fg); opacity: 0.7;
+    border-radius: 8px;
+    transition: opacity 160ms ease;
+  }
+  .bot-toggle:hover { opacity: 1; }
+  .bot-toggle .chev { transition: transform 200ms ease; }
+  .bot-dropdown.open .bot-toggle .chev { transform: rotate(180deg); }
+  .bot-menu {
+    position: absolute; top: calc(100% + 10px); left: 0;
+    min-width: 220px;
+    background: rgba(250, 251, 252, 0.96);
+    backdrop-filter: saturate(140%) blur(12px);
+    -webkit-backdrop-filter: saturate(140%) blur(12px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lift);
+    padding: 8px;
+    display: flex; flex-direction: column; gap: 2px;
+    opacity: 0; visibility: hidden; transform: translateY(-6px);
+    transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+    z-index: 70;
+  }
+  .bot-dropdown.open .bot-menu {
+    opacity: 1; visibility: visible; transform: translateY(0);
+  }
+  .bot-menu a {
+    padding: 10px 14px;
+    font-size: 14px; font-weight: 500;
+    color: var(--fg); opacity: 0.78;
+    border-radius: 6px;
+    transition: background 140ms ease, opacity 140ms ease;
+  }
+  .bot-menu a:hover { background: var(--chip); opacity: 1; }
+
   .nav-cta {
     margin-left: 8px;
     padding: 10px 16px; font-size: 14px; font-weight: 500;
@@ -120,7 +161,8 @@
   .hero-photo {
     position: absolute; inset: 0; z-index: 1;
     overflow: hidden;
-    background: #0A0E1A;
+    background: #0A0E1A url("assets/berg.png") center/cover no-repeat;
+    background-position: var(--img-focus);
     filter: saturate(var(--img-sat)) brightness(var(--img-bri));
   }
   .hero-photo video {
@@ -415,6 +457,21 @@
       <span class="brand-mark" aria-hidden="true"></span>
       <span>Integra&nbsp;AI</span>
     </a>
+
+    <div class="bot-dropdown" id="bot-dropdown">
+      <button class="bot-toggle" type="button" id="bot-toggle" aria-haspopup="menu" aria-expanded="false">
+        Chattbotar
+        <svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 L6 7.5 L9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="bot-menu" role="menu">
+        <a href="halland-chattbot-ny.html" role="menuitem">HallandGPT</a>
+        <a href="laholm-chattbot-ny.html" role="menuitem">LaholmGPT</a>
+        <a href="hylte-chattbot-ny.html" role="menuitem">HylteGPT</a>
+        <a href="halmstad-chattbot.html" role="menuitem">HalmstadGPT</a>
+        <a href="hallandstrafiken-chattbot-ny.html" role="menuitem">Hallandstrafiken</a>
+      </div>
+    </div>
+
     <nav class="nav-links" aria-label="Huvudnavigation">
       <a class="nav-link" href="#tjanster">Tjänster</a>
       <a class="nav-link" href="#om">Om oss</a>
@@ -553,6 +610,26 @@
     if (window.lucide && window.lucide.createIcons) {
       try { window.lucide.createIcons(); } catch (e) {}
     }
+
+    const dropdown = document.getElementById('bot-dropdown');
+    const toggle = document.getElementById('bot-toggle');
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = dropdown.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', (e) => {
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        dropdown.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
   });
 </script>
 
