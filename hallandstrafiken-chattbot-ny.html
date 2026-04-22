@@ -888,6 +888,51 @@
   }
 
   /* ────────────────────────────────────────
+     QUICK REPLIES (empty state suggestions)
+  ──────────────────────────────────────── */
+  .quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 4px 18px 12px 56px;
+    animation: fadeInChips 0.45s var(--ease-spring) 0.1s both;
+  }
+  @keyframes fadeInChips {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .quick-reply-chip {
+    appearance: none;
+    background: #FFFFFF;
+    border: 1.5px solid var(--ht-blue);
+    color: var(--ht-blue);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+    cursor: pointer;
+    line-height: 1.2;
+    min-height: 36px;
+    transition:
+      background 0.25s var(--ease-spring),
+      color      0.25s var(--ease-spring),
+      transform  0.25s var(--ease-spring),
+      box-shadow 0.25s var(--ease-spring);
+  }
+  .quick-reply-chip:hover {
+    background: var(--ht-blue);
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,110,182,0.25);
+  }
+  .quick-reply-chip:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  .quick-reply-chip:active { transform: translateY(0) scale(0.97); }
+
+  /* ────────────────────────────────────────
      ACTIONS MENU (dropdown)
   ──────────────────────────────────────── */
   .actions-menu {
@@ -1289,12 +1334,18 @@
       right: 8px;
       border-radius: var(--radius-md);
     }
-    /* Komprimera input-raden så att textfältet får mer plats */
-    .chat-input-bar { gap: 6px; padding: 10px 10px 12px 10px; }
-    .util-btn { width: 34px; height: 34px; }
-    .util-btn svg { width: 16px; height: 16px; }
-    .chat-input-wrap input { font-size: 14px; padding: 10px 40px 10px 14px; }
-    .send-btn-inline { width: 32px; height: 32px; }
+    /* Input-raden: touch-targets minst 44px, 16px font för att slippa iOS auto-zoom */
+    .chat-input-bar { gap: 8px; padding: 12px 12px 14px 12px; }
+    .util-btn { width: 44px; height: 44px; }
+    .util-btn svg { width: 18px; height: 18px; }
+    .chat-input-wrap input {
+      font-size: 16px;
+      padding: 13px 52px 13px 16px;
+      min-height: 44px;
+    }
+    .send-btn-inline { width: 40px; height: 40px; right: 3px; }
+    .quick-replies { padding: 4px 14px 12px 14px; }
+    .quick-reply-chip { min-height: 40px; font-size: 14px; padding: 9px 14px; }
   }
 
   /* Reduced motion */
@@ -1618,12 +1669,81 @@
     return messageTimes.length >= RATE_LIMIT_COUNT;
   }
   function recordMessage() { messageTimes.push(Date.now()); }
-  function showRateLimitToast() {
+
+  /* ────────────────────────────────────────
+     RATE LIMIT – persistent cooldown UI
+  ──────────────────────────────────────── */
+  let cooldownInterval = null;
+  function msUntilNextSlot() {
+    if (messageTimes.length === 0) return 0;
+    const oldest = messageTimes[0];
+    return Math.max(0, RATE_LIMIT_WINDOW - (Date.now() - oldest));
+  }
+  function startCooldown() {
+    const input = document.getElementById('chatInput');
+    const send = document.querySelector('.send-btn-inline');
+    input.disabled = true;
+    if (send) send.disabled = true;
     rateLimitToast.classList.add('show');
-    if (rateLimitTimeout) clearTimeout(rateLimitTimeout);
-    rateLimitTimeout = setTimeout(() => {
-      rateLimitToast.classList.remove('show');
-    }, 3500);
+    rateLimitToast.setAttribute('aria-live', 'polite');
+
+    function tick() {
+      const remaining = msUntilNextSlot();
+      if (remaining <= 0) {
+        rateLimitToast.classList.remove('show');
+        input.disabled = false;
+        if (send) send.disabled = false;
+        clearInterval(cooldownInterval);
+        cooldownInterval = null;
+        input.focus();
+        return;
+      }
+      const secs = Math.ceil(remaining / 1000);
+      rateLimitToast.textContent = `Vänta ${secs} s innan du skickar fler meddelanden`;
+    }
+    tick();
+    if (cooldownInterval) clearInterval(cooldownInterval);
+    cooldownInterval = setInterval(tick, 200);
+  }
+
+  /* ────────────────────────────────────────
+     QUICK REPLIES – initial empty state
+  ──────────────────────────────────────── */
+  const QUICK_REPLIES = [
+    'Köp biljett',
+    'Hitta din linje',
+    'Priser & zoner',
+    'Trafikinformation',
+    'Prata med handläggare'
+  ];
+  function renderQuickReplies() {
+    if (document.getElementById('quickReplies')) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'quickReplies';
+    wrap.className = 'quick-replies';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Snabbval');
+
+    QUICK_REPLIES.forEach(label => {
+      const btn = document.createElement('button');
+      btn.className = 'quick-reply-chip';
+      btn.type = 'button';
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        if (label === 'Prata med handläggare') {
+          connectToHumanAgent();
+          wrap.remove();
+          return;
+        }
+        chatInput.value = label;
+        updateCharCount();
+        wrap.remove();
+        sendMessage();
+      });
+      wrap.appendChild(btn);
+    });
+    chatMessages.appendChild(wrap);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
   }
 
   /* ────────────────────────────────────────
@@ -1744,6 +1864,7 @@
       // så att DOM-mutationer inte stör window-animationen.
       setTimeout(() => {
         addMessage('bot', 'Hej! Jag är Hallandstrafikens AI-assistent. Vad kan jag hjälpa dig med idag?', false);
+        renderQuickReplies();
       }, 650);
     }
     setTimeout(() => chatInput.focus(), 700);
@@ -1995,6 +2116,12 @@
      CONTACT OVERLAY (kontaktuppgifter)
   ──────────────────────────────────────── */
   function showContactInfo() {
+    // Stäng handover-overlayen först om den är öppen, annars hamnar
+    // kontakt-overlayen under den (lägre z-index) och ser ut att inte fungera.
+    const handoverOverlay = document.getElementById('handoverOverlay');
+    if (handoverOverlay && handoverOverlay.classList.contains('visible')) {
+      handoverOverlay.classList.remove('visible');
+    }
     const overlay = document.getElementById('contactOverlay');
     overlay.classList.add('visible');
     const inner = overlay.querySelector('.contact-overlay-inner');
@@ -2160,7 +2287,7 @@
     }
     const text = chatInput.value.trim();
     if (!text) return;
-    if (isRateLimited()) { showRateLimitToast(); return; }
+    if (isRateLimited()) { startCooldown(); return; }
     recordMessage();
 
     addMessage('user', text);
