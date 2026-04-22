@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hallandstrafiken – AI-assistent</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23006EB6'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial,sans-serif' font-weight='700' font-size='18' fill='white'%3EH%3C/text%3E%3C/svg%3E">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
@@ -139,7 +140,7 @@
     bottom: 24px;
     right: 24px;
     width: 400px;
-    max-height: 620px;
+    max-height: min(620px, calc(100dvh - 48px));
     height: 620px;
     z-index: 10000;
     border-radius: var(--radius-lg);
@@ -581,9 +582,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 4px 2px;
+    padding: 10px 2px;
     animation: msgIn 0.6s var(--ease-spring);
-    margin: 4px 0;
+    margin: 14px 0 10px;
   }
   .handover-divider .line {
     flex: 1;
@@ -747,6 +748,19 @@
     outline: none;
     box-shadow: 0 2px 6px rgba(0,110,182,0.28), var(--focus-ring);
   }
+  .util-btn:disabled {
+    background: #B4CADD;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  .util-btn:disabled:hover {
+    background: #B4CADD;
+    transform: none;
+    box-shadow: none;
+  }
+  .util-btn[disabled]::after,
+  .util-btn[disabled]::before { opacity: 0 !important; }
 
   /* ────────────────────────────────────────
      TOOLTIPS
@@ -1275,6 +1289,12 @@
       right: 8px;
       border-radius: var(--radius-md);
     }
+    /* Komprimera input-raden så att textfältet får mer plats */
+    .chat-input-bar { gap: 6px; padding: 10px 10px 12px 10px; }
+    .util-btn { width: 34px; height: 34px; }
+    .util-btn svg { width: 16px; height: 16px; }
+    .chat-input-wrap input { font-size: 14px; padding: 10px 40px 10px 14px; }
+    .send-btn-inline { width: 32px; height: 32px; }
   }
 
   /* Reduced motion */
@@ -1503,7 +1523,7 @@
           <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
         </svg>
       </button>
-      <button class="util-btn" onclick="connectToHumanAgent()" data-tooltip="Prata med handläggare" data-tooltip-align="left" aria-label="Prata med en handläggare hos Hallandstrafiken">
+      <button class="util-btn" id="handoverUtilBtn" onclick="connectToHumanAgent()" data-tooltip="Prata med handläggare" data-tooltip-align="left" aria-label="Prata med en handläggare hos Hallandstrafiken">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
           <circle cx="12" cy="7" r="4"/>
@@ -1736,6 +1756,14 @@
   }
 
   function closeChat() {
+    // Bekräfta endast om användaren faktiskt har skickat något (minst ett user-meddelande)
+    // eller är kopplad till en handläggare – annars tyst avslut.
+    const hasUserMessages = chatMessages.querySelectorAll('.msg.user').length > 0;
+    if ((hasUserMessages || isHumanAgentMode) &&
+        !confirm('Vill du avsluta chatten? Konversationen sparas inte.')) {
+      return;
+    }
+
     chatWindow.classList.remove('open');
     chatToggle.classList.remove('hidden');
     closeActionsMenu();
@@ -1850,6 +1878,10 @@
   }
 
   function updateCharCount() {
+    // Paste kan kringgå maxlength-attributet; trunkera defensivt
+    if (chatInput.value.length > 1000) {
+      chatInput.value = chatInput.value.slice(0, 1000);
+    }
     const counter = document.getElementById('charCounter');
     const len = chatInput.value.length;
     counter.textContent = len + ' / 1000';
@@ -1998,6 +2030,14 @@
     document.getElementById('handoverOverlay').classList.remove('visible');
     isHumanAgentMode = true;
 
+    const handoverUtilBtn = document.getElementById('handoverUtilBtn');
+    if (handoverUtilBtn) {
+      handoverUtilBtn.disabled = true;
+      handoverUtilBtn.setAttribute('aria-label', 'Du är redan ansluten till en handläggare');
+    }
+    // Flytta fokus till input så tooltip/focus-ringen på startknappen försvinner
+    setTimeout(() => chatInput.focus(), 0);
+
     // Avdelare i meddelandeflödet
     const divider = document.createElement('div');
     divider.className = 'handover-divider';
@@ -2044,6 +2084,11 @@
   }
 
   function exitHumanAgentMode() {
+    const handoverUtilBtn = document.getElementById('handoverUtilBtn');
+    if (handoverUtilBtn) {
+      handoverUtilBtn.disabled = false;
+      handoverUtilBtn.setAttribute('aria-label', 'Prata med en handläggare hos Hallandstrafiken');
+    }
     if (!isHumanAgentMode) {
       chatHeader.classList.remove('human-mode');
       chatDisclaimer.classList.remove('human-mode');
@@ -2102,6 +2147,11 @@
   }
 
   async function sendMessage() {
+    // Paste kan kringgå maxlength; trunkera innan skick
+    if (chatInput.value.length > 1000) {
+      chatInput.value = chatInput.value.slice(0, 1000);
+      updateCharCount();
+    }
     const text = chatInput.value.trim();
     if (!text) return;
     if (isRateLimited()) { showRateLimitToast(); return; }
@@ -2161,8 +2211,7 @@
       console.error('[Chat] Nätverks-/CORS-fel:', networkErr);
       addMessage(
         'bot',
-        'Kunde inte nå servern. Kontrollera din uppkoppling eller försök igen om en stund. ' +
-        '(Tips till utvecklare: öppna konsolen — ett CORS-fel här betyder att webhooken behöver sätta Access-Control-Allow-Origin.)',
+        'Kunde inte nå servern. Kontrollera din uppkoppling eller försök igen om en stund.',
         false
       );
       chatInput.disabled = false;
@@ -2292,6 +2341,24 @@
       }
     }
   });
+
+  /* ────────────────────────────────────────
+     Tooltip-hygien: blur knappar med tooltip vid pointer-klick
+     så att ::after-tooltipen inte blir hängande på :focus-visible.
+     Tangentbordsfokus (keydown -> click) påverkas inte.
+  ──────────────────────────────────────── */
+  (function() {
+    let lastPointer = 0;
+    document.addEventListener('pointerdown', () => { lastPointer = Date.now(); }, true);
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-tooltip]');
+      if (!btn) return;
+      // Om klicket kom från pointer (mus/touch) inom 500ms – ta bort fokus
+      if (Date.now() - lastPointer < 500) {
+        setTimeout(() => btn.blur(), 0);
+      }
+    }, true);
+  })();
 </script>
 </body>
 </html>
