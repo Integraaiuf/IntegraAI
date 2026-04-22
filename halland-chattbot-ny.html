@@ -183,7 +183,7 @@
     flex-shrink: 0;
     border-bottom: 1.5px solid rgba(0,0,0,0.12);
     position: relative;
-    z-index: 15;
+    z-index: 30;
   }
   .chat-header-title {
     display: flex;
@@ -1424,6 +1424,12 @@
   }
 
   function minimizeChat() {
+    // Stäng contact-overlay om användaren minimerar när den är öppen,
+    // annars visas kontakt-modalen först när chatten öppnas igen.
+    const contactOverlay = document.getElementById('contactOverlay');
+    if (contactOverlay && contactOverlay.classList.contains('visible')) {
+      contactOverlay.classList.remove('visible');
+    }
     chatWindow.classList.remove('open');
     chatToggle.classList.remove('hidden');
     closeActionsMenu();
