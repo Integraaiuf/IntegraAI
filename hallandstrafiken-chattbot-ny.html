@@ -181,7 +181,7 @@
     flex-shrink: 0;
     border-bottom: 1.5px solid rgba(0,0,0,0.12);
     position: relative;
-    z-index: 15;
+    z-index: 30;
     transition: background 0.5s var(--ease-spring);
   }
   .chat-header.human-mode {
@@ -1750,6 +1750,12 @@
   }
 
   function minimizeChat() {
+    // Stäng handover-overlay om användaren minimerar mitt i kopplings-flödet,
+    // annars visas handover-modalen först när chatten öppnas igen.
+    const handoverOverlay = document.getElementById('handoverOverlay');
+    if (handoverOverlay && handoverOverlay.classList.contains('visible')) {
+      handoverOverlay.classList.remove('visible');
+    }
     chatWindow.classList.remove('open');
     chatToggle.classList.remove('hidden');
     closeActionsMenu();
