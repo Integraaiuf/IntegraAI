@@ -951,20 +951,26 @@
   /* ─── Kontakt ───────────────────────────────────────────────────── */
   .kontakt {
     padding: clamp(112px, 14vw, 168px) 0 clamp(96px, 12vw, 140px);
-    border-top: 1px solid var(--line);
     background: var(--bg);
     position: relative;
+    isolation: isolate;
     overflow: hidden;
   }
+  /* Top blend from FAQ's #F4F6F9 down to Kontakt's own #FAFBFC.
+     Previous decorative corner radials removed — they clashed with the
+     new fade boundary, causing visible elliptical blobs near the section
+     edges where the fade ended. */
   .kontakt::before {
-    content: ""; position: absolute; inset: 0;
+    content: ""; position: absolute;
+    left: 0; right: 0; top: 0;
+    height: clamp(44px, 5.5vw, 68px);
     pointer-events: none;
-    background:
-      radial-gradient(ellipse 40% 30% at 88% 12%, rgba(38,59,51,0.08), transparent 60%),
-      radial-gradient(ellipse 50% 40% at 12% 88%, rgba(38,59,51,0.06), transparent 60%);
+    z-index: 0;
+    background: linear-gradient(to bottom, var(--bg-warm) 0%, var(--bg) 100%);
   }
   .kontakt-inner {
     position: relative;
+    z-index: 1;
     max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x);
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
@@ -1038,11 +1044,25 @@
 
   /* ─── Footer ────────────────────────────────────────────────────── */
   .footer {
-    border-top: 1px solid var(--line);
     background: var(--bg-warm);
     padding: clamp(56px, 7vw, 84px) 0 32px;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  /* Top blend from Kontakt's #FAFBFC down to footer's own #F4F6F9 */
+  .footer::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: clamp(44px, 5.5vw, 68px);
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-warm) 100%);
   }
   .footer-inner {
+    position: relative;
+    z-index: 1;
     max-width: var(--max); margin: 0 auto;
     padding: 0 var(--pad-x);
     display: grid;
