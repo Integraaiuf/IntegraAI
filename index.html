@@ -49,6 +49,19 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
+
+  .scroll-progress {
+    position: fixed; top: 0; left: 0; right: 0;
+    height: 2px;
+    z-index: 200;
+    pointer-events: none;
+    transform: scaleX(var(--progress, 0));
+    transform-origin: left center;
+    background: linear-gradient(to right, var(--accent), var(--accent-ink));
+    opacity: 0.9;
+    transition: opacity 240ms var(--spring);
+  }
+  .scroll-progress.hidden { opacity: 0; }
   body {
     font-family: var(--font-sans);
     font-feature-settings: "ss01", "cv11";
@@ -98,35 +111,26 @@
 
   /* ─── Nav ────────────────────────────────────────────────────────── */
   .nav {
+    --nav-p: 0;
     position: fixed; top: 0; left: 0; right: 0; z-index: 60;
-    transition: background 240ms var(--spring), backdrop-filter 240ms var(--spring),
-                border-color 240ms var(--spring), color 240ms var(--spring),
-                padding 220ms var(--spring);
-    border-bottom: 1px solid transparent;
-    color: #F4F6F9;
+    border-bottom: 1px solid rgba(10, 14, 26, calc(0.08 * var(--nav-p)));
+    background-color: rgba(250, 251, 252, calc(0.82 * var(--nav-p)));
+    backdrop-filter: saturate(calc(100% + 60% * var(--nav-p))) blur(calc(14px * var(--nav-p)));
+    -webkit-backdrop-filter: saturate(calc(100% + 60% * var(--nav-p))) blur(calc(14px * var(--nav-p)));
+    color: color-mix(in srgb, #F4F6F9, #0A0E1A calc(var(--nav-p) * 100%));
   }
   .nav::before {
     content: ""; position: absolute; inset: 0;
     background: linear-gradient(to bottom, rgba(15,14,12,0.42) 0%, rgba(15,14,12,0) 100%);
     pointer-events: none;
-    transition: opacity 240ms var(--spring);
+    opacity: calc(1 - var(--nav-p));
   }
-  .nav.is-scrolled {
-    background: rgba(250, 251, 252, 0.82);
-    backdrop-filter: saturate(160%) blur(14px);
-    -webkit-backdrop-filter: saturate(160%) blur(14px);
-    border-bottom-color: var(--line);
-    color: var(--fg);
-  }
-  .nav.is-scrolled::before { opacity: 0; }
   .nav-inner {
     position: relative;
     max-width: none; margin: 0;
-    padding: 22px clamp(24px, 4vw, 56px);
+    padding: calc(22px - 8px * var(--nav-p)) clamp(24px, 4vw, 56px);
     display: flex; align-items: center; gap: 28px;
-    transition: padding 220ms var(--spring);
   }
-  .nav.is-scrolled .nav-inner { padding-top: 14px; padding-bottom: 14px; }
 
   .brand {
     display: inline-flex; align-items: center; gap: 3px;
@@ -234,35 +238,28 @@
     margin-left: 10px;
     padding: 10px 18px;
     font-size: 14px; font-weight: 500; letter-spacing: -0.003em;
-    color: var(--bg); background: var(--accent);
-    border: 1px solid var(--accent);
+    color: color-mix(in srgb, var(--fg), #FAFBFC calc(var(--nav-p) * 100%));
+    background: color-mix(in srgb, #F4F6F9, var(--accent) calc(var(--nav-p) * 100%));
+    border: 1px solid color-mix(in srgb, #F4F6F9, var(--accent) calc(var(--nav-p) * 100%));
     border-radius: var(--radius);
     display: inline-flex; align-items: center; gap: 8px;
-    transition: background 200ms var(--spring), transform 200ms var(--spring), box-shadow 220ms var(--spring);
+    transition: transform 200ms var(--spring), box-shadow 220ms var(--spring), filter 200ms var(--spring);
   }
   .nav-cta:hover {
-    background: var(--accent-hover);
+    filter: brightness(1.06);
     transform: translateY(-1px);
     box-shadow: 0 10px 20px -10px rgba(38,59,51,0.5);
   }
   .nav-cta:active { transform: translateY(0) scale(0.98); }
-  .nav:not(.is-scrolled) .nav-cta {
-    background: #F4F6F9; color: var(--fg);
-    border-color: #F4F6F9;
-  }
-  .nav:not(.is-scrolled) .nav-cta:hover { background: #ffffff; }
 
   .nav-menu-toggle {
     display: none; background: transparent;
-    border: 1px solid var(--line);
+    border: 1px solid color-mix(in srgb, rgba(255,255,255,0.28), var(--line) calc(var(--nav-p) * 100%));
     border-radius: var(--radius);
     padding: 10px;
     min-width: 44px; min-height: 44px;
     align-items: center; justify-content: center;
     color: currentColor;
-  }
-  .nav:not(.is-scrolled) .nav-menu-toggle {
-    border-color: rgba(255,255,255,0.28);
   }
 
   body.menu-open .nav {
@@ -384,7 +381,27 @@
     font-size: 15px; font-weight: 500; letter-spacing: -0.004em;
     box-shadow: 0 1px 0 rgba(15,14,12,0.08), 0 20px 38px -18px rgba(15,14,12,0.55);
     transition: transform 220ms var(--spring), background 220ms var(--spring), box-shadow 240ms var(--spring);
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
   }
+  .btn-primary > * { position: relative; z-index: 1; }
+  .btn-primary::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 320ms var(--spring);
+    background: radial-gradient(140px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.55) 0%,
+      rgba(255, 255, 255, 0.28) 30%,
+      rgba(255, 255, 255, 0.1) 55%,
+      rgba(255, 255, 255, 0) 80%);
+    mix-blend-mode: screen;
+  }
+  .btn-primary:hover::after { opacity: 1; }
   .btn-primary:hover {
     background: #ffffff;
     transform: translateY(-2px);
@@ -412,12 +429,21 @@
   .link-secondary:hover .arrow { transform: translateX(3px); }
 
   .scroll-hint {
-    position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+    position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
     z-index: 4;
     font-family: var(--font-mono);
     font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase;
     color: #F4F6F9; opacity: 0.78;
     display: inline-flex; flex-direction: column; align-items: center; gap: 10px;
+    background: transparent; border: 0; padding: 8px 12px;
+    cursor: pointer;
+    transition: opacity 220ms var(--spring), transform 280ms var(--spring);
+  }
+  .scroll-hint:hover { opacity: 1; transform: translate(-50%, 3px); }
+  .scroll-hint:focus-visible {
+    outline: 2px solid #F4F6F9;
+    outline-offset: 6px;
+    border-radius: 4px;
   }
   .scroll-hint .bar {
     width: 1px; height: 32px;
@@ -428,6 +454,17 @@
     content: ""; position: absolute; left: 0; top: -100%; width: 100%; height: 60%;
     background: linear-gradient(to bottom, rgba(242,239,232,0) 0%, #F4F6F9 70%, #F4F6F9 100%);
     animation: scroll-drip 2.4s var(--ease-out) infinite;
+  }
+  .scroll-hint .chev {
+    width: 18px; height: 10px;
+    display: block;
+    animation: scroll-chev 2.4s var(--ease-out) infinite;
+  }
+  .scroll-hint:hover .chev { animation-duration: 1.4s; }
+  @keyframes scroll-chev {
+    0%, 20% { transform: translateY(-3px); opacity: 0.55; }
+    60%     { transform: translateY(2px);  opacity: 1; }
+    100%    { transform: translateY(-3px); opacity: 0.55; }
   }
   @keyframes scroll-drip {
     0% { top: -100%; }
@@ -470,11 +507,23 @@
 
   /* ─── Tjänster (bento) ──────────────────────────────────────────── */
   .tjanster {
+    position: relative;
     padding: clamp(96px, 12vw, 144px) 0;
-    background: var(--bg);
+    background: #FFFFFF;
     border-top: 1px solid var(--line);
+    isolation: isolate;
+    overflow: hidden;
   }
-  .tjanster-inner { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); }
+  .tjanster-smoke {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .tjanster-inner { position: relative; z-index: 2; max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); }
 
   .bento {
     display: grid;
@@ -491,7 +540,7 @@
     display: flex; flex-direction: column;
     overflow: hidden;
     transition: transform 320ms var(--spring), border-color 320ms var(--spring),
-                box-shadow 320ms var(--spring);
+                box-shadow 320ms var(--spring), background-color 320ms var(--spring);
   }
   .tile::before {
     content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
@@ -499,8 +548,39 @@
     transform: scaleX(0); transform-origin: left;
     transition: transform 520ms var(--spring);
   }
-  .tile:hover { border-color: var(--line-strong); box-shadow: var(--envelope-2); }
+  .tile:hover { border-color: var(--line-strong); box-shadow: var(--envelope-2); transform: translateY(-2px); }
   .tile:hover::before { transform: scaleX(1); }
+
+  /* Near-white tiles with a soft light-blue glow. The cards should feel
+     luminous — not blue-filled — so they lift off the threaded background
+     without competing with it for colour. */
+  .tjanster .tile {
+    background: #FDFEFF;
+    border-color: rgba(120, 170, 220, 0.28);
+    box-shadow:
+      0 1px 2px rgba(62, 105, 160, 0.06),
+      0 10px 28px -14px rgba(80, 135, 200, 0.22),
+      0 0 36px rgba(160, 200, 235, 0.16);
+  }
+  .tjanster .tile:hover {
+    background: #FFFFFF;
+    border-color: rgba(90, 150, 215, 0.45);
+    transform: translateY(-3px);
+    box-shadow:
+      0 2px 4px rgba(62, 105, 160, 0.08),
+      0 18px 38px -16px rgba(80, 135, 200, 0.35),
+      0 0 48px rgba(150, 195, 235, 0.28);
+  }
+  .tjanster .tile-icon {
+    background: rgba(200, 222, 242, 0.55);
+    color: #3E6DA6;
+    box-shadow: inset 0 0 0 1px rgba(120, 170, 220, 0.22);
+  }
+  .tjanster .tile:hover .tile-icon {
+    background: rgba(200, 222, 242, 0.85);
+  }
+  .tjanster .tile-number { color: #4A7AB3; opacity: 0.55; }
+  .tjanster .tile-flag .tile-number { color: #3A6AA3; opacity: 0.72; }
 
   .tile-flag { grid-column: span 7; grid-row: span 2; padding: 44px; }
   .tile-a    { grid-column: span 5; grid-row: span 1; }
@@ -1070,10 +1150,11 @@
 </head>
 <body>
 
+<div class="scroll-progress" aria-hidden="true"></div>
+
 <header class="nav" id="nav" role="banner">
   <div class="nav-inner">
     <a href="#" class="brand" aria-label="Integra AI startsida">
-      <span class="brand-logo" aria-hidden="true"></span>
       <span>Integra&nbsp;AI</span>
     </a>
 
@@ -1152,14 +1233,14 @@
       <div class="hero-copy">
         <span class="hero-eyebrow fade-up" data-delay="0">
           <span class="dot" aria-hidden="true"></span>
-          AI-byrå från Halmstad
+          AI-partner från Halmstad
         </span>
         <h1 class="hero-h1 fade-up" id="hero-title" data-delay="120">
           <span class="line">Nå nya höjder</span>
           <span class="line soft">med AI</span>
         </h1>
         <p class="hero-sub fade-up" data-delay="220">
-          Vi hjälper små och medelstora företag att integrera AI — skräddarsytt, prisvärt och praktiskt. Inga buzzwords. Bara arbete som bär.
+          Vi hjälper kommuner, offentliga verksamheter och företag att integrera AI — skräddarsytt, prisvärt och praktiskt.
         </p>
         <div class="hero-actions fade-up" data-delay="320">
           <a class="btn-primary" href="#kontakt">
@@ -1174,13 +1255,17 @@
       </div>
     </div>
 
-    <span class="scroll-hint" aria-hidden="true">
+    <button class="scroll-hint" type="button" aria-label="Scrolla till tjänster" data-scroll-to="#tjanster" data-scroll-offset="100">
       <span>Scrolla</span>
-      <span class="bar"></span>
-    </span>
+      <span class="bar" aria-hidden="true"></span>
+      <svg class="chev" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M1 1.5 L9 8.5 L17 1.5" />
+      </svg>
+    </button>
   </section>
 
   <section class="tjanster" id="tjanster" aria-labelledby="tjanster-title">
+    <canvas class="tjanster-smoke" aria-hidden="true"></canvas>
     <div class="tjanster-inner">
       <div class="section-head">
         <div class="head-left fade-up" data-delay="0">
@@ -1202,7 +1287,7 @@
             <span class="tile-number">01</span>
           </div>
           <h3 class="tile-title">AI-agenter</h3>
-          <p class="tile-desc">Skräddarsydda AI-agenter som automatiserar era arbetsflöden och frigör tid till det som faktiskt driver företaget framåt.</p>
+          <p class="tile-desc">Skräddarsydda AI-agenter som automatiserar era arbetsflöden och frigör tid till det som faktiskt driver verksamheten framåt.</p>
           <div class="tile-foot">
             <span class="tile-meta">Flaggskepp</span>
           </div>
@@ -1218,7 +1303,7 @@
             <span class="tile-number">02</span>
           </div>
           <h3 class="tile-title">AI-chattbotar</h3>
-          <p class="tile-desc">Intelligenta chattbotar tränade på ert företags egen data — tillgängliga för kunder och medarbetare dygnet runt.</p>
+          <p class="tile-desc">Intelligenta chattbotar tränade på er egen data — tillgängliga för invånare, kunder och medarbetare dygnet runt.</p>
         </article>
 
         <article class="tile tile-b fade-up" data-delay="180">
@@ -1233,7 +1318,7 @@
             <span class="tile-number">03</span>
           </div>
           <h3 class="tile-title">Webbutveckling</h3>
-          <p class="tile-desc">Moderna, snabba hemsidor byggda för att konvertera besökare till kunder — med AI integrerat där det gör skillnad.</p>
+          <p class="tile-desc">Moderna, snabba hemsidor byggda för att möta era besökare där de är — med AI integrerat där det gör skillnad.</p>
         </article>
 
         <article class="tile tile-wide fade-up" data-delay="240">
@@ -1246,8 +1331,8 @@
             </div>
             <span class="tile-number">04</span>
           </div>
-          <h3 class="tile-title">Marknadsföring</h3>
-          <p class="tile-desc">AI-driven marknadsföring och innehållsproduktion som når rätt målgrupp med rätt budskap vid rätt tillfälle.</p>
+          <h3 class="tile-title">Marknadsföring & kommunikation</h3>
+          <p class="tile-desc">AI-driven kommunikation och innehållsproduktion som når rätt målgrupp med rätt budskap vid rätt tillfälle.</p>
         </article>
       </div>
     </div>
@@ -1265,13 +1350,13 @@
         </div>
         <div class="om-body fade-up" data-delay="120">
           <p>
-            Vi startade Integra AI för att hjälpa företag runt omkring oss att ta steget in i AI-eran — utan jargong, utan onödig komplexitet och utan långa bindningstider.
+            Vi startade Integra AI för att hjälpa verksamheterna runt omkring oss — kommuner, offentliga organisationer och företag — att ta steget in i AI-eran. Utan jargong, utan onödig komplexitet och utan långa bindningstider.
           </p>
           <p>
             Det vi saknar i erfarenhet kompenserar vi med energi, djup nyfikenhet och en arbetsetik som säger ja till att lära oss det som krävs. Vi testar, mäter och justerar tills lösningen faktiskt fungerar i er vardag.
           </p>
           <p>
-            Varje uppdrag börjar med ett samtal. Vi lyssnar mer än vi pratar, förstår hur ni arbetar idag och föreslår bara det som gör verklig skillnad. Inga paketlösningar — bara arbete som bär.
+            Varje uppdrag börjar med ett samtal. Vi lyssnar mer än vi pratar, förstår hur ni arbetar idag och föreslår bara det som gör verklig skillnad. Inga paketlösningar — bara det som passar er.
           </p>
         </div>
 
@@ -1354,7 +1439,7 @@
             </span>
           </button>
           <div class="faq-a"><div class="faq-a-inner">
-            <p>Er data är er data. Vi använder GDPR-kompatibla lösningar, tränar inte publika modeller på ert innehåll och är transparenta med var informationen lagras. Tveka inte att fråga om detaljerna.</p>
+            <p>Er data är er data. Vi använder GDPR-kompatibla lösningar, lagrar data inom EU där det är möjligt, tränar inte publika modeller på ert innehåll och är transparenta med var informationen finns. För offentlig sektor kan vi också anpassa lösningen efter era krav på informationssäkerhet och offentlighetsprincipen.</p>
           </div></div>
         </div>
 
@@ -1374,13 +1459,26 @@
         <div class="faq-item" role="listitem">
           <button class="faq-q" aria-expanded="false">
             <span class="faq-idx">06</span>
-            <span>Jobbar ni bara med företag i Halmstad?</span>
+            <span>Jobbar ni bara med verksamheter i Halmstad?</span>
             <span class="faq-icon" aria-hidden="true">
               <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
             </span>
           </button>
           <div class="faq-a"><div class="faq-a-inner">
-            <p>Vi utgår från Halmstad men arbetar digitalt med företag i hela Sverige. Första samtalet kan vara på plats, över video eller telefon — vad som passar er bäst.</p>
+            <p>Vi utgår från Halmstad men arbetar digitalt med verksamheter i hela Sverige. Första samtalet kan vara på plats, över video eller telefon — vad som passar er bäst.</p>
+          </div></div>
+        </div>
+
+        <div class="faq-item" role="listitem">
+          <button class="faq-q" aria-expanded="false">
+            <span class="faq-idx">07</span>
+            <span>Kan ni arbeta med kommuner och offentliga verksamheter?</span>
+            <span class="faq-icon" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </span>
+          </button>
+          <div class="faq-a"><div class="faq-a-inner">
+            <p>Ja. Vi anpassar vårt arbetssätt efter de krav som gäller i offentlig sektor — från informationssäkerhet och dataskydd till dokumentation och avtalsform. Är ni en kommun eller myndighet som vill utforska vad AI kan göra hos er, boka ett kostnadsfritt samtal så berättar vi hur vi brukar lägga upp det.</p>
           </div></div>
         </div>
       </div>
@@ -1414,11 +1512,10 @@
   <div class="footer-inner">
     <div class="footer-brand">
       <a href="#" class="brand" aria-label="Integra AI startsida">
-        <span class="brand-logo" aria-hidden="true"></span>
-        <span>Integra&nbsp;AI</span>
+          <span>Integra&nbsp;AI</span>
       </a>
       <p class="footer-tag">
-        En AI-partner från Halmstad. Lugn takt, tydliga leveranser, arbete som bär.
+        En AI-partner från Halmstad. Lugn takt och tydliga leveranser.
       </p>
     </div>
 
@@ -1474,13 +1571,102 @@
   const nav = document.getElementById('nav');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Nav scroll state
+  // Custom rAF-based smooth scroll — guaranteed animation, works regardless of
+  // prefers-reduced-motion (intentional user click is not an ambient animation).
+  const smoothScrollTo = (targetY, duration = 900) => {
+    const startY = window.scrollY;
+    const diff = targetY - startY;
+    if (Math.abs(diff) < 2) return;
+    const startTime = performance.now();
+    const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+    const step = (now) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      window.scrollTo(0, Math.round(startY + diff * ease(t)));
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
+  // Resolve a target element and perform the smooth scroll.
+  // A bare "#" is treated as "scroll to the top of the page" (used by the logo).
+  const scrollToSelector = (selector, extra = 0) => {
+    if (!selector || selector === '#') {
+      smoothScrollTo(0, 950);
+      return true;
+    }
+    const target = document.querySelector(selector);
+    if (!target) return false;
+    const navH = nav ? nav.offsetHeight : 0;
+    const y = target.getBoundingClientRect().top + window.scrollY - navH - 8 + extra;
+    smoothScrollTo(y, 950);
+    return true;
+  };
+
+  const bindScrollTrigger = (el, selector) => {
+    el.addEventListener('click', (e) => {
+      const extra = parseInt(el.dataset.scrollOffset || '0', 10);
+      if (scrollToSelector(selector, extra)) e.preventDefault();
+    });
+  };
+
+  // Explicit [data-scroll-to] triggers (e.g. the hero "Scrolla" button)
+  document.querySelectorAll('[data-scroll-to]').forEach((el) => {
+    bindScrollTrigger(el, el.getAttribute('data-scroll-to'));
+  });
+
+  // Any internal hash link gets the same smooth behavior (nav links, CTA,
+  // footer links, mobile menu, the logo "#" which goes back to the top).
+  document.querySelectorAll('a[href^="#"]').forEach((a) => {
+    const href = a.getAttribute('href');
+    if (!href) return;
+    // Non-top hashes require an existing element; "#" always works (→ top).
+    if (href !== '#' && !document.querySelector(href)) return;
+    bindScrollTrigger(a, href);
+  });
+
+  // Nav scroll state — smoothly interpolate over the first 80px instead of snapping
+  const NAV_RANGE = 80;
+  let navTicking = false;
+  const applyNav = () => {
+    const raw = window.scrollY / NAV_RANGE;
+    const p = raw < 0 ? 0 : raw > 1 ? 1 : raw;
+    // ease the progress slightly so the transition feels more organic
+    const eased = p * p * (3 - 2 * p);
+    nav.style.setProperty('--nav-p', eased.toFixed(4));
+    navTicking = false;
+  };
   const onScroll = () => {
-    if (window.scrollY > 40) nav.classList.add('is-scrolled');
-    else nav.classList.remove('is-scrolled');
+    if (!navTicking) {
+      navTicking = true;
+      requestAnimationFrame(applyNav);
+    }
   };
   window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
+  applyNav();
+
+  // Cursor-following glow on primary buttons
+  document.querySelectorAll('.btn-primary').forEach(btn => {
+    btn.addEventListener('pointermove', (e) => {
+      const rect = btn.getBoundingClientRect();
+      btn.style.setProperty('--mx', (e.clientX - rect.left) + 'px');
+      btn.style.setProperty('--my', (e.clientY - rect.top) + 'px');
+    });
+  });
+
+  // Scroll progress bar
+  (() => {
+    const bar = document.querySelector('.scroll-progress');
+    if (!bar) return;
+    const update = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      bar.style.setProperty('--progress', p.toFixed(4));
+      bar.classList.toggle('hidden', window.scrollY < 60);
+    };
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
 
   document.addEventListener('DOMContentLoaded', () => {
     // Staggered fade-up for hero (runs on load)
@@ -1522,29 +1708,49 @@
       update();
     }
 
-    // Count-up for "24"
-    const animateCount = (el, target, suffix, duration = 1500) => {
-      const start = performance.now();
-      const step = (now) => {
-        const t = Math.min((now - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - t, 3);
-        el.textContent = Math.round(target * eased) + suffix;
-        if (t < 1) requestAnimationFrame(step);
+    // Scroll-scrubbed count-up + per-card parallax on Om oss-stats
+    const omStats = document.querySelector('.om-stats');
+    const countEls = Array.from(document.querySelectorAll('[data-count-to]')).map(el => ({
+      el,
+      target: parseInt(el.getAttribute('data-count-to'), 10),
+      suffix: el.getAttribute('data-count-suffix') || '',
+    }));
+    const statCards = omStats ? Array.from(omStats.querySelectorAll('.om-stat')) : [];
+
+    if (reduceMotion) {
+      countEls.forEach(c => c.el.textContent = c.target + c.suffix);
+    } else if (omStats && (countEls.length || statCards.length)) {
+      const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+      let ticking = false;
+      const updateStats = () => {
+        ticking = false;
+        const r = omStats.getBoundingClientRect();
+        const wh = window.innerHeight;
+        // Progress: 0 when stats top hits 85% of viewport, 1 when it hits 35%
+        const startY = wh * 0.85;
+        const endY = wh * 0.35;
+        const raw = (startY - r.top) / (startY - endY);
+        const p = Math.min(1, Math.max(0, raw));
+        const eased = easeOut(p);
+        countEls.forEach(c => {
+          c.el.textContent = Math.round(c.target * eased) + c.suffix;
+        });
+        statCards.forEach((card, i) => {
+          const delay = i * 0.12;
+          const cp = Math.min(1, Math.max(0, (p - delay) / (1 - delay)));
+          const ce = easeOut(cp);
+          card.style.transform = `translate3d(0, ${(1 - ce) * 28}px, 0)`;
+          card.style.opacity = String(0.25 + ce * 0.75);
+        });
       };
-      requestAnimationFrame(step);
-    };
-    const countObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        const el = entry.target;
-        const target = parseInt(el.getAttribute('data-count-to'), 10);
-        const suffix = el.getAttribute('data-count-suffix') || '';
-        if (reduceMotion) el.textContent = target + suffix;
-        else { el.textContent = '0' + suffix; animateCount(el, target, suffix); }
-        countObserver.unobserve(el);
-      });
-    }, { threshold: 0.4 });
-    document.querySelectorAll('[data-count-to]').forEach(el => countObserver.observe(el));
+      countEls.forEach(c => c.el.textContent = '0' + c.suffix);
+      statCards.forEach(card => { card.style.willChange = 'transform, opacity'; });
+      window.addEventListener('scroll', () => {
+        if (!ticking) { requestAnimationFrame(updateStats); ticking = true; }
+      }, { passive: true });
+      window.addEventListener('resize', updateStats);
+      updateStats();
+    }
 
     // Chattbotar mega-menu
     const dropdown = document.getElementById('bot-dropdown');
@@ -1618,6 +1824,130 @@
       if (e.key === 'Escape' && document.body.classList.contains('menu-open')) closeMenu();
     });
   });
+
+  /* ─── Tjänster smoke animation (WebGL) ─────────────────────────── */
+  (() => {
+    const canvas = document.querySelector('.tjanster-smoke');
+    if (!canvas) return;
+    const gl = canvas.getContext('webgl2', { antialias: false, alpha: true, premultipliedAlpha: true });
+    if (!gl) {
+      // No WebGL2 — CSS gradient fallback on .tjanster takes over.
+      console.warn('[tjanster-smoke] WebGL2 not available; using CSS fallback.');
+      return;
+    }
+
+    const vertexSrc = `#version 300 es
+      precision highp float;
+      in vec4 position;
+      void main(){ gl_Position = position; }`;
+
+    const fragmentSrc = `#version 300 es
+      precision highp float;
+      out vec4 O;
+      uniform float time;
+      uniform vec2 resolution;
+      uniform vec3 u_color;
+      #define FC gl_FragCoord.xy
+      #define R resolution
+      #define T (time+660.)
+      float rnd(vec2 p){p=fract(p*vec2(12.9898,78.233));p+=dot(p,p+34.56);return fract(p.x*p.y);}
+      float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);return mix(mix(rnd(i),rnd(i+vec2(1,0)),u.x),mix(rnd(i+vec2(0,1)),rnd(i+1.),u.x),u.y);}
+      float fbm(vec2 p){float t=.0,a=1.;for(int i=0;i<5;i++){t+=a*noise(p);p*=mat2(1,-1.2,.2,1.2)*2.;a*=.5;}return t;}
+      void main(){
+        // Symmetric coordinate system — threads spread across both sides evenly.
+        vec2 uv = (FC - .5*R) / R.y;
+        uv *= vec2(1.3, 1.0);
+
+        // Low-frequency flow warp — slow, sweeping distortion
+        float flow = fbm(uv * 0.55 + vec2(T * 0.018, 0.0));
+        float field = fbm(uv * 1.10 + flow * 0.85 + vec2(0.0, T * 0.012));
+
+        // Multiple iso-contours spread across the full value range of the field,
+        // so threads appear everywhere the field takes a value — left, center, right.
+        // Narrower bands = thinner threads.
+        float alpha = 0.0;
+        alpha += (1.0 - smoothstep(0.0, 0.045, abs(field - 0.22))) * 0.28;
+        alpha += (1.0 - smoothstep(0.0, 0.050, abs(field - 0.38))) * 0.36;
+        alpha += (1.0 - smoothstep(0.0, 0.045, abs(field - 0.54))) * 0.40;
+        alpha += (1.0 - smoothstep(0.0, 0.040, abs(field - 0.70))) * 0.34;
+        alpha += (1.0 - smoothstep(0.0, 0.035, abs(field - 0.84))) * 0.26;
+
+        alpha = clamp(alpha, 0.0, 0.85);
+        alpha *= min(time * 0.5, 1.0);
+
+        // Premultiplied-alpha output: pale sky-blue threads on transparent
+        O = vec4(u_color * alpha, alpha);
+      }`;
+
+    const compile = (type, src) => {
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        console.error(gl.getShaderInfoLog(s));
+      }
+      return s;
+    };
+
+    const vs = compile(gl.VERTEX_SHADER, vertexSrc);
+    const fs = compile(gl.FRAGMENT_SHADER, fragmentSrc);
+    const program = gl.createProgram();
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
+    gl.linkProgram(program);
+
+    const buffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,1,-1,-1,1,1,1,-1]), gl.STATIC_DRAW);
+    const posLoc = gl.getAttribLocation(program, 'position');
+    gl.enableVertexAttribArray(posLoc);
+    gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+
+    const uRes = gl.getUniformLocation(program, 'resolution');
+    const uTime = gl.getUniformLocation(program, 'time');
+    const uColor = gl.getUniformLocation(program, 'u_color');
+
+    // Very light sky-blue so the threads blend softly into the white background
+    const smokeColor = [0xC8/255, 0xDE/255, 0xF2/255]; // #C8DEF2
+
+    const section = document.getElementById('tjanster');
+    const updateSize = () => {
+      const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+      const w = section.clientWidth;
+      const h = section.clientHeight;
+      canvas.width  = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    };
+    updateSize();
+    window.addEventListener('resize', updateSize);
+    if (typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(updateSize).observe(section);
+    }
+
+    // Only render when the section is on-screen, to save GPU
+    let onScreen = false;
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { onScreen = e.isIntersecting; });
+    }, { rootMargin: '200px 0px' });
+    io.observe(section);
+
+    gl.clearColor(0, 0, 0, 0);
+    let raf;
+    const loop = (now) => {
+      if (onScreen) {
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.useProgram(program);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.uniform1f(uTime, now * 1e-3);
+        gl.uniform3fv(uColor, smokeColor);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      }
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+  })();
 })();
 </script>
 
