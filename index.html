@@ -303,10 +303,35 @@
     object-position: 60% 55%;
     display: block;
   }
-  .hero-photo::after {
-    content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 26%;
-    background: linear-gradient(to bottom, rgba(247,245,241,0), var(--bg));
+  /* A cloudy, atmospheric transition from the sky-video down into the
+     page background. A real DOM sibling of .hero-photo (not a pseudo
+     element) so WebKit/Safari's composited <video> layer cannot paint
+     over it — previously the fade lived on .hero-photo::after and iOS
+     Safari rendered the video above it, producing a hard cut. */
+  .hero-fade {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: -1px;
+    height: 58%;
     z-index: 3;
+    pointer-events: none;
+    /* Ends in #E6F0F9 — the exact rendered colour at the top of .tjanster
+       (white bg + rgba(200,222,242,0.45) overlay) — so there is no visible
+       seam where hero meets the next section. */
+    background:
+      radial-gradient(ellipse 110% 42% at 28% 88%,
+        rgba(230,240,249,0.22) 0%,
+        rgba(230,240,249,0) 62%),
+      radial-gradient(ellipse 95% 52% at 72% 96%,
+        rgba(230,240,249,0.28) 0%,
+        rgba(230,240,249,0) 58%),
+      linear-gradient(to bottom,
+        rgba(230,240,249,0) 0%,
+        rgba(230,240,249,0.08) 22%,
+        rgba(230,240,249,0.26) 46%,
+        rgba(230,240,249,0.56) 72%,
+        rgba(230,240,249,0.84) 90%,
+        #E6F0F9 100%);
   }
   /* Soft radial vignette from left for copy legibility */
   .hero-gradient {
@@ -449,11 +474,15 @@
   .link-secondary:hover .arrow { transform: translateX(3px); }
 
   .scroll-hint {
-    position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+    position: absolute; bottom: 56px; left: 50%; transform: translateX(-50%);
     z-index: 4;
     font-family: var(--font-mono);
-    font-size: 10.5px; letter-spacing: 0.2em; text-transform: uppercase;
-    color: #F4F6F9; opacity: 0.78;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
+    /* dark navy reads clearly on the cloudy/white bottom of the hero.
+       A soft pale halo gives legibility on the darker mountain above,
+       so the hint is visible regardless of where scroll-state places it. */
+    color: #5F7BA0; opacity: 0.82;
+    text-shadow: 0 0 8px rgba(230,240,249,0.7), 0 1px 2px rgba(230,240,249,0.5);
     display: inline-flex; flex-direction: column; align-items: center; gap: 10px;
     background: transparent; border: 0; padding: 8px 12px;
     cursor: pointer;
@@ -461,18 +490,19 @@
   }
   .scroll-hint:hover { opacity: 1; transform: translate(-50%, 3px); }
   .scroll-hint:focus-visible {
-    outline: 2px solid #F4F6F9;
+    outline: 2px solid #5F7BA0;
     outline-offset: 6px;
     border-radius: 4px;
   }
   .scroll-hint .bar {
-    width: 1px; height: 32px;
+    width: 1.5px; height: 36px;
     background: currentColor;
     position: relative; overflow: hidden;
+    box-shadow: 0 0 8px rgba(230,240,249,0.7);
   }
   .scroll-hint .bar::after {
     content: ""; position: absolute; left: 0; top: -100%; width: 100%; height: 60%;
-    background: linear-gradient(to bottom, rgba(242,239,232,0) 0%, #F4F6F9 70%, #F4F6F9 100%);
+    background: linear-gradient(to bottom, rgba(95,123,160,0) 0%, #5F7BA0 70%, #5F7BA0 100%);
     animation: scroll-drip 2.4s var(--ease-out) infinite;
   }
   .scroll-hint .chev {
@@ -531,9 +561,23 @@
     z-index: 1;
     padding: clamp(96px, 12vw, 144px) 0 clamp(72px, 8vw, 104px);
     background: #FFFFFF;
-    border-top: 1px solid var(--line);
     isolation: isolate;
     overflow: hidden;
+  }
+  /* soft sky wisp echoing the hero video — bridges the fade at hero's
+     bottom into the threaded white tjanster canvas */
+  .tjanster::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: clamp(120px, 14vw, 180px);
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to bottom,
+      rgba(200, 222, 242, 0.45) 0%,
+      rgba(200, 222, 242, 0.18) 48%,
+      rgba(200, 222, 242, 0.05) 82%,
+      rgba(200, 222, 242, 0) 100%);
   }
   .tjanster-smoke {
     position: absolute;
@@ -1103,6 +1147,12 @@
     .mobile-menu, .menu-scrim { display: none; }
   }
 
+  @media (max-width: 900px), (pointer: coarse) {
+    /* parallax is JS-driven — this CSS override is a safety net so the
+       photo stays rock-solid even if something races it */
+    .hero-photo { transform: none !important; will-change: auto; }
+  }
+
   @media (max-width: 768px) {
     .nav-inner { padding: 16px 20px; gap: 16px; }
     .brand { font-size: 15.5px; }
@@ -1264,6 +1314,7 @@
       <video src="hero.mp4" autoplay muted loop playsinline preload="auto"></video>
     </div>
     <div class="hero-gradient" aria-hidden="true"></div>
+    <div class="hero-fade" aria-hidden="true"></div>
 
     <div class="hero-inner">
       <div class="hero-copy">
@@ -1748,12 +1799,20 @@
       fadeObserver.observe(el);
     });
 
-    // Subtle hero parallax
+    // Subtle hero parallax — desktop only. On mobile the parallax combined
+    // with iOS Safari's dynamic viewport (address bar collapsing) produces
+    // a visible "drift + zoom" artefact, so we keep the photo fully static.
     const heroPhoto = document.querySelector('.hero-photo');
     const heroSection = document.querySelector('.hero');
     if (heroPhoto && heroSection && !reduceMotion) {
+      const mobileMQ = window.matchMedia('(max-width: 900px), (pointer: coarse)');
       let ticking = false;
       const update = () => {
+        if (mobileMQ.matches) {
+          heroPhoto.style.transform = '';
+          ticking = false;
+          return;
+        }
         const y = window.scrollY;
         const h = heroSection.offsetHeight;
         if (y < h) heroPhoto.style.transform = `translate3d(0, ${y * 0.28}px, 0)`;
@@ -1762,6 +1821,7 @@
       window.addEventListener('scroll', () => {
         if (!ticking) { requestAnimationFrame(update); ticking = true; }
       }, { passive: true });
+      mobileMQ.addEventListener('change', update);
       update();
     }
 
