@@ -162,6 +162,10 @@
     opacity: 0.82;
     transition: opacity 160ms ease, color 160ms ease;
     position: relative;
+    /* removes the ~300ms tap-delay mobile browsers add while waiting for
+       a possible double-tap zoom gesture */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .nav-link:hover { opacity: 1; }
   .nav-link::after {
@@ -245,6 +249,8 @@
     border-radius: var(--radius);
     display: inline-flex; align-items: center; gap: 8px;
     transition: transform 200ms var(--spring), box-shadow 220ms var(--spring), filter 200ms var(--spring);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
   }
   .nav-cta:hover {
     filter: brightness(1.06);
@@ -276,6 +282,11 @@
     position: relative;
     min-height: 100vh; min-height: 100dvh;
     overflow: hidden; isolation: isolate;
+    /* clip-path forces strict paint-level clipping, which some browsers
+       (Safari/WebKit) don't apply to GPU-composited <video> layers —
+       without this the mountain video can bleed into later sections. */
+    clip-path: inset(0);
+    z-index: 0;
   }
   .hero-photo {
     position: absolute; inset: 0; z-index: 1;
@@ -517,6 +528,7 @@
   /* ─── Tjänster (bento) ──────────────────────────────────────────── */
   .tjanster {
     position: relative;
+    z-index: 1;
     padding: clamp(96px, 12vw, 144px) 0 clamp(72px, 8vw, 104px);
     background: #FFFFFF;
     border-top: 1px solid var(--line);
