@@ -53,6 +53,13 @@
      browser-level smooth animation, which stacks into a multi-second delay
      on Safari and on some Chromium configurations. The JS animation is
      self-contained and handles all intentional scrolls. */
+  /* While a smooth-scroll animation is running, block pointer events on all
+     scroll triggers. Prevents mouse-hover-while-spamming from stacking
+     extra clicks on the "Scrolla" button and nav links. */
+  body.is-scrolling a[href^="#"],
+  body.is-scrolling [data-scroll-to] {
+    pointer-events: none;
+  }
 
   .scroll-progress {
     position: fixed; top: 0; left: 0; right: 0;
@@ -1732,10 +1739,26 @@
 
   // Custom rAF-based smooth scroll — guaranteed animation, works regardless of
   // prefers-reduced-motion (intentional user click is not an ambient animation).
+  //
+  // Spam-safe: tracks the single active rAF and target Y. Clicking the same
+  // link repeatedly while an animation runs is a no-op. Clicking a *different*
+  // link mid-scroll cancels the in-flight animation and starts a fresh one
+  // from the current position — so total time never exceeds one 900 ms run,
+  // regardless of how many clicks the user fires.
+  let scrollRafId = null;
+  let scrollTargetY = null;
   const smoothScrollTo = (targetY, duration = 900) => {
+    if (scrollRafId !== null && scrollTargetY === targetY) return;
+    if (scrollRafId !== null) {
+      cancelAnimationFrame(scrollRafId);
+      scrollRafId = null;
+    }
     const startY = window.scrollY;
     const diff = targetY - startY;
-    if (Math.abs(diff) < 2) return;
+    if (Math.abs(diff) < 2) { scrollTargetY = null; return; }
+    scrollTargetY = targetY;
+    // Mark body so CSS can disable pointer events on all scroll triggers.
+    document.body.classList.add('is-scrolling');
     const startTime = performance.now();
     const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
     const step = (now) => {
@@ -1744,9 +1767,15 @@
       // globally later, our per-frame scrollTo stays instant and doesn't
       // trigger a browser-level animation on top of ours.
       window.scrollTo({ top: Math.round(startY + diff * ease(t)), left: 0, behavior: 'auto' });
-      if (t < 1) requestAnimationFrame(step);
+      if (t < 1) {
+        scrollRafId = requestAnimationFrame(step);
+      } else {
+        scrollRafId = null;
+        scrollTargetY = null;
+        document.body.classList.remove('is-scrolling');
+      }
     };
-    requestAnimationFrame(step);
+    scrollRafId = requestAnimationFrame(step);
   };
 
   // Resolve a target element and perform the smooth scroll.
@@ -1764,8 +1793,19 @@
     return true;
   };
 
+  // Extra spam guard for rapid repeat clicks: 250 ms cooldown between any
+  // two scroll-trigger clicks, and body-level `scrolling` class that
+  // disables pointer events on all triggers while an animation runs.
+  let lastScrollClickAt = 0;
+  const SCROLL_CLICK_COOLDOWN = 250;
   const bindScrollTrigger = (el, selector) => {
     el.addEventListener('click', (e) => {
+      const now = performance.now();
+      if (now - lastScrollClickAt < SCROLL_CLICK_COOLDOWN) {
+        e.preventDefault();
+        return;
+      }
+      lastScrollClickAt = now;
       const extra = parseInt(el.dataset.scrollOffset || '0', 10);
       if (scrollToSelector(selector, extra)) e.preventDefault();
     });
