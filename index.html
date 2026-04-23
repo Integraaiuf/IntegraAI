@@ -48,7 +48,11 @@
   /* ─── Base ───────────────────────────────────────────────────────── */
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
+  /* NB: no CSS `scroll-behavior: smooth` — when combined with our rAF-based
+     smoothScrollTo it makes every per-frame scrollTo call queue its own
+     browser-level smooth animation, which stacks into a multi-second delay
+     on Safari and on some Chromium configurations. The JS animation is
+     self-contained and handles all intentional scrolls. */
 
   .scroll-progress {
     position: fixed; top: 0; left: 0; right: 0;
@@ -587,6 +591,19 @@
     display: block;
     z-index: 0;
     pointer-events: none;
+    /* Fade the shader canvas to transparent at the top and bottom edges
+       so the threads don't get sliced off at the section boundary —
+       they dissolve into the section background before the seam. */
+    -webkit-mask-image: linear-gradient(to bottom,
+      transparent 0%,
+      black 10%,
+      black 82%,
+      transparent 100%);
+    mask-image: linear-gradient(to bottom,
+      transparent 0%,
+      black 10%,
+      black 82%,
+      transparent 100%);
   }
   .tjanster-inner { position: relative; z-index: 2; max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); }
 
@@ -735,10 +752,24 @@
   /* ─── Om oss ────────────────────────────────────────────────────── */
   .om {
     padding: clamp(96px, 12vw, 140px) 0;
-    border-top: 1px solid var(--line);
     background: var(--bg);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
   }
-  .om-inner { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); }
+  /* Short direct gradient from the previous section's white into Om oss'
+     own cool off-white. Kept brief (~44-68px) so the distinct section
+     tone takes over quickly and the shade difference remains visible. */
+  .om::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: clamp(44px, 5.5vw, 68px);
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom, #FFFFFF 0%, var(--bg) 100%);
+  }
+  .om-inner { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); position: relative; z-index: 1; }
 
   .om-layout {
     display: grid;
@@ -815,8 +846,21 @@
   /* ─── FAQ ───────────────────────────────────────────────────────── */
   .faq {
     padding: clamp(96px, 12vw, 140px) 0;
-    border-top: 1px solid var(--line);
     background: var(--bg-warm);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  /* Same short-gradient approach as .om::before — keeps FAQ's darker
+     #F4F6F9 clearly distinct below a brief blend band. */
+  .faq::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 0;
+    height: clamp(44px, 5.5vw, 68px);
+    z-index: 0;
+    pointer-events: none;
+    background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-warm) 100%);
   }
   .faq-inner {
     max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x);
@@ -824,6 +868,8 @@
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
     gap: clamp(40px, 6vw, 96px);
     align-items: start;
+    position: relative;
+    z-index: 1;
   }
   .faq-head {
     display: flex; flex-direction: column; gap: 22px;
@@ -1185,13 +1231,21 @@
 
     .tjanster { padding: 80px 0 64px; }
     .bento { grid-template-columns: 1fr; grid-template-rows: auto; }
-    .bento-head { grid-column: 1; grid-row: auto; padding: 0 0 20px; gap: 16px; }
+    .bento-head { grid-column: 1; grid-row: auto; padding: 0 0 20px; gap: 16px; order: 0; }
     .tile, .tile-flag, .tile-a, .tile-b, .tile-top {
       grid-column: 1;
       grid-row: auto;
       padding: 28px 24px;
       min-height: 0;
     }
+    /* Stack tiles in their natural numeric order on phones: 01→02→03→04.
+       Desktop uses explicit grid-area placement so DOM order doesn't
+       matter there, but on mobile we need this override since tile-top
+       (02) currently sits before tile-flag (01) in DOM. */
+    .tile-flag { order: 1; }
+    .tile-top  { order: 2; }
+    .tile-a    { order: 3; }
+    .tile-b    { order: 4; }
     .tile-flag .tile-number { font-size: 28px; }
     .tile-flag .tile-title { font-size: 30px; }
     .tile-flag .tile-icon { width: 46px; height: 46px; border-radius: 10px; }
@@ -1666,7 +1720,10 @@
     const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
     const step = (now) => {
       const t = Math.min(1, (now - startTime) / duration);
-      window.scrollTo(0, Math.round(startY + diff * ease(t)));
+      // explicit `auto` so even if a style rule re-enables scroll-behavior
+      // globally later, our per-frame scrollTo stays instant and doesn't
+      // trigger a browser-level animation on top of ours.
+      window.scrollTo({ top: Math.round(startY + diff * ease(t)), left: 0, behavior: 'auto' });
       if (t < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
