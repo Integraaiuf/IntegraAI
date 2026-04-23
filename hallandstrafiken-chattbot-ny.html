@@ -2,7 +2,7 @@
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Hallandstrafiken – AI-assistent</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23006EB6'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle' font-family='Arial,sans-serif' font-weight='700' font-size='18' fill='white'%3EH%3C/text%3E%3C/svg%3E">
 <style>
@@ -888,49 +888,90 @@
   }
 
   /* ────────────────────────────────────────
-     QUICK REPLIES (empty state suggestions)
+     PII WARNING MODAL
+     Triggas innan sendMessage() om regex-detektorn hittar
+     personnummer, telefon, mail eller kortnummer i inputen.
+     Användaren måste aktivt bekräfta för att skicka.
   ──────────────────────────────────────── */
-  .quick-replies {
+  .pii-modal-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 63, 104, 0.28);
+    backdrop-filter: blur(2px);
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 4px 18px 12px 56px;
-    animation: fadeInChips 0.45s var(--ease-spring) 0.1s both;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 220ms var(--ease-spring);
+    z-index: 80;
   }
-  @keyframes fadeInChips {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .pii-modal-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
   }
-  .quick-reply-chip {
-    appearance: none;
+  .pii-modal {
     background: #FFFFFF;
-    border: 1.5px solid var(--ht-blue);
-    color: var(--ht-blue);
-    font-family: inherit;
-    font-size: 13.5px;
-    font-weight: 600;
-    padding: 8px 14px;
-    border-radius: 999px;
-    cursor: pointer;
-    line-height: 1.2;
-    min-height: 36px;
-    transition:
-      background 0.25s var(--ease-spring),
-      color      0.25s var(--ease-spring),
-      transform  0.25s var(--ease-spring),
-      box-shadow 0.25s var(--ease-spring);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    width: min(360px, 100%);
+    transform: translateY(10px) scale(0.96);
+    transition: transform 260ms var(--ease-spring);
   }
-  .quick-reply-chip:hover {
+  .pii-modal-overlay.show .pii-modal {
+    transform: translateY(0) scale(1);
+  }
+  .pii-modal-header {
+    background: var(--ht-blue-deep);
+    color: #FFFFFF;
+    padding: 14px 20px;
+    font-size: 15.5px;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+  }
+  .pii-modal-body {
+    padding: 20px 22px 18px;
+    color: var(--text);
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .pii-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 0 22px 20px;
+  }
+  .pii-modal-btn {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 9px 20px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition:
+      background 180ms var(--ease-spring),
+      color 180ms var(--ease-spring),
+      transform 180ms var(--ease-spring);
+  }
+  .pii-modal-btn:active { transform: translateY(1px); }
+  .pii-modal-btn.primary {
     background: var(--ht-blue);
     color: #FFFFFF;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,110,182,0.25);
+    border: 1px solid var(--ht-blue);
   }
-  .quick-reply-chip:focus-visible {
+  .pii-modal-btn.primary:hover { background: var(--ht-blue-hover); border-color: var(--ht-blue-hover); }
+  .pii-modal-btn.secondary {
+    background: #FFFFFF;
+    color: var(--ht-blue);
+    border: 1px solid var(--ht-blue);
+  }
+  .pii-modal-btn.secondary:hover { background: var(--ht-softer); }
+  .pii-modal-btn:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
   }
-  .quick-reply-chip:active { transform: translateY(0) scale(0.97); }
 
   /* ────────────────────────────────────────
      ACTIONS MENU (dropdown)
@@ -1327,25 +1368,20 @@
   /* ── Responsivt ── */
   @media (max-width: 440px) {
     .chat-window {
-      width: calc(100vw - 16px);
-      height: calc(100vh - 16px);
-      max-height: calc(100vh - 16px);
-      bottom: 8px;
-      right: 8px;
+      /* iOS safe-area: respektera notch/Dynamic Island/hemknapp-indikator */
+      width: calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right));
+      height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      max-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      bottom: calc(8px + env(safe-area-inset-bottom));
+      right: calc(8px + env(safe-area-inset-right));
       border-radius: var(--radius-md);
     }
-    /* Input-raden: touch-targets minst 44px, 16px font för att slippa iOS auto-zoom */
-    .chat-input-bar { gap: 8px; padding: 12px 12px 14px 12px; }
-    .util-btn { width: 44px; height: 44px; }
-    .util-btn svg { width: 18px; height: 18px; }
-    .chat-input-wrap input {
-      font-size: 16px;
-      padding: 13px 52px 13px 16px;
-      min-height: 44px;
-    }
-    .send-btn-inline { width: 40px; height: 40px; right: 3px; }
-    .quick-replies { padding: 4px 14px 12px 14px; }
-    .quick-reply-chip { min-height: 40px; font-size: 14px; padding: 9px 14px; }
+    /* Komprimera input-raden så att textfältet får mer plats */
+    .chat-input-bar { gap: 6px; padding: 10px 10px 12px 10px; }
+    .util-btn { width: 34px; height: 34px; }
+    .util-btn svg { width: 16px; height: 16px; }
+    .chat-input-wrap input { font-size: 14px; padding: 10px 40px 10px 14px; }
+    .send-btn-inline { width: 32px; height: 32px; }
   }
 
   /* Reduced motion */
@@ -1451,6 +1487,20 @@
     <!-- Rate limit toast -->
     <div class="rate-limit-toast" id="rateLimitToast" role="alert">
       Vänta några sekunder innan du skickar fler meddelanden.
+    </div>
+
+    <!-- PII-varningsmodal: visas när regex-detektorn hittar personuppgifter i inputen -->
+    <div class="pii-modal-overlay" id="piiModalOverlay" role="dialog" aria-modal="true" aria-labelledby="piiModalTitle" aria-describedby="piiModalBody">
+      <div class="pii-modal">
+        <div class="pii-modal-header" id="piiModalTitle">Varning!</div>
+        <div class="pii-modal-body" id="piiModalBody">
+          Du verkar ha skrivit in personuppgifter. Skicka inte känslig information som personnummer, kortnummer eller lösenord. Vill du verkligen skicka meddelandet?
+        </div>
+        <div class="pii-modal-actions">
+          <button class="pii-modal-btn secondary" id="piiModalCancel" type="button">Nej</button>
+          <button class="pii-modal-btn primary" id="piiModalConfirm" type="button">Ja, skicka</button>
+        </div>
+      </div>
     </div>
 
     <!-- Kontaktinfo-overlay -->
@@ -1669,81 +1719,12 @@
     return messageTimes.length >= RATE_LIMIT_COUNT;
   }
   function recordMessage() { messageTimes.push(Date.now()); }
-
-  /* ────────────────────────────────────────
-     RATE LIMIT – persistent cooldown UI
-  ──────────────────────────────────────── */
-  let cooldownInterval = null;
-  function msUntilNextSlot() {
-    if (messageTimes.length === 0) return 0;
-    const oldest = messageTimes[0];
-    return Math.max(0, RATE_LIMIT_WINDOW - (Date.now() - oldest));
-  }
-  function startCooldown() {
-    const input = document.getElementById('chatInput');
-    const send = document.querySelector('.send-btn-inline');
-    input.disabled = true;
-    if (send) send.disabled = true;
+  function showRateLimitToast() {
     rateLimitToast.classList.add('show');
-    rateLimitToast.setAttribute('aria-live', 'polite');
-
-    function tick() {
-      const remaining = msUntilNextSlot();
-      if (remaining <= 0) {
-        rateLimitToast.classList.remove('show');
-        input.disabled = false;
-        if (send) send.disabled = false;
-        clearInterval(cooldownInterval);
-        cooldownInterval = null;
-        input.focus();
-        return;
-      }
-      const secs = Math.ceil(remaining / 1000);
-      rateLimitToast.textContent = `Vänta ${secs} s innan du skickar fler meddelanden`;
-    }
-    tick();
-    if (cooldownInterval) clearInterval(cooldownInterval);
-    cooldownInterval = setInterval(tick, 200);
-  }
-
-  /* ────────────────────────────────────────
-     QUICK REPLIES – initial empty state
-  ──────────────────────────────────────── */
-  const QUICK_REPLIES = [
-    'Köp biljett',
-    'Hitta din linje',
-    'Priser & zoner',
-    'Trafikinformation',
-    'Prata med handläggare'
-  ];
-  function renderQuickReplies() {
-    if (document.getElementById('quickReplies')) return;
-    const wrap = document.createElement('div');
-    wrap.id = 'quickReplies';
-    wrap.className = 'quick-replies';
-    wrap.setAttribute('role', 'group');
-    wrap.setAttribute('aria-label', 'Snabbval');
-
-    QUICK_REPLIES.forEach(label => {
-      const btn = document.createElement('button');
-      btn.className = 'quick-reply-chip';
-      btn.type = 'button';
-      btn.textContent = label;
-      btn.addEventListener('click', () => {
-        if (label === 'Prata med handläggare') {
-          connectToHumanAgent();
-          wrap.remove();
-          return;
-        }
-        chatInput.value = label;
-        updateCharCount();
-        wrap.remove();
-        sendMessage();
-      });
-      wrap.appendChild(btn);
-    });
-    chatMessages.appendChild(wrap);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    if (rateLimitTimeout) clearTimeout(rateLimitTimeout);
+    rateLimitTimeout = setTimeout(() => {
+      rateLimitToast.classList.remove('show');
+    }, 3500);
   }
 
   /* ────────────────────────────────────────
@@ -1864,7 +1845,6 @@
       // så att DOM-mutationer inte stör window-animationen.
       setTimeout(() => {
         addMessage('bot', 'Hej! Jag är Hallandstrafikens AI-assistent. Vad kan jag hjälpa dig med idag?', false);
-        renderQuickReplies();
       }, 650);
     }
     setTimeout(() => chatInput.focus(), 700);
@@ -2279,7 +2259,65 @@
     return sessionId;
   }
 
-  async function sendMessage() {
+  /* ────────────────────────────────────────
+     PII-DETEKTOR + VARNINGSMODAL
+     Klientsidig regex för de vanligaste svenska mönstren. Ger en
+     rekommendation, inte en blockering — användaren kan alltid trycka
+     "Ja, skicka" om de medvetet vill skicka t.ex. ett reseddatum som
+     råkar likna ett personnummer.
+  ──────────────────────────────────────── */
+  const PII_PATTERNS = [
+    // Personnummer: 10 eller 12 siffror, valfritt bindestreck eller mellanslag
+    //  - YYYYMMDD-XXXX, YYYYMMDDXXXX, YYYYMMDD XXXX
+    //  - YYMMDD-XXXX,   YYMMDDXXXX,   YYMMDD XXXX
+    { name: 'personnummer', regex: /(?:^|[^\d])((?:19|20)?\d{6}[\s-]?\d{4})(?=$|[^\d])/ },
+    // E-postadress
+    { name: 'e-post',       regex: /\b[\w.+-]+@[\w-]+\.[\w.-]+\b/ },
+    // Svenskt mobilnummer: +46/0046/0 + 7X + 8 siffror (med valfria mellanslag/bindestreck)
+    { name: 'telefonnummer',regex: /(?:^|[^\d])(?:\+46|0046|0)[\s-]?7\d[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}(?=$|[^\d])/ },
+    // Kortnummer: 4 grupper om 4 siffror
+    { name: 'kortnummer',   regex: /(?:^|[^\d])\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}(?=$|[^\d])/ }
+  ];
+
+  function detectPII(text) {
+    for (const p of PII_PATTERNS) {
+      if (p.regex.test(text)) return p.name;
+    }
+    return null;
+  }
+
+  const piiModalOverlay = document.getElementById('piiModalOverlay');
+  const piiModalConfirm = document.getElementById('piiModalConfirm');
+  const piiModalCancel  = document.getElementById('piiModalCancel');
+  let piiOnConfirm = null;
+
+  function showPIIWarning(onConfirm) {
+    piiOnConfirm = onConfirm;
+    piiModalOverlay.classList.add('show');
+    // fokusera "Nej" som default — säkrare val
+    setTimeout(() => piiModalCancel.focus(), 50);
+  }
+  function hidePIIWarning() {
+    piiModalOverlay.classList.remove('show');
+    piiOnConfirm = null;
+    chatInput.focus();
+  }
+  piiModalConfirm.addEventListener('click', () => {
+    const cb = piiOnConfirm;
+    piiModalOverlay.classList.remove('show');
+    piiOnConfirm = null;
+    if (cb) cb();
+  });
+  piiModalCancel.addEventListener('click', hidePIIWarning);
+  // Esc + klick utanför stänger som "Nej"
+  piiModalOverlay.addEventListener('click', (e) => {
+    if (e.target === piiModalOverlay) hidePIIWarning();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && piiModalOverlay.classList.contains('show')) hidePIIWarning();
+  });
+
+  async function sendMessage(skipPIICheck = false) {
     // Paste kan kringgå maxlength; trunkera innan skick
     if (chatInput.value.length > 1000) {
       chatInput.value = chatInput.value.slice(0, 1000);
@@ -2287,7 +2325,14 @@
     }
     const text = chatInput.value.trim();
     if (!text) return;
-    if (isRateLimited()) { startCooldown(); return; }
+    if (isRateLimited()) { showRateLimitToast(); return; }
+
+    // PII-check: om något mönster matchar, visa varningsruta innan skick
+    if (!skipPIICheck && detectPII(text)) {
+      showPIIWarning(() => sendMessage(true));
+      return;
+    }
+
     recordMessage();
 
     addMessage('user', text);
