@@ -636,7 +636,10 @@
     border-radius: 999px;
     padding: 11px 44px 11px 16px;
     font-family: inherit;
-    font-size: 14.5px;
+    /* 16px är lägsta gränsen iOS Safari accepterar innan den auto-zoomar
+       in på inputen vid fokus. Håll alltid ≥ 16px på alla input/select/
+       textarea-element för att slippa zoom-hopp på iPhone. */
+    font-size: 16px;
     color: var(--text);
     transition:
       border-color 0.35s var(--ease-spring),
@@ -1266,7 +1269,7 @@
     border: 1.5px solid var(--border-strong);
     border-radius: var(--radius-md);
     font-family: inherit;
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text);
     background: #FFFFFF;
     cursor: pointer;
@@ -1380,7 +1383,7 @@
     .chat-input-bar { gap: 6px; padding: 10px 10px 12px 10px; }
     .util-btn { width: 34px; height: 34px; }
     .util-btn svg { width: 16px; height: 16px; }
-    .chat-input-wrap input { font-size: 14px; padding: 10px 40px 10px 14px; }
+    .chat-input-wrap input { font-size: 16px; padding: 10px 40px 10px 14px; }
     .send-btn-inline { width: 32px; height: 32px; }
   }
 
