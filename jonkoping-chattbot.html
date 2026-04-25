@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>JönköpingGPT – AI-assistent</title>
+<link rel="icon" type="image/png" href="jonkoping-logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    /* Jönköpings kommun ljusblå palett (logotypens #007FC8) */
+    --jk-blue-deep:    #003E63;
+    --jk-blue:         #007FC8;
+    --jk-blue-hover:   #0068A3;
+    --jk-blue-bright:  #4DA8DC;
+    --jk-blue-mid:     #1A93D6;
+
+    --jk-light:        #D6ECF7;
+    --jk-light-soft:   #E5F2FA;
+    --jk-softer:       #F1F8FC;
+    --jk-bubble:       #E5F2FA;
+
+    /* Human-agent accent (grönt för differentiering) */
+    --ha-green:        #2E7D5B;
+    --ha-green-light:  #E3F1EA;
+    --ha-green-border: #A5CFB8;
+
+    --text:             #0A1F2E;
+    --text-muted:       #4A5D70;
+    --text-soft:        #8A9DAE;
+    --border:           #D5E3EC;
+    --border-strong:    #A7C2D2;
+    --bg:               #FFFFFF;
+    --bot-bubble:       #EBF4FA;
+    --user-bubble:      #007FC8;
+
+    --shadow-sm:  0 2px 6px rgba(0,62,99,0.08);
+    --shadow-md:  0 8px 24px rgba(0,62,99,0.12), 0 2px 6px rgba(0,62,99,0.06);
+    --shadow-lg:  0 16px 48px rgba(0,62,99,0.16), 0 4px 12px rgba(0,62,99,0.08);
+
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  16px;
+    --radius-xl:  20px;
+
+    --focus-ring: 0 0 0 3px rgba(0,127,200,0.35);
+
+    --ease-spring:  cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out:     cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body {
+    font-family: 'Mulish', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--jk-light);
+    min-height: 100vh;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Demo sida ── */
+  .demo-page {
+    padding: 60px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .demo-page h1 {
+    font-size: 44px;
+    color: var(--jk-blue-deep);
+    margin-bottom: 18px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+  }
+  .demo-page p {
+    color: var(--jk-blue-deep);
+    line-height: 1.6;
+    font-size: 17px;
+    max-width: 560px;
+  }
+
+  /* ────────────────────────────────────────
+     CHAT TOGGLE BUTTON
+  ──────────────────────────────────────── */
+  .chat-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--jk-blue);
+    color: #FFFFFF;
+    border: none;
+    padding: 14px 22px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,127,200,0.32), 0 2px 6px rgba(0,127,200,0.18);
+    transition:
+      opacity   0.55s var(--ease-spring),
+      transform 0.55s var(--ease-spring),
+      background-color 0.25s var(--ease-standard),
+      box-shadow 0.35s var(--ease-standard);
+    letter-spacing: 0.1px;
+  }
+  .chat-toggle:hover {
+    background: var(--jk-blue-hover);
+    box-shadow: 0 10px 28px rgba(0,127,200,0.42), 0 4px 10px rgba(0,127,200,0.24);
+    transform: translateY(-2px);
+  }
+  .chat-toggle:active:not(.hidden) {
+    transform: translateY(-1px);
+  }
+  .chat-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 6px 20px rgba(0,127,200,0.32), var(--focus-ring);
+  }
+  .chat-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.72) translateY(20px);
+  }
+  .chat-toggle svg {
+    flex-shrink: 0;
+  }
+
+  /* ────────────────────────────────────────
+     CHAT WINDOW
+  ──────────────────────────────────────── */
+  .chat-window {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 400px;
+    max-height: min(620px, calc(100dvh - 48px));
+    height: 620px;
+    z-index: 10000;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(16px) scale(0.97);
+    transition:
+      opacity   0.45s var(--ease-spring),
+      transform 0.45s var(--ease-spring);
+    border: 1px solid var(--border);
+    transform-origin: center bottom;
+    will-change: transform, opacity;
+  }
+  .chat-window.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0) scale(1);
+  }
+
+  /* ── Header ── */
+  .chat-header {
+    background:
+      radial-gradient(ellipse 130% 100% at 110% 130%,
+        rgba(77,168,220, 0.45) 0%,
+        rgba(77,168,220, 0.18) 40%,
+        transparent 70%),
+      linear-gradient(160deg, #0068A3 0%, #007FC8 100%);
+    color: #FFFFFF;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    border-bottom: 1.5px solid rgba(0,0,0,0.12);
+    position: relative;
+    z-index: 30;
+    transition: background 0.5s var(--ease-spring);
+  }
+  .chat-header.human-mode {
+    background:
+      radial-gradient(ellipse 130% 100% at 110% 130%,
+        rgba(102, 187, 138, 0.35) 0%,
+        rgba(102, 187, 138, 0.15) 40%,
+        transparent 70%),
+      linear-gradient(160deg, #1F5E44 0%, #2E7D5B 100%);
+  }
+  .chat-header-title {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+  }
+  .chat-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #FFFFFF; /* fallback bakom SVG i handläggarläge */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid #FFFFFF;
+    box-shadow: 0 0 0 1px rgba(0,62,99, 0.08);
+    transition: background 0.3s var(--ease-standard);
+  }
+  .chat-header-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .chat-header-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .chat-header-name {
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    line-height: 1.2;
+  }
+  .chat-header-subtitle {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+    margin-top: 1px;
+  }
+  .chat-header-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .chat-header-actions button {
+    background: transparent;
+    border: none;
+    color: #FFFFFF;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background  0.3s var(--ease-spring),
+      opacity     0.3s var(--ease-spring),
+      transform   0.25s var(--ease-spring);
+    opacity: 0.82;
+    position: relative;
+  }
+  .chat-header-actions button:hover {
+    background: rgba(255,255,255,0.18);
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  .chat-header-actions button:active {
+    background: rgba(255,255,255,0.28);
+    transform: scale(0.94);
+  }
+  .chat-header-actions button:focus-visible {
+    outline: none;
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+  }
+
+  /* ── Disclaimer ── */
+  .chat-disclaimer {
+    padding: 14px 16px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-align: center;
+    background: var(--jk-softer);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1.45;
+    transition: background 0.4s var(--ease-standard), color 0.4s var(--ease-standard);
+  }
+  .chat-disclaimer.human-mode {
+    background: var(--ha-green-light);
+    color: var(--ha-green);
+  }
+  .chat-disclaimer svg {
+    flex-shrink: 0;
+    color: var(--jk-blue);
+    transition: color 0.4s var(--ease-standard);
+  }
+  .chat-disclaimer.human-mode svg {
+    color: var(--ha-green);
+  }
+  .chat-disclaimer a {
+    color: var(--jk-blue-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 600;
+    transition: color 0.25s var(--ease-standard);
+  }
+  .chat-disclaimer a:hover {
+    color: var(--jk-blue-deep);
+  }
+
+  /* ── Chat body ── */
+  .chat-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(180deg, var(--jk-softer) 0%, #FFFFFF 40%, #FFFFFF 100%);
+  }
+
+  .chat-messages {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 18px 16px 8px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+  .chat-messages::-webkit-scrollbar { width: 6px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: #C4D4E2;
+    border-radius: 10px;
+  }
+  .chat-messages::-webkit-scrollbar-thumb:hover { background: #A6BDD0; }
+
+  /* ── Message bubbles ── */
+  .msg {
+    display: flex;
+    gap: 10px;
+    max-width: 88%;
+    min-width: 0;
+    animation: msgIn 0.65s var(--ease-spring) both;
+    transition:
+      opacity   0.45s var(--ease-out),
+      transform 0.45s var(--ease-out);
+    will-change: transform, opacity;
+  }
+  @keyframes msgIn {
+    0%   { opacity: 0; transform: translateY(18px) scale(0.95); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .msg.fading-out {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+  .msg.human { align-self: flex-start; }
+
+  .msg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    background: #FFFFFF;
+    color: var(--jk-blue-hover);
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+  }
+  .msg-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* Bot-avataren innehåller bilden — ta bort kant/bakgrund så loggan fyller cirkeln */
+  .msg.bot .msg-avatar {
+    background: transparent;
+    border: none;
+  }
+  .msg.user .msg-avatar {
+    background: var(--jk-blue);
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .msg.human .msg-avatar {
+    background: var(--ha-green-light);
+    color: var(--ha-green);
+    border: 1.5px solid var(--ha-green-border);
+  }
+
+  .msg-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .msg-bubble {
+    padding: 11px 14px;
+    border-radius: var(--radius-md);
+    font-size: 14.5px;
+    line-height: 1.55;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--text);
+  }
+  .msg.bot .msg-bubble {
+    background: var(--bot-bubble);
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user .msg-bubble {
+    background: var(--user-bubble);
+    color: #FFFFFF;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.human .msg-bubble {
+    background: var(--ha-green-light);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+
+  .msg-name {
+    font-size: 10.5px;
+    color: var(--text-soft);
+    padding: 0 2px;
+    font-weight: 600;
+  }
+  .msg.human .msg-name {
+    color: var(--ha-green);
+  }
+  .msg-time {
+    font-size: 10.5px;
+    color: var(--text-soft);
+    padding: 0 2px;
+    font-weight: 500;
+  }
+  .msg.user .msg-time { text-align: right; }
+
+  /* ── Länk i meddelandet ── */
+  .chat-link {
+    color: var(--jk-blue);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1.2px;
+    font-weight: 600;
+    transition: color 0.3s var(--ease-spring);
+  }
+  .chat-link:hover {
+    color: var(--jk-blue-deep);
+    text-decoration-thickness: 2px;
+  }
+  .msg.user .chat-link {
+    color: #FFFFFF;
+    text-decoration-color: rgba(255,255,255,0.7);
+  }
+  .msg-bubble ul {
+    margin: 6px 0 2px 0;
+    padding-left: 20px;
+    list-style: disc;
+  }
+  .msg-bubble li { margin-bottom: 4px; }
+  .msg-bubble strong { font-weight: 700; }
+
+  /* ── Stjärnbetyg ── */
+  .msg-feedback {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    margin-top: 2px;
+    padding-left: 2px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity   0.55s var(--ease-spring) 0.85s,
+      transform 0.55s var(--ease-spring) 0.85s;
+  }
+  .msg-feedback.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .star-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 3px 2px;
+    color: var(--border-strong);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      color     0.15s var(--ease-standard),
+      transform 0.2s  var(--ease-spring);
+  }
+  .star-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .star-btn.hovered {
+    color: var(--jk-blue-bright);
+    transform: scale(1.18) translateY(-1px);
+  }
+  .star-btn.filled {
+    color: var(--jk-blue);
+  }
+  .star-btn.locked {
+    cursor: default;
+    transform: none !important;
+  }
+  @keyframes starPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.4); }
+    70%  { transform: scale(0.88); }
+    100% { transform: scale(1); }
+  }
+  .star-btn.pop {
+    animation: starPop 0.5s var(--ease-spring);
+  }
+  .feedback-thanks {
+    font-size: 11px;
+    color: var(--text-soft);
+    font-style: italic;
+    align-self: center;
+    margin-left: 6px;
+    animation: thanksIn 0.55s var(--ease-spring);
+  }
+  @keyframes thanksIn {
+    0%   { opacity: 0; transform: translateX(-10px); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── Typing indicator ── */
+  .typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 0 2px;
+    align-items: center;
+    height: 20px;
+  }
+  .typing-indicator span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--jk-blue);
+    opacity: 0.28;
+    animation: typeDot 1.4s ease-in-out infinite;
+    will-change: opacity;
+    backface-visibility: hidden;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typeDot {
+    0%, 100% { opacity: 0.28; }
+    50%      { opacity: 1; }
+  }
+
+  /* ── Handover-avdelare ── */
+  .handover-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 2px;
+    animation: msgIn 0.6s var(--ease-spring);
+    margin: 14px 0 10px;
+  }
+  .handover-divider .line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--ha-green-border), transparent);
+  }
+  .handover-divider .label {
+    text-align: center;
+    padding: 2px 4px;
+    max-width: 70%;
+  }
+  .handover-divider .label strong {
+    display: block;
+    color: var(--ha-green);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.2px;
+  }
+  .handover-divider .label .wait-time {
+    display: block;
+    font-size: 11px;
+    color: var(--text-soft);
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  /* ────────────────────────────────────────
+     INPUT BAR
+  ──────────────────────────────────────── */
+  .chat-input-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px 14px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .chat-input-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+  .chat-input-wrap input {
+    width: 100%;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 999px;
+    padding: 11px 44px 11px 16px;
+    font-family: inherit;
+    font-size: 14.5px;
+    color: var(--text);
+    transition:
+      border-color 0.35s var(--ease-spring),
+      box-shadow   0.35s var(--ease-spring),
+      background   0.35s var(--ease-spring);
+    background: #FFFFFF;
+  }
+  .chat-input-wrap input:focus {
+    outline: none;
+    border-color: var(--jk-blue);
+    box-shadow: var(--focus-ring);
+  }
+  .chat-input-wrap input::placeholder {
+    color: var(--text-soft);
+  }
+  .chat-input-wrap input:disabled {
+    background: #F5F5F5;
+    cursor: not-allowed;
+  }
+
+  /* Inbäddad send-knapp i input */
+  .send-btn-inline {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--jk-blue);
+    border: none;
+    color: #FFFFFF;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background   0.3s var(--ease-spring),
+      transform    0.35s var(--ease-spring),
+      box-shadow   0.35s var(--ease-spring);
+    box-shadow: 0 2px 6px rgba(0,127,200,0.28);
+  }
+  .send-btn-inline:hover {
+    background: var(--jk-blue-hover);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 5px 14px rgba(0,127,200,0.42);
+  }
+  .send-btn-inline:active {
+    transform: translateY(-50%) scale(0.93);
+    box-shadow: 0 2px 6px rgba(0,127,200,0.22);
+  }
+  .send-btn-inline:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  .send-btn-inline:disabled {
+    background: #A7C2D2;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .char-counter {
+    position: absolute;
+    bottom: -16px;
+    right: 14px;
+    font-size: 10.5px;
+    font-family: inherit;
+    color: var(--text-soft);
+    pointer-events: none;
+    transition:
+      opacity 0.4s var(--ease-spring),
+      color   0.4s var(--ease-spring);
+    opacity: 0;
+    font-weight: 500;
+  }
+  .char-counter.visible { opacity: 1; }
+  .char-counter.warning { color: #B87820; opacity: 1; }
+  .char-counter.limit { color: #A84040; font-weight: 700; opacity: 1; }
+
+  /* Utility-knappar – solida, visuellt lika send-knappen */
+  .util-btn {
+    background: var(--jk-blue);
+    border: none;
+    color: #FFFFFF;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background  0.3s var(--ease-spring),
+      transform   0.35s var(--ease-spring),
+      box-shadow  0.35s var(--ease-spring);
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,127,200,0.28);
+  }
+  .util-btn:hover {
+    background: var(--jk-blue-hover);
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 5px 14px rgba(0,127,200,0.42);
+  }
+  .util-btn:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 2px 6px rgba(0,127,200,0.22);
+  }
+  .util-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0,127,200,0.28), var(--focus-ring);
+  }
+  .util-btn:disabled {
+    background: #A7C2D2;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+  .util-btn:disabled:hover {
+    background: #A7C2D2;
+    transform: none;
+    box-shadow: none;
+  }
+  .util-btn[disabled]::after,
+  .util-btn[disabled]::before { opacity: 0 !important; }
+
+  /* ────────────────────────────────────────
+     TOOLTIPS
+  ──────────────────────────────────────── */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: var(--jk-blue-deep);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity   0.3s var(--ease-spring),
+      transform 0.3s var(--ease-spring);
+    z-index: 1000;
+    box-shadow: var(--shadow-sm);
+  }
+  [data-tooltip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    border: 5px solid transparent;
+    border-top-color: var(--jk-blue-deep);
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity   0.3s var(--ease-spring),
+      transform 0.3s var(--ease-spring);
+    z-index: 1000;
+  }
+  [data-tooltip]:hover::after,
+  [data-tooltip]:hover::before,
+  [data-tooltip]:focus-visible::after,
+  [data-tooltip]:focus-visible::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .chat-header-actions [data-tooltip]::after {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
+  .chat-header-actions [data-tooltip]::before {
+    bottom: auto;
+    top: calc(100% + 2px);
+    border-top-color: transparent;
+    border-bottom-color: var(--jk-blue-deep);
+  }
+
+  [data-tooltip-align="left"]::after {
+    left: 0;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="left"]:hover::after,
+  [data-tooltip-align="left"]:focus-visible::after {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="left"]::before {
+    left: 18px;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="left"]:hover::before,
+  [data-tooltip-align="left"]:focus-visible::before {
+    transform: translateX(0) translateY(0);
+  }
+
+  [data-tooltip-align="right"]::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="right"]:hover::after,
+  [data-tooltip-align="right"]:focus-visible::after {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="right"]::before {
+    left: auto;
+    right: 12px;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="right"]:hover::before,
+  [data-tooltip-align="right"]:focus-visible::before {
+    transform: translateX(0) translateY(0);
+  }
+
+  /* ────────────────────────────────────────
+     RATE LIMIT TOAST
+  ──────────────────────────────────────── */
+  .rate-limit-toast {
+    position: absolute;
+    bottom: 78px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: #7A3030;
+    color: #FFFFFF;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(122,48,48,0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity   0.4s var(--ease-spring),
+      transform 0.4s var(--ease-spring);
+    z-index: 10;
+    white-space: nowrap;
+  }
+  .rate-limit-toast.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ────────────────────────────────────────
+     QUICK REPLIES (empty state)
+  ──────────────────────────────────────── */
+  .quick-replies {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    padding: 4px 18px 12px 56px;
+    animation: fadeInChips 0.45s var(--ease-spring) 0.1s both;
+  }
+  @keyframes fadeInChips {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .quick-reply-chip {
+    appearance: none;
+    background: #FFFFFF;
+    border: 1.5px solid var(--jk-blue);
+    color: var(--jk-blue-hover);
+    font-family: inherit;
+    font-size: 13.5px; font-weight: 600;
+    padding: 8px 14px; border-radius: 999px;
+    cursor: pointer; line-height: 1.2; min-height: 36px;
+    transition: background 0.25s var(--ease-spring), color 0.25s var(--ease-spring), transform 0.25s var(--ease-spring), box-shadow 0.25s var(--ease-spring);
+  }
+  .quick-reply-chip:hover {
+    background: var(--jk-blue);
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0,127,200,0.3);
+  }
+  .quick-reply-chip:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+  .quick-reply-chip:active { transform: translateY(0) scale(0.97); }
+
+  /* ────────────────────────────────────────
+     ACTIONS MENU (dropdown)
+  ──────────────────────────────────────── */
+  .actions-menu {
+    position: absolute;
+    top: 58px;
+    right: 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    min-width: 210px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-12px) scale(0.96);
+    transform-origin: top right;
+    transition:
+      opacity   0.4s var(--ease-spring),
+      transform 0.4s var(--ease-spring);
+    z-index: 50;
+    overflow: hidden;
+  }
+  .actions-menu.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0) scale(1);
+  }
+  .actions-menu button {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition:
+      background-color 0.25s var(--ease-standard),
+      color            0.25s var(--ease-standard);
+  }
+  .actions-menu button:hover {
+    background: var(--jk-softer);
+    color: var(--jk-blue-hover);
+  }
+  .actions-menu button:focus-visible {
+    outline: none;
+    background: var(--jk-bubble);
+  }
+  .actions-menu button + button {
+    border-top: 1px solid var(--border);
+  }
+  .actions-menu svg {
+    flex-shrink: 0;
+    color: var(--jk-blue);
+  }
+
+  /* ────────────────────────────────────────
+     CONTACT OVERLAY – kontaktuppgifter
+  ──────────────────────────────────────── */
+  .contact-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition:
+      opacity   0.5s var(--ease-spring),
+      transform 0.5s var(--ease-spring);
+  }
+  .contact-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .contact-header {
+    padding: 14px 16px;
+    background: var(--jk-softer);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .contact-header-text { min-width: 0; }
+  .contact-header-title-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--jk-blue-deep);
+    line-height: 1.2;
+  }
+  .contact-header-sub {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.35;
+  }
+  .contact-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--jk-blue-hover);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background 0.3s var(--ease-spring),
+      color      0.3s var(--ease-spring),
+      transform  0.25s var(--ease-spring);
+    flex-shrink: 0;
+  }
+  .contact-close-btn:hover {
+    background: rgba(0,127,200,0.14);
+    color: var(--jk-blue);
+    transform: scale(1.1) rotate(5deg);
+  }
+  .contact-close-btn:active {
+    background: rgba(0,127,200,0.22);
+    transform: scale(0.92);
+  }
+  .contact-close-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  .contact-overlay-inner {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px 20px 16px;
+  }
+  .contact-overlay-inner::-webkit-scrollbar { width: 6px; }
+  .contact-overlay-inner::-webkit-scrollbar-track { background: transparent; }
+  .contact-overlay-inner::-webkit-scrollbar-thumb { background: #C4D4E2; border-radius: 10px; }
+
+  .contact-section {
+    background: var(--jk-bubble);
+    border: 1px solid rgba(0,127,200,0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    transition:
+      background    0.35s var(--ease-spring),
+      border-color  0.35s var(--ease-spring),
+      transform     0.35s var(--ease-spring),
+      box-shadow    0.35s var(--ease-spring);
+  }
+  .contact-section:last-child { margin-bottom: 0; }
+
+  .contact-section:hover {
+    background: #DCEBF7;
+    border-color: rgba(0,127,200,0.22);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0,62,99,0.1);
+  }
+
+  .contact-section-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--jk-blue-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+  .contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 13.5px;
+  }
+  .contact-row + .contact-row {
+    border-top: 1px solid rgba(0,127,200,0.12);
+  }
+  .contact-label {
+    color: var(--text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .contact-value {
+    color: var(--jk-blue-deep);
+    font-weight: 700;
+    text-decoration: none;
+    text-align: right;
+    transition: color 0.3s var(--ease-spring);
+  }
+  .contact-value:hover,
+  .contact-value:focus-visible {
+    color: var(--jk-blue-hover);
+    text-decoration: underline;
+    outline: none;
+  }
+  .contact-address {
+    font-size: 13.5px;
+    color: var(--jk-blue-deep);
+    font-weight: 600;
+    line-height: 1.4;
+  }
+  .contact-note {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    font-style: italic;
+  }
+
+  /* ────────────────────────────────────────
+     HANDOVER OVERLAY – ämnesval för handläggare
+  ──────────────────────────────────────── */
+  .handover-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 25;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition:
+      opacity   0.5s var(--ease-spring),
+      transform 0.5s var(--ease-spring);
+  }
+  .handover-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .handover-header {
+    padding: 14px 16px;
+    background: var(--ha-green-light);
+    border-bottom: 1px solid var(--ha-green-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .handover-header-title-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ha-green);
+    line-height: 1.2;
+  }
+  .handover-header-sub {
+    font-size: 11.5px;
+    color: #537863;
+    margin-top: 2px;
+    line-height: 1.35;
+  }
+
+  .handover-inner {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 20px 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .handover-intro {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.55;
+  }
+
+  .handover-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--jk-blue-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  .handover-select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--text);
+    background: #FFFFFF;
+    cursor: pointer;
+    transition:
+      border-color 0.3s var(--ease-spring),
+      box-shadow   0.3s var(--ease-spring);
+  }
+  .handover-select:focus {
+    outline: none;
+    border-color: var(--jk-blue);
+    box-shadow: var(--focus-ring);
+  }
+
+  .handover-wait {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    text-align: center;
+    font-style: italic;
+  }
+
+  .handover-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 4px;
+  }
+
+  .handover-start-btn {
+    background: var(--ha-green);
+    color: #FFFFFF;
+    border: none;
+    padding: 14px 18px;
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 0.2px;
+    box-shadow: 0 4px 12px rgba(46,125,91,0.28);
+    transition:
+      background 0.3s var(--ease-spring),
+      transform  0.3s var(--ease-spring),
+      box-shadow 0.3s var(--ease-spring),
+      opacity    0.3s var(--ease-spring);
+  }
+  .handover-start-btn:hover:not(:disabled) {
+    background: #266B4E;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(46,125,91,0.38);
+  }
+  .handover-start-btn:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  .handover-start-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 4px 12px rgba(46,125,91,0.28), 0 0 0 3px rgba(46,125,91,0.35);
+  }
+  .handover-start-btn:disabled {
+    background: #B8CEC1;
+    cursor: not-allowed;
+    box-shadow: none;
+    opacity: 0.7;
+  }
+
+  .handover-cancel-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 8px;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.3s var(--ease-standard);
+  }
+  .handover-cancel-btn:hover {
+    color: var(--jk-blue-deep);
+  }
+  .handover-cancel-btn:focus-visible {
+    outline: none;
+    color: var(--jk-blue-deep);
+  }
+
+  /* Visuellt gömt men läsbart för skärmläsare */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── Responsivt ── */
+  @media (max-width: 440px) {
+    .chat-window {
+      /* iOS safe-area: respektera notch/Dynamic Island/hemknapp-indikator */
+      width: calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right));
+      height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      max-height: calc(100dvh - 16px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+      bottom: calc(8px + env(safe-area-inset-bottom));
+      right: calc(8px + env(safe-area-inset-right));
+      border-radius: var(--radius-md);
+    }
+    /* Komprimera input-raden så att textfältet får mer plats */
+    .chat-input-bar { gap: 6px; padding: 10px 10px 12px 10px; }
+    .util-btn { width: 34px; height: 34px; }
+    .util-btn svg { width: 16px; height: 16px; }
+    .chat-input-wrap input { font-size: 14px; padding: 10px 40px 10px 14px; }
+    .send-btn-inline { width: 32px; height: 32px; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ────────────────────────────────────────
+     ACCESS LOCK OVERLAY
+  ──────────────────────────────────────── */
+  .lock-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,127,200,0.18) 0%, transparent 60%),
+      linear-gradient(160deg, #E5F2FA 0%, #F1F8FC 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 1;
+    transition: opacity 0.45s var(--ease-spring);
+  }
+  .lock-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .lock-card {
+    width: 100%;
+    max-width: 420px;
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    padding: 36px 32px 32px;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .lock-icon {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 18px;
+    background: var(--jk-light-soft);
+    color: var(--jk-blue);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .lock-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--jk-blue-deep);
+    letter-spacing: -0.3px;
+    margin-bottom: 8px;
+  }
+  .lock-sub {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+  .lock-inputs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 18px;
+  }
+  .lock-digit {
+    width: 44px;
+    height: 54px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    background: #FFFFFF;
+    font-family: inherit;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--jk-blue-deep);
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s var(--ease-standard), box-shadow 0.2s var(--ease-standard), transform 0.2s var(--ease-standard);
+    -moz-appearance: textfield;
+  }
+  .lock-digit::-webkit-outer-spin-button,
+  .lock-digit::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .lock-digit:focus {
+    border-color: var(--jk-blue);
+    box-shadow: var(--focus-ring);
+  }
+  .lock-digit.filled {
+    background: var(--jk-light-soft);
+    border-color: var(--jk-blue);
+  }
+  .lock-overlay.error .lock-digit {
+    border-color: #C0392B;
+    background: #FDECEA;
+    color: #C0392B;
+    animation: lock-shake 0.45s var(--ease-standard);
+  }
+  @keyframes lock-shake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+  }
+  .lock-error {
+    font-size: 13px;
+    color: #C0392B;
+    min-height: 18px;
+    margin-bottom: 6px;
+  }
+  .lock-hint {
+    font-size: 12px;
+    color: var(--text-soft);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ──────── ACCESS LOCK ──────── -->
+<div class="lock-overlay" id="lockOverlay" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
+  <div class="lock-card">
+    <div class="lock-icon" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <div class="lock-title" id="lockTitle">Skyddad åtkomst</div>
+    <div class="lock-sub">Ange den 6-siffriga koden för att öppna JönköpingGPT.</div>
+    <div class="lock-inputs" id="lockInputs">
+      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" aria-label="Siffra 1">
+      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 2">
+      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 3">
+      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 4">
+      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 5">
+      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 6">
+    </div>
+    <div class="lock-error" id="lockError" aria-live="polite"></div>
+  </div>
+</div>
+
+<!-- Demo-bakgrund -->
+<div class="demo-page">
+  <h1>Välkommen till Jönköpings kommun</h1>
+  <p>Det här är en demo-sida för att visa chattwidgeten. Klicka på knappen längst ner till höger för att öppna chatten.</p>
+</div>
+
+<!-- ──────── LOGO (Jönköpings kommun, bas64 PNG) ──────── -->
+<!-- Förvaras som konstant så vi bara definierar den en gång -->
+
+<!-- ──────── CHAT TOGGLE BUTTON ──────── -->
+<button class="chat-toggle" id="chatToggle" onclick="openChat()" aria-label="Öppna chatt med JönköpingGPT">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+  </svg>
+  Jönköpings kommun
+</button>
+
+<!-- ──────── CHAT WINDOW ──────── -->
+<div class="chat-window" id="chatWindow" role="dialog" aria-label="Chatt med JönköpingGPT">
+
+  <!-- Header -->
+  <div class="chat-header" id="chatHeader">
+    <div class="chat-header-title">
+      <div class="chat-header-icon" id="chatHeaderIcon" aria-hidden="true">
+        <img id="chatHeaderIconImg" src="jonkoping-logo.png" alt="Jönköpings kommun logotyp">
+      </div>
+      <div class="chat-header-text">
+        <div class="chat-header-name" id="chatHeaderName">JönköpingGPT</div>
+        <div class="chat-header-subtitle" id="chatHeaderSubtitle">AI-assistent · Jönköpings kommun</div>
+      </div>
+    </div>
+    <div class="chat-header-actions">
+      <button onclick="toggleActionsMenu(event)" data-tooltip="Fler alternativ" aria-label="Fler alternativ" id="menuBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <circle cx="5" cy="12" r="2"/>
+          <circle cx="12" cy="12" r="2"/>
+          <circle cx="19" cy="12" r="2"/>
+        </svg>
+      </button>
+      <button onclick="minimizeChat()" data-tooltip="Minimera" aria-label="Minimera chatt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </button>
+      <button onclick="closeChat()" data-tooltip="Avsluta chatt" data-tooltip-align="right" aria-label="Avsluta chatt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Actions dropdown menu -->
+  <div class="actions-menu" id="actionsMenu" role="menu">
+    <button onclick="newSession(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M23 4v6h-6"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Börja om chatten
+    </button>
+    <button onclick="downloadChat(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Ladda ner konversation
+    </button>
+    <button onclick="showContactInfo(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      Kontaktuppgifter
+    </button>
+  </div>
+
+  <!-- Chat body -->
+  <div class="chat-body" id="chatBody">
+    <div class="chat-disclaimer" id="chatDisclaimer">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span id="chatDisclaimerText">Svaren är AI-genererade. Kontrollera alltid viktig information. <a href="https://www.jonkoping.se/ovriga-sidor/behandling-av-personuppgifter-gdpr" target="_blank" rel="noopener">Så hanterar vi dina uppgifter</a></span>
+    </div>
+    <div class="chat-messages" id="chatMessages" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- Rate limit toast -->
+    <div class="rate-limit-toast" id="rateLimitToast" role="alert">
+      Vänta några sekunder innan du skickar fler meddelanden.
+    </div>
+
+    <!-- Kontaktinfo-overlay -->
+    <div class="contact-overlay" id="contactOverlay" role="dialog" aria-label="Kontakta Jönköpings kommun">
+      <div class="contact-header">
+        <div class="contact-header-text">
+          <div class="contact-header-title-text">Kontakta Jönköpings kommun</div>
+          <div class="contact-header-sub">Så når du oss direkt – telefon, e-post och besök.</div>
+        </div>
+        <button class="contact-close-btn" onclick="closeContactOverlay()" aria-label="Stäng kontaktinformation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="contact-overlay-inner">
+        <div class="contact-section">
+          <div class="contact-section-title">Kontaktcenter (växel)</div>
+          <div class="contact-row">
+            <span class="contact-label">Telefon</span>
+            <a class="contact-value" href="tel:+46361050000">036-10 50 00</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">E-post</span>
+            <a class="contact-value" href="mailto:kontaktcenter@jonkoping.se">kontaktcenter@jonkoping.se</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Öppettider</span>
+            <span class="contact-value">Mån–tors 8–17, fre 8–16</span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Sommartid</span>
+            <span class="contact-value">Juni–aug: mån–tors 8–16</span>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Akuta ärenden efter kontorstid</div>
+          <div class="contact-row">
+            <span class="contact-label">Telefon</span>
+            <a class="contact-value" href="tel:+46361050000">036-10 50 00</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Gäller</span>
+            <span class="contact-value">Gator, parker, fastigheter, parkering, vatten/avlopp</span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Räddning / socialjour</span>
+            <a class="contact-value" href="tel:112">112</a>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Synpunkt eller felanmälan</div>
+          <div class="contact-row">
+            <span class="contact-label">Webb</span>
+            <a class="contact-value" href="https://www.jonkoping.se/kommun--politik/kontakta-oss" target="_blank" rel="noopener">jonkoping.se/kontakta-oss</a>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Besöksadress</div>
+          <div class="contact-address">
+            Juneporten<br>
+            Västra Storgatan 16<br>
+            553 15 Jönköping
+          </div>
+          <div class="contact-row" style="margin-top:10px;">
+            <span class="contact-label">Öppettider</span>
+            <span class="contact-value">Mån–tors 8–17, fre 8–16</span>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Postadress</div>
+          <div class="contact-address">
+            Jönköpings kommun<br>
+            551 89 Jönköping
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Handover-overlay: ämnesval för mänsklig handläggare -->
+    <div class="handover-overlay" id="handoverOverlay" role="dialog" aria-label="Koppla till handläggare">
+      <div class="handover-header">
+        <div>
+          <div class="handover-header-title-text">Koppla till handläggare</div>
+          <div class="handover-header-sub">En av våra medarbetare hjälper dig snart.</div>
+        </div>
+        <button class="contact-close-btn" onclick="cancelHandover()" aria-label="Stäng">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="handover-inner">
+        <p class="handover-intro">
+          Vad gäller ditt ärende? Välj ämne så kopplas du till rätt handläggare.
+        </p>
+
+        <div>
+          <label for="handoverTopic" class="handover-label">Ämne</label>
+          <select id="handoverTopic" class="handover-select" onchange="updateHandoverBtn()" style="margin-top:8px;">
+            <option value="" disabled selected>Välj ämne…</option>
+          </select>
+        </div>
+
+        <div class="handover-wait" id="handoverWait"></div>
+
+        <div class="handover-actions">
+          <button class="handover-start-btn" id="handoverStartBtn" disabled onclick="confirmHandover()">
+            Starta chatt med handläggare
+          </button>
+          <button class="handover-cancel-btn" onclick="cancelHandover()">Avbryt</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-bar">
+      <button class="util-btn" onclick="newSession()" data-tooltip="Ny chatt" data-tooltip-align="left" aria-label="Starta en ny chatt">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M23 4v6h-6"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+      </button>
+      <button class="util-btn" id="handoverUtilBtn" onclick="connectToHumanAgent()" data-tooltip="Kontakta oss" data-tooltip-align="left" aria-label="Kontakta Jönköpings kommun">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </button>
+      <div class="chat-input-wrap">
+        <input type="text" id="chatInput" placeholder="Skriv din fråga..." maxlength="1000" oninput="updateCharCount()" onkeydown="if(event.key==='Enter')sendMessage()" aria-label="Skriv din fråga till Jönköpings kommun">
+        <button class="send-btn-inline" onclick="sendMessage()" aria-label="Skicka meddelande" id="sendBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+        <span class="char-counter" id="charCounter" aria-live="polite">0 / 1000</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ────────────────────────────────────────
+     ACCESS LOCK (6-siffrig kod)
+  ──────────────────────────────────────── */
+  (function setupLock() {
+    const ACCESS_CODE = '123456';
+    const STORAGE_KEY = 'jonkoping_chat_unlocked';
+    const overlay = document.getElementById('lockOverlay');
+    const inputs  = Array.from(document.querySelectorAll('#lockInputs .lock-digit'));
+    const errorEl = document.getElementById('lockError');
+
+    // Redan upplåst i denna webbläsare → göm direkt och hoppa över setup.
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      overlay.remove();
+      return;
+    }
+
+    // Hindra scroll bakom overlayen
+    document.documentElement.style.overflow = 'hidden';
+    setTimeout(() => inputs[0].focus(), 50);
+
+    function readCode() {
+      return inputs.map(i => i.value).join('');
+    }
+
+    function setFilledStates() {
+      inputs.forEach(i => i.classList.toggle('filled', i.value.length === 1));
+    }
+
+    function clearError() {
+      overlay.classList.remove('error');
+      errorEl.textContent = '';
+    }
+
+    function showError(msg) {
+      overlay.classList.add('error');
+      errorEl.textContent = msg;
+    }
+
+    function attemptUnlock() {
+      const code = readCode();
+      if (code.length < 6) return;
+      if (code === ACCESS_CODE) {
+        localStorage.setItem(STORAGE_KEY, 'true');
+        overlay.classList.add('hidden');
+        document.documentElement.style.overflow = '';
+        setTimeout(() => overlay.remove(), 500);
+      } else {
+        showError('Fel kod. Försök igen.');
+        // Återställ utan att flytta fokus förrän shake-animationen är klar
+        setTimeout(() => {
+          inputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+          clearError();
+          inputs[0].focus();
+        }, 500);
+      }
+    }
+
+    inputs.forEach((input, idx) => {
+      input.addEventListener('input', (e) => {
+        // Tillåt bara siffror
+        const digit = e.target.value.replace(/\D/g, '').slice(-1);
+        e.target.value = digit;
+        setFilledStates();
+        clearError();
+
+        if (digit && idx < inputs.length - 1) {
+          inputs[idx + 1].focus();
+        }
+        if (readCode().length === 6) {
+          attemptUnlock();
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && idx > 0) {
+          inputs[idx - 1].focus();
+          inputs[idx - 1].value = '';
+          setFilledStates();
+        } else if (e.key === 'ArrowLeft' && idx > 0) {
+          inputs[idx - 1].focus();
+        } else if (e.key === 'ArrowRight' && idx < inputs.length - 1) {
+          inputs[idx + 1].focus();
+        } else if (e.key === 'Enter') {
+          attemptUnlock();
+        }
+      });
+
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+        if (!pasted) return;
+        pasted.split('').forEach((ch, i) => {
+          if (inputs[i]) inputs[i].value = ch;
+        });
+        setFilledStates();
+        const nextEmpty = inputs.findIndex(i => !i.value);
+        (nextEmpty === -1 ? inputs[inputs.length - 1] : inputs[nextEmpty]).focus();
+        if (readCode().length === 6) attemptUnlock();
+      });
+    });
+  })();
+
+  /* ────────────────────────────────────────
+     KONSTANTER OCH LOGOTYP
+  ──────────────────────────────────────── */
+  // Jönköpings kommuns logotyp (bas64, PNG) – en gång definierad, återanvänd
+  const JK_LOGO_SRC = document.getElementById('chatHeaderIconImg').src;
+
+  // SVG för handläggar-ikon (när header byter läge)
+  const AGENT_HEADER_ICON_SVG = `
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2E7D5B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>`;
+
+  /* ────────────────────────────────────────
+     DOM-REFERENSER
+  ──────────────────────────────────────── */
+  const chatWindow    = document.getElementById('chatWindow');
+  const chatToggle    = document.getElementById('chatToggle');
+  const chatBody      = document.getElementById('chatBody');
+  const chatMessages  = document.getElementById('chatMessages');
+  const chatInput     = document.getElementById('chatInput');
+  const rateLimitToast= document.getElementById('rateLimitToast');
+  const actionsMenu   = document.getElementById('actionsMenu');
+  const chatHeader    = document.getElementById('chatHeader');
+  const chatDisclaimer= document.getElementById('chatDisclaimer');
+  const chatHeaderIcon= document.getElementById('chatHeaderIcon');
+  const chatHeaderName= document.getElementById('chatHeaderName');
+  const chatHeaderSub = document.getElementById('chatHeaderSubtitle');
+
+  /* ────────────────────────────────────────
+     HANDOVER-KONFIGURATION
+  ──────────────────────────────────────── */
+  // Lägg till, ta bort eller byt namn på ämnen här:
+  const HANDOVER_TOPICS = [
+    'Bygglov, mark och bostäder',
+    'Förskola, skola och utbildning',
+    'Omsorg och socialtjänst',
+    'Avfall, vatten och miljö',
+    'Trafik, gator och parkering',
+    'Övrigt'
+  ];
+
+  // Uppskattad väntetid – tom sträng döljer raden helt.
+  // Sätt t.ex. 'ca 3 minuter' så visas den i overlay och i divider.
+  const EXPECTED_WAIT_TIME = '';
+
+  let isHumanAgentMode = false;
+
+  // Populera dropdown med ämnen
+  (function populateHandoverTopics() {
+    const sel = document.getElementById('handoverTopic');
+    HANDOVER_TOPICS.forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t;
+      opt.textContent = t;
+      sel.appendChild(opt);
+    });
+  })();
+
+  /* ────────────────────────────────────────
+     RATE LIMITING – max 2 meddelanden per 10 sek
+  ──────────────────────────────────────── */
+  const messageTimes = [];
+  const RATE_LIMIT_COUNT = 2;
+  const RATE_LIMIT_WINDOW = 10000;
+  let rateLimitTimeout = null;
+
+  function isRateLimited() {
+    const now = Date.now();
+    while (messageTimes.length > 0 && now - messageTimes[0] > RATE_LIMIT_WINDOW) {
+      messageTimes.shift();
+    }
+    return messageTimes.length >= RATE_LIMIT_COUNT;
+  }
+  function recordMessage() { messageTimes.push(Date.now()); }
+  function showRateLimitToast() {
+    rateLimitToast.classList.add('show');
+    if (rateLimitTimeout) clearTimeout(rateLimitTimeout);
+    rateLimitTimeout = setTimeout(() => {
+      rateLimitToast.classList.remove('show');
+    }, 3500);
+  }
+
+  /* ────────────────────────────────────────
+     RATE LIMIT — persistent cooldown UI
+  ──────────────────────────────────────── */
+  let cooldownInterval = null;
+  function msUntilNextSlot() {
+    if (messageTimes.length === 0) return 0;
+    const oldest = messageTimes[0];
+    return Math.max(0, RATE_LIMIT_WINDOW - (Date.now() - oldest));
+  }
+  function startCooldown() {
+    const input = document.getElementById('chatInput');
+    const sendBtn = document.querySelector('.send-btn-inline');
+    input.disabled = true;
+    if (sendBtn) sendBtn.disabled = true;
+    rateLimitToast.classList.add('show');
+    rateLimitToast.setAttribute('aria-live', 'polite');
+    function tick() {
+      const remaining = msUntilNextSlot();
+      if (remaining <= 0) {
+        rateLimitToast.classList.remove('show');
+        input.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        clearInterval(cooldownInterval);
+        cooldownInterval = null;
+        input.focus();
+        return;
+      }
+      const secs = Math.ceil(remaining / 1000);
+      rateLimitToast.textContent = `Vänta ${secs} s innan du skickar fler meddelanden`;
+    }
+    tick();
+    if (cooldownInterval) clearInterval(cooldownInterval);
+    cooldownInterval = setInterval(tick, 200);
+  }
+
+  /* ────────────────────────────────────────
+     QUICK REPLIES — empty state suggestions
+  ──────────────────────────────────────── */
+  const QUICK_REPLIES = [
+    'Öppettider',
+    'Bygglov',
+    'Avfall & renhållning',
+    'Felanmälan',
+    'Kontakta oss'
+  ];
+  function renderQuickReplies() {
+    const chatMessagesEl = document.getElementById('chatMessages');
+    if (!chatMessagesEl || document.getElementById('quickReplies')) return;
+    const wrap = document.createElement('div');
+    wrap.id = 'quickReplies';
+    wrap.className = 'quick-replies';
+    wrap.setAttribute('role', 'group');
+    wrap.setAttribute('aria-label', 'Snabbval');
+    QUICK_REPLIES.forEach(label => {
+      const btn = document.createElement('button');
+      btn.className = 'quick-reply-chip';
+      btn.type = 'button';
+      btn.textContent = label;
+      btn.addEventListener('click', () => {
+        if (label === 'Kontakta oss') {
+          showContactInfo();
+          wrap.remove();
+          return;
+        }
+        chatInput.value = label;
+        if (typeof updateCharCount === 'function') updateCharCount();
+        wrap.remove();
+        sendMessage();
+      });
+      wrap.appendChild(btn);
+    });
+    chatMessagesEl.appendChild(wrap);
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+  }
+
+  /* ────────────────────────────────────────
+     ACTIONS MENU
+  ──────────────────────────────────────── */
+  function toggleActionsMenu(e) {
+    if (e) e.stopPropagation();
+    actionsMenu.classList.toggle('open');
+  }
+  function closeActionsMenu() {
+    actionsMenu.classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!actionsMenu.contains(e.target) && e.target.closest('#menuBtn') === null) {
+      closeActionsMenu();
+    }
+  });
+
+  /* ────────────────────────────────────────
+     STAR RATING FEEDBACK
+  ──────────────────────────────────────── */
+  function createFeedback(interactionId) {
+    const container = document.createElement('div');
+    container.className = 'msg-feedback';
+    container.dataset.locked = 'false';
+    container.dataset.interactionId = interactionId || '';
+
+    const starOutline = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    const starFilled  = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+    const stars = [];
+
+    const setHover = (upToIndex) => {
+      stars.forEach((s, i) => {
+        s.classList.toggle('hovered', i <= upToIndex);
+        s.classList.toggle('filled', false);
+      });
+    };
+
+    const clearHover = () => {
+      stars.forEach(s => s.classList.remove('hovered'));
+    };
+
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'star-btn';
+      btn.setAttribute('aria-label', `Ge ${i} stjärn${i === 1 ? 'a' : 'or'}`);
+      btn.setAttribute('type', 'button');
+      btn.innerHTML = starOutline;
+
+      btn.addEventListener('mouseenter', () => {
+        if (container.dataset.locked === 'true') return;
+        setHover(i - 1);
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        if (container.dataset.locked === 'true') return;
+        clearHover();
+      });
+
+      btn.addEventListener('click', async function() {
+        if (container.dataset.locked === 'true') return;
+        const currentInteractionId = container.dataset.interactionId;
+        if (!currentInteractionId) return;
+
+        container.dataset.locked = 'true';
+        clearHover();
+
+        stars.forEach((s, idx) => {
+          s.classList.add('locked');
+          if (idx < i) {
+            s.classList.add('filled');
+            s.innerHTML = starFilled;
+          }
+          if (idx === i - 1) s.classList.add('pop');
+        });
+
+        const thanks = document.createElement('span');
+        thanks.className = 'feedback-thanks';
+        thanks.textContent = 'Tack för din feedback';
+        container.appendChild(thanks);
+
+        try {
+          await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'rating',
+              interactionId: currentInteractionId,
+              sessionId: ensureSessionId(),
+              rating: i,
+              feedback: i >= 4 ? 'up' : i <= 2 ? 'down' : 'neutral'
+            })
+          });
+        } catch (err) {
+          console.error('Feedback webhook error:', err);
+        }
+      });
+
+      stars.push(btn);
+      container.appendChild(btn);
+    }
+
+    setTimeout(() => container.classList.add('visible'), 50);
+    return container;
+  }
+
+  /* ────────────────────────────────────────
+     CORE CHAT FUNCTIONS
+  ──────────────────────────────────────── */
+  function openChat() {
+    chatWindow.classList.add('open');
+    chatToggle.classList.add('hidden');
+
+    if (chatMessages.children.length === 0) {
+      ensureSessionId();
+      // Vänta tills öppnings-animationen är klar innan välkomstmeddelandet läggs till,
+      // så att DOM-mutationer inte stör window-animationen.
+      setTimeout(() => {
+        addMessage('bot', 'Hej! Jag är JönköpingGPTs AI-assistent. Vad kan jag hjälpa dig med idag?', false);
+      }, 650);
+    }
+    setTimeout(() => chatInput.focus(), 700);
+  }
+
+  function minimizeChat() {
+    // Stäng handover-overlay om användaren minimerar mitt i kopplings-flödet,
+    // annars visas handover-modalen först när chatten öppnas igen.
+    const handoverOverlay = document.getElementById('handoverOverlay');
+    if (handoverOverlay && handoverOverlay.classList.contains('visible')) {
+      handoverOverlay.classList.remove('visible');
+    }
+    chatWindow.classList.remove('open');
+    chatToggle.classList.remove('hidden');
+    closeActionsMenu();
+  }
+
+  function closeChat() {
+    // Bekräfta endast om användaren faktiskt har skickat något (minst ett user-meddelande)
+    // eller är kopplad till en handläggare – annars tyst avslut.
+    const hasUserMessages = chatMessages.querySelectorAll('.msg.user').length > 0;
+    if ((hasUserMessages || isHumanAgentMode) &&
+        !confirm('Vill du avsluta chatten? Konversationen sparas inte.')) {
+      return;
+    }
+
+    chatWindow.classList.remove('open');
+    chatToggle.classList.remove('hidden');
+    closeActionsMenu();
+    closeContactOverlay();
+    cancelHandover();
+
+    setTimeout(() => {
+      chatMessages.innerHTML = '';
+      chatInput.disabled = false;
+      sessionId = '';
+      localStorage.removeItem('jonkoping_chat_session_id');
+      messageTimes.length = 0;
+      exitHumanAgentMode();
+    }, 400);
+  }
+
+  function newSession() {
+    const existingMessages = chatMessages.querySelectorAll('.msg, .handover-divider');
+    existingMessages.forEach(el => el.classList.add('fading-out'));
+    closeContactOverlay();
+    cancelHandover();
+    closeActionsMenu();
+
+    setTimeout(() => {
+      chatMessages.innerHTML = '';
+      chatInput.disabled = false;
+      sessionId = generateSessionId();
+      localStorage.setItem('jonkoping_chat_session_id', sessionId);
+      messageTimes.length = 0;
+      exitHumanAgentMode();
+
+      setTimeout(() => {
+        addMessage('bot', 'Chatten har startats om. Vad kan jag hjälpa dig med?', false);
+      }, 80);
+      chatInput.focus();
+    }, 240);
+  }
+
+  function downloadChat() {
+    const nodes = chatMessages.querySelectorAll('.msg, .handover-divider');
+    if (nodes.length === 0) return;
+
+    const now = new Date();
+    const dateStr = now.toLocaleString('sv-SE');
+    let text = 'Jönköpings kommun – Konversation\n';
+    text += 'Datum: ' + dateStr + '\n';
+    text += '─'.repeat(50) + '\n\n';
+
+    nodes.forEach(node => {
+      if (node.id === 'typingIndicator') return;
+      if (node.classList.contains('handover-divider')) {
+        const strong = node.querySelector('strong');
+        text += '---\n' + (strong ? strong.textContent : 'Kopplad till handläggare') + '\n---\n\n';
+        return;
+      }
+      const isBot   = node.classList.contains('bot');
+      const isHuman = node.classList.contains('human');
+      const sender  = isBot ? 'Jönköpings kommun (AI)' : isHuman ? 'Handläggare' : 'Du';
+      const bubble  = node.querySelector('.msg-bubble');
+      if (!bubble) return;
+      let content = bubble.innerText || bubble.textContent;
+      text += sender + ':\n' + content + '\n\n';
+    });
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jonkoping_' + now.toISOString().slice(0,10) + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function formatMessage(text) {
+    let formatted = text;
+    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    formatted = formatted.replace(/_(.+?)_/g, '<em>$1</em>');
+    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="chat-link">$1</a>');
+    formatted = formatted.replace(/(?<!href="|">)(https?:\/\/[^\s<>"]+)/g, function(url) {
+      let title = url;
+      try {
+        const urlObj = new URL(url);
+        const path = urlObj.pathname.replace(/\.html$|\.htm$/i, '').replace(/\.[a-z]+\d*$/i, '');
+        const parts = path.split('/').filter(p => p.length > 0);
+        if (parts.length > 0) {
+          let lastPart = parts[parts.length - 1];
+          lastPart = lastPart
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/och/g, ' och ')
+            .replace(/[-_]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+          title = lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
+        } else {
+          title = urlObj.hostname.replace('www.', '');
+        }
+      } catch(e) { title = 'Läs mer'; }
+      return '<a href="' + url + '" target="_blank" rel="noopener" class="chat-link">' + title + '</a>';
+    });
+    formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
+    formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+    formatted = formatted.replace(/\n/g, '<br>');
+    return formatted;
+  }
+
+  function getTimeStr() {
+    return new Date().toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function updateCharCount() {
+    // Paste kan kringgå maxlength-attributet; trunkera defensivt
+    if (chatInput.value.length > 1000) {
+      chatInput.value = chatInput.value.slice(0, 1000);
+    }
+    const counter = document.getElementById('charCounter');
+    const len = chatInput.value.length;
+    counter.textContent = len + ' / 1000';
+    counter.classList.remove('warning', 'limit', 'visible');
+    if (len >= 1000) counter.classList.add('limit', 'visible');
+    else if (len >= 800) counter.classList.add('warning', 'visible');
+    else if (len >= 700) counter.classList.add('visible');
+  }
+
+  let botMsgCounter = 0;
+
+  function addMessage(type, text, showFeedback, interactionId = null) {
+    if (showFeedback === undefined) showFeedback = (type === 'bot');
+
+    const msg = document.createElement('div');
+    msg.className = 'msg ' + type;
+    const time = getTimeStr();
+    const formattedText = (type === 'bot' || type === 'human') ? formatMessage(text) : text;
+
+    let avatarHTML;
+    if (type === 'bot') {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">
+        <img src="${JK_LOGO_SRC}" alt="Jönköpings kommun">
+      </div>`;
+    } else if (type === 'human') {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>`;
+    } else {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">DU</div>`;
+    }
+
+    if (type === 'bot') {
+      botMsgCounter++;
+      msg.id = 'bot-msg-' + botMsgCounter;
+      msg.innerHTML = `
+        ${avatarHTML}
+        <div class="msg-content">
+          <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">${time}</span>
+        </div>`;
+
+      if (showFeedback) {
+        const contentDiv = msg.querySelector('.msg-content');
+        contentDiv.appendChild(createFeedback(interactionId));
+      }
+    } else if (type === 'human') {
+      msg.innerHTML = `
+        ${avatarHTML}
+        <div class="msg-content">
+          <span class="msg-name">Handläggare</span>
+          <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">${time}</span>
+        </div>`;
+    } else {
+      msg.innerHTML = `
+        ${avatarHTML}
+        <div class="msg-content">
+          <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">${time}</span>
+        </div>`;
+    }
+    chatMessages.appendChild(msg);
+
+    if (type === 'bot' || type === 'human') {
+      requestAnimationFrame(() => {
+        const msgRect = msg.getBoundingClientRect();
+        const containerRect = chatMessages.getBoundingClientRect();
+        const delta = msgRect.top - containerRect.top;
+        const maxScroll = chatMessages.scrollHeight - chatMessages.clientHeight;
+        const target = Math.min(Math.max(0, chatMessages.scrollTop + delta), maxScroll);
+        chatMessages.scrollTo({ top: target, behavior: 'smooth' });
+      });
+    } else {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }
+
+  function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'msg bot';
+    el.id = 'typingIndicator';
+    el.innerHTML = `
+      <div class="msg-avatar" aria-hidden="true">
+        <img src="${JK_LOGO_SRC}" alt="Jönköpings kommun">
+      </div>
+      <div class="msg-content">
+        <div class="msg-bubble">
+          <div class="typing-indicator" aria-label="AI-assistenten skriver"><span></span><span></span><span></span></div>
+        </div>
+      </div>`;
+    chatMessages.appendChild(el);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  /* ────────────────────────────────────────
+     CONTACT OVERLAY (kontaktuppgifter)
+  ──────────────────────────────────────── */
+  function showContactInfo() {
+    // Stäng handover-overlayen först om den är öppen, annars hamnar
+    // kontakt-overlayen under den (lägre z-index) och ser ut att inte fungera.
+    const handoverOverlay = document.getElementById('handoverOverlay');
+    if (handoverOverlay && handoverOverlay.classList.contains('visible')) {
+      handoverOverlay.classList.remove('visible');
+    }
+    const overlay = document.getElementById('contactOverlay');
+    overlay.classList.add('visible');
+    const inner = overlay.querySelector('.contact-overlay-inner');
+    if (inner) inner.scrollTop = 0;
+  }
+  function closeContactOverlay() {
+    document.getElementById('contactOverlay').classList.remove('visible');
+  }
+
+  /* ────────────────────────────────────────
+     HUMAN AGENT HANDOVER
+  ──────────────────────────────────────── */
+  function connectToHumanAgent() {
+    // Jönköping har ingen handover-backend — visa kontaktuppgifter istället.
+    showContactInfo();
+    return;
+    // eslint-disable-next-line no-unreachable
+    if (isHumanAgentMode) return;
+    const overlay = document.getElementById('handoverOverlay');
+    overlay.classList.add('visible');
+    document.getElementById('handoverTopic').selectedIndex = 0;
+    document.getElementById('handoverStartBtn').disabled = true;
+    const waitEl = document.getElementById('handoverWait');
+    waitEl.textContent = EXPECTED_WAIT_TIME
+      ? 'Uppskattad väntetid: ' + EXPECTED_WAIT_TIME
+      : '';
+  }
+
+  function cancelHandover() {
+    document.getElementById('handoverOverlay').classList.remove('visible');
+  }
+
+  function updateHandoverBtn() {
+    const btn = document.getElementById('handoverStartBtn');
+    const sel = document.getElementById('handoverTopic');
+    btn.disabled = !sel.value;
+  }
+
+  function confirmHandover() {
+    const topic = document.getElementById('handoverTopic').value;
+    if (!topic) return;
+
+    document.getElementById('handoverOverlay').classList.remove('visible');
+    isHumanAgentMode = true;
+
+    const handoverUtilBtn = document.getElementById('handoverUtilBtn');
+    if (handoverUtilBtn) {
+      handoverUtilBtn.disabled = true;
+      handoverUtilBtn.setAttribute('aria-label', 'Du är redan ansluten till en handläggare');
+    }
+    // Flytta fokus till input så tooltip/focus-ringen på startknappen försvinner
+    setTimeout(() => chatInput.focus(), 0);
+
+    // Avdelare i meddelandeflödet
+    const divider = document.createElement('div');
+    divider.className = 'handover-divider';
+    const waitLine = EXPECTED_WAIT_TIME
+      ? `<span class="wait-time">Förväntad väntetid: ${EXPECTED_WAIT_TIME}</span>`
+      : '';
+    divider.innerHTML = `
+      <div class="line"></div>
+      <div class="label">
+        <strong>Du är kopplad till en handläggare</strong>
+        <span class="wait-time">Ärende: ${topic}</span>
+        ${waitLine}
+      </div>
+      <div class="line"></div>`;
+    chatMessages.appendChild(divider);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    // Uppdatera disclaimer
+    chatDisclaimer.classList.add('human-mode');
+    document.getElementById('chatDisclaimerText').textContent =
+      'Du chattar nu med en handläggare hos Jönköpings kommun.';
+
+    // Uppdatera header
+    chatHeader.classList.add('human-mode');
+    chatHeaderName.textContent = 'Handläggare';
+    chatHeaderSub.textContent = 'Jönköpings kommuns kundservice';
+    chatHeaderIcon.innerHTML = AGENT_HEADER_ICON_SVG;
+
+    // Skicka till backend att handover initieras
+    const activeSessionId = ensureSessionId();
+    try {
+      fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'handover_request',
+          sessionId: activeSessionId,
+          topic: topic
+        })
+      }).catch(err => console.error('Handover webhook error:', err));
+    } catch (err) {
+      console.error('Handover webhook error:', err);
+    }
+  }
+
+  function exitHumanAgentMode() {
+    const handoverUtilBtn = document.getElementById('handoverUtilBtn');
+    if (handoverUtilBtn) {
+      handoverUtilBtn.disabled = false;
+      handoverUtilBtn.setAttribute('aria-label', 'Prata med en handläggare hos Jönköpings kommun');
+    }
+    if (!isHumanAgentMode) {
+      chatHeader.classList.remove('human-mode');
+      chatDisclaimer.classList.remove('human-mode');
+      chatHeaderName.textContent = 'Jönköpings kommun';
+      chatHeaderSub.textContent = 'AI-assistent · Jönköpings kommun';
+      chatHeaderIcon.innerHTML = `<img id="chatHeaderIconImg" src="${JK_LOGO_SRC}" alt="Jönköpings kommun logotyp">`;
+      document.getElementById('chatDisclaimerText').innerHTML =
+        'Svaren är AI-genererade. Kontrollera alltid viktig information. <a href="https://www.jonkoping.se/ovriga-sidor/behandling-av-personuppgifter-gdpr" target="_blank" rel="noopener">Så hanterar vi dina uppgifter</a>';
+      return;
+    }
+    isHumanAgentMode = false;
+    chatHeader.classList.remove('human-mode');
+    chatDisclaimer.classList.remove('human-mode');
+    chatHeaderName.textContent = 'Jönköpings kommun';
+    chatHeaderSub.textContent = 'AI-assistent · Jönköpings kommun';
+    chatHeaderIcon.innerHTML = `<img id="chatHeaderIconImg" src="${JK_LOGO_SRC}" alt="Jönköpings kommun logotyp">`;
+    document.getElementById('chatDisclaimerText').innerHTML =
+      'Svaren är AI-genererade. Kontrollera alltid viktig information. <a href="https://www.jonkoping.se/ovriga-sidor/behandling-av-personuppgifter-gdpr" target="_blank" rel="noopener">Så hanterar vi dina uppgifter</a>';
+  }
+
+  /**
+   * Anropa från backend för att visa meddelande från handläggare.
+   * Exempel: addHumanAgentMessage('Hej! Hur kan jag hjälpa dig?');
+   */
+  function addHumanAgentMessage(text) {
+    addMessage('human', text, false);
+  }
+
+  /**
+   * Anropa vid behov för att uppdatera väntetid i realtid.
+   * Exempel: updateWaitTime('ca 3 minuter');
+   */
+  function updateWaitTime(text) {
+    const waitEl = document.getElementById('handoverWait');
+    if (waitEl) waitEl.textContent = text ? 'Uppskattad väntetid: ' + text : '';
+  }
+
+  /* ────────────────────────────────────────
+     SESSION + WEBHOOK
+  ──────────────────────────────────────── */
+  const WEBHOOK_URL = 'https://api.halmstadchattbot.se/jonkoping';
+  let sessionId = localStorage.getItem('jonkoping_chat_session_id') || '';
+
+  function generateSessionId() {
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+  }
+  function generateInteractionId() {
+    return 'interaction_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+  }
+  function ensureSessionId() {
+    if (!sessionId) {
+      sessionId = generateSessionId();
+      localStorage.setItem('jonkoping_chat_session_id', sessionId);
+    }
+    return sessionId;
+  }
+
+  async function sendMessage() {
+    // Paste kan kringgå maxlength; trunkera innan skick
+    if (chatInput.value.length > 1000) {
+      chatInput.value = chatInput.value.slice(0, 1000);
+      updateCharCount();
+    }
+    const text = chatInput.value.trim();
+    if (!text) return;
+    if (isRateLimited()) { startCooldown(); return; }
+    recordMessage();
+
+    addMessage('user', text);
+    chatInput.value = '';
+    updateCharCount();
+
+    const activeSessionId = ensureSessionId();
+
+    // I handläggar-läge: skicka som "human_message" och anropa INTE AI
+    if (isHumanAgentMode) {
+      try {
+        fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'human_message',
+            sessionId: activeSessionId,
+            message: text
+          })
+        }).catch(err => console.error('Human message webhook error:', err));
+      } catch (err) {
+        console.error('Human message webhook error:', err);
+      }
+      chatInput.focus();
+      return;
+    }
+
+    // AI-läge: anropa webhook och visa svar
+    const interactionId = generateInteractionId();
+    chatInput.disabled = true;
+    showTyping();
+    const originSessionId = activeSessionId;
+
+    const requestBody = {
+      type: 'message',
+      interactionId: interactionId,
+      sessionId: originSessionId,
+      message: text
+    };
+
+    console.log('[Chat] → POST', WEBHOOK_URL, requestBody);
+
+    let res, rawText;
+    try {
+      res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
+      });
+    } catch (networkErr) {
+      // Nätverks- eller CORS-fel (fetch kastar INNAN response kommer fram)
+      if (sessionId !== originSessionId) return;
+      removeTyping();
+      console.error('[Chat] Nätverks-/CORS-fel:', networkErr);
+      addMessage(
+        'bot',
+        'Kunde inte nå servern. Kontrollera din uppkoppling eller försök igen om en stund.',
+        false
+      );
+      chatInput.disabled = false;
+      chatInput.focus();
+      return;
+    }
+
+    if (sessionId !== originSessionId) return;
+    removeTyping();
+
+    // Läs svar som text först — då kan vi hantera tomma svar, felaktig JSON och statuskoder separat
+    try {
+      rawText = await res.text();
+    } catch (readErr) {
+      console.error('[Chat] Kunde inte läsa response-body:', readErr);
+      rawText = '';
+    }
+
+    console.log('[Chat] ← Status:', res.status, res.statusText);
+    console.log('[Chat] ← Raw body:', rawText);
+
+    // Fall 1: HTTP-fel (4xx/5xx)
+    if (!res.ok) {
+      addMessage(
+        'bot',
+        'Servern svarade med ett fel (status ' + res.status + '). Försök igen om en stund.',
+        false
+      );
+      chatInput.disabled = false;
+      chatInput.focus();
+      return;
+    }
+
+    // Fall 2: Tom body — vanligast orsak: "Respond to Webhook" i n8n returnerar inget
+    if (!rawText || rawText.trim() === '') {
+      addMessage(
+        'bot',
+        'Servern svarade men skickade inget innehåll tillbaka. Kontrollera att "Respond to Webhook"-noden i n8n har Response Body ifylld (t.ex. `={{ $json }}` som pekar på AI Agent-output).',
+        false
+      );
+      console.warn('[Chat] Tomt svar från webhook – se instruktioner om n8n-konfiguration.');
+      chatInput.disabled = false;
+      chatInput.focus();
+      return;
+    }
+
+    // Fall 3: Parsa JSON
+    let data;
+    try {
+      data = JSON.parse(rawText);
+    } catch (parseErr) {
+      // Svaret är inte JSON — visa det som vanlig text ändå
+      console.warn('[Chat] Svaret är inte giltig JSON. Visar som text.', parseErr);
+      addMessage('bot', rawText, true, interactionId);
+      chatInput.disabled = false;
+      chatInput.focus();
+      return;
+    }
+
+    // n8n returnerar ofta en array med ett element — packa upp om så är fallet
+    if (Array.isArray(data)) {
+      data = data[0] ?? {};
+    }
+
+    // Plocka ut svarstext robust — täcker de flesta n8n-format
+    const reply = extractReply(data);
+
+    if (!reply) {
+      console.warn('[Chat] Kunde inte hitta svarstext i response:', data);
+      addMessage(
+        'bot',
+        'Servern svarade men jag hittade inget läsbart svar. (Konsolen visar råsvaret — kontrollera att "Respond to Webhook" returnerar ett fält som `output`, `text`, `message` eller liknande.)',
+        false
+      );
+    } else {
+      addMessage('bot', reply, true, interactionId);
+    }
+
+    chatInput.disabled = false;
+    chatInput.focus();
+  }
+
+  /**
+   * Letar rekursivt efter svarstext i olika vanliga n8n/AI-responser.
+   * Täcker:
+   *   { output: "..." }
+   *   { answer: "..." }
+   *   { message: "..." }
+   *   { reply: "..." }
+   *   { response: "..." }
+   *   { text: "..." }
+   *   { data: { output: "..." } }
+   *   { result: { output: "..." } }
+   *   { output: { text: "..." } }
+   *   AI Agent-specifika: { output: "..." }
+   */
+  function extractReply(obj, depth = 0) {
+    if (depth > 4) return null;
+    if (typeof obj === 'string') return obj.trim() || null;
+    if (!obj || typeof obj !== 'object') return null;
+
+    const directKeys = ['answer', 'output', 'reply', 'response', 'text', 'message', 'content'];
+    for (const key of directKeys) {
+      if (typeof obj[key] === 'string' && obj[key].trim()) return obj[key];
+    }
+
+    const nestedKeys = ['data', 'result', 'output', 'response', 'body'];
+    for (const key of nestedKeys) {
+      if (obj[key] && typeof obj[key] === 'object') {
+        const nested = extractReply(obj[key], depth + 1);
+        if (nested) return nested;
+      }
+    }
+    return null;
+  }
+
+  // Stäng overlays med Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeActionsMenu();
+      if (document.getElementById('handoverOverlay').classList.contains('visible')) {
+        cancelHandover();
+        return;
+      }
+      if (document.getElementById('contactOverlay').classList.contains('visible')) {
+        closeContactOverlay();
+      }
+    }
+  });
+
+  /* ────────────────────────────────────────
+     Tooltip-hygien: blur knappar med tooltip vid pointer-klick
+     så att ::after-tooltipen inte blir hängande på :focus-visible.
+     Tangentbordsfokus (keydown -> click) påverkas inte.
+  ──────────────────────────────────────── */
+  (function() {
+    let lastPointer = 0;
+    document.addEventListener('pointerdown', () => { lastPointer = Date.now(); }, true);
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-tooltip]');
+      if (!btn) return;
+      // Om klicket kom från pointer (mus/touch) inom 500ms – ta bort fokus
+      if (Date.now() - lastPointer < 500) {
+        setTimeout(() => btn.blur(), 0);
+      }
+    }, true);
+  })();
+</script>
+</body>
+</html>
