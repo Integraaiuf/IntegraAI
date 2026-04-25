@@ -1313,6 +1313,138 @@
     .sig-mkt .line { stroke-dashoffset: 0; transition: none; }
     .sig-mkt .end { opacity: 1; transition: none; }
   }
+
+  /* ─── JönköpingGPT access lock ──────────────────────────────────── */
+  .jk-lock-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    background: rgba(10, 14, 26, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.35s var(--ease-out);
+  }
+  .jk-lock-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .jk-lock-card {
+    width: 100%;
+    max-width: 420px;
+    background: #FFFFFF;
+    border-radius: var(--radius-lg);
+    padding: 32px 30px 28px;
+    box-shadow: var(--envelope-2);
+    border: 1px solid var(--line);
+    text-align: center;
+    transform: translateY(8px) scale(0.98);
+    transition: transform 0.4s var(--ease-out);
+  }
+  .jk-lock-overlay.visible .jk-lock-card {
+    transform: translateY(0) scale(1);
+  }
+  .jk-lock-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 16px;
+    background: #E5F2FA;
+    color: #007FC8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .jk-lock-title {
+    font-family: var(--font-sans);
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.2px;
+    margin: 0 0 6px;
+  }
+  .jk-lock-sub {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--fg-soft);
+    line-height: 1.5;
+    margin: 0 0 22px;
+  }
+  .jk-lock-inputs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+  .jk-lock-digit {
+    width: 42px;
+    height: 52px;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 8px;
+    background: #FFFFFF;
+    font-family: var(--font-sans);
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--fg);
+    text-align: center;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+    -moz-appearance: textfield;
+  }
+  .jk-lock-digit::-webkit-outer-spin-button,
+  .jk-lock-digit::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .jk-lock-digit:focus {
+    border-color: #007FC8;
+    box-shadow: 0 0 0 3px rgba(0,127,200,0.25);
+  }
+  .jk-lock-digit.filled {
+    background: #E5F2FA;
+    border-color: #007FC8;
+  }
+  .jk-lock-overlay.error .jk-lock-digit {
+    border-color: var(--destructive);
+    background: #FDECEA;
+    color: var(--destructive);
+    animation: jkLockShake 0.45s ease-in-out;
+  }
+  @keyframes jkLockShake {
+    0%, 100% { transform: translateX(0); }
+    20%      { transform: translateX(-6px); }
+    40%      { transform: translateX(6px); }
+    60%      { transform: translateX(-4px); }
+    80%      { transform: translateX(4px); }
+  }
+  .jk-lock-error {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--destructive);
+    min-height: 18px;
+    margin: 0 0 4px;
+  }
+  .jk-lock-cancel {
+    margin-top: 10px;
+    background: transparent;
+    border: none;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--fg-muted);
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+  }
+  .jk-lock-cancel:hover {
+    color: var(--fg);
+    background: var(--accent-soft);
+  }
 </style>
 </head>
 <body>
@@ -1351,6 +1483,10 @@
           <span class="bot-thumb" aria-hidden="true">Ht</span>
           <span class="bot-name">Hallandstrafiken</span>
         </a>
+        <a class="bot-row" href="jonkoping-chattbot.html" role="menuitem">
+          <span class="bot-thumb" aria-hidden="true">J</span>
+          <span class="bot-name">JönköpingGPT</span>
+        </a>
       </div>
     </div>
 
@@ -1385,6 +1521,7 @@
   <a class="mm-bot" href="hylte-chattbot-ny.html">HylteGPT</a>
   <a class="mm-bot" href="halmstad-chattbot.html">HalmstadGPT</a>
   <a class="mm-bot" href="hallandstrafiken-chattbot-ny.html">Hallandstrafiken</a>
+  <a class="mm-bot" href="jonkoping-chattbot.html">JönköpingGPT</a>
 
   <a class="mm-cta" href="#kontakt">Boka kostnadsfri rådgivning</a>
 </aside>
@@ -1703,6 +1840,7 @@
         <li><a href="hylte-chattbot-ny.html">HylteGPT</a></li>
         <li><a href="halmstad-chattbot.html">HalmstadGPT</a></li>
         <li><a href="hallandstrafiken-chattbot-ny.html">Hallandstrafiken</a></li>
+        <li><a href="jonkoping-chattbot.html">JönköpingGPT</a></li>
       </ul>
     </div>
 
@@ -2183,6 +2321,137 @@
     raf = requestAnimationFrame(loop);
   })();
 })();
+</script>
+
+<!-- ─── JönköpingGPT access lock ─── -->
+<div class="jk-lock-overlay" id="jkLockOverlay" role="dialog" aria-modal="true" aria-labelledby="jkLockTitle">
+  <div class="jk-lock-card">
+    <div class="jk-lock-icon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+    </div>
+    <h3 class="jk-lock-title" id="jkLockTitle">Skyddad åtkomst</h3>
+    <p class="jk-lock-sub">Ange den 6-siffriga koden för att öppna JönköpingGPT.</p>
+    <div class="jk-lock-inputs" id="jkLockInputs">
+      <input class="jk-lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" aria-label="Siffra 1">
+      <input class="jk-lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 2">
+      <input class="jk-lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 3">
+      <input class="jk-lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 4">
+      <input class="jk-lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 5">
+      <input class="jk-lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 6">
+    </div>
+    <div class="jk-lock-error" id="jkLockError" aria-live="polite"></div>
+    <button type="button" class="jk-lock-cancel" id="jkLockCancel">Avbryt</button>
+  </div>
+</div>
+
+<script>
+  /* JönköpingGPT klick-gate: kräv 6-siffrig kod innan navigering */
+  (function() {
+    const ACCESS_CODE = '123456';
+    const STORAGE_KEY = 'jonkoping_chat_unlocked';
+    const overlay  = document.getElementById('jkLockOverlay');
+    const inputs   = Array.from(document.querySelectorAll('#jkLockInputs .jk-lock-digit'));
+    const errorEl  = document.getElementById('jkLockError');
+    const cancelBtn= document.getElementById('jkLockCancel');
+    let pendingHref = null;
+
+    function isUnlocked() {
+      return localStorage.getItem(STORAGE_KEY) === 'true';
+    }
+
+    function readCode() { return inputs.map(i => i.value).join(''); }
+    function setFilled() { inputs.forEach(i => i.classList.toggle('filled', i.value.length === 1)); }
+    function clearError() { overlay.classList.remove('error'); errorEl.textContent = ''; }
+    function resetInputs() {
+      inputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
+      clearError();
+    }
+
+    function openLock(href) {
+      pendingHref = href;
+      overlay.classList.add('visible');
+      document.documentElement.style.overflow = 'hidden';
+      resetInputs();
+      setTimeout(() => inputs[0].focus(), 80);
+    }
+
+    function closeLock() {
+      overlay.classList.remove('visible');
+      document.documentElement.style.overflow = '';
+      pendingHref = null;
+      resetInputs();
+    }
+
+    function attemptUnlock() {
+      const code = readCode();
+      if (code.length < 6) return;
+      if (code === ACCESS_CODE) {
+        localStorage.setItem(STORAGE_KEY, 'true');
+        const target = pendingHref;
+        closeLock();
+        if (target) window.location.href = target;
+      } else {
+        overlay.classList.add('error');
+        errorEl.textContent = 'Fel kod. Försök igen.';
+        setTimeout(() => {
+          resetInputs();
+          inputs[0].focus();
+        }, 500);
+      }
+    }
+
+    // Intercepta alla klick på JönköpingGPT-länkar
+    document.addEventListener('click', function(e) {
+      const link = e.target.closest('a[href="jonkoping-chattbot.html"]');
+      if (!link) return;
+      if (isUnlocked()) return; // släpp igenom utan prompt
+      e.preventDefault();
+      openLock(link.getAttribute('href'));
+    });
+
+    // Input-hantering
+    inputs.forEach((input, idx) => {
+      input.addEventListener('input', (e) => {
+        const digit = e.target.value.replace(/\D/g, '').slice(-1);
+        e.target.value = digit;
+        setFilled();
+        clearError();
+        if (digit && idx < inputs.length - 1) inputs[idx + 1].focus();
+        if (readCode().length === 6) attemptUnlock();
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && idx > 0) {
+          inputs[idx - 1].focus();
+          inputs[idx - 1].value = '';
+          setFilled();
+        } else if (e.key === 'ArrowLeft' && idx > 0) {
+          inputs[idx - 1].focus();
+        } else if (e.key === 'ArrowRight' && idx < inputs.length - 1) {
+          inputs[idx + 1].focus();
+        } else if (e.key === 'Enter') {
+          attemptUnlock();
+        } else if (e.key === 'Escape') {
+          closeLock();
+        }
+      });
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
+        if (!pasted) return;
+        pasted.split('').forEach((ch, i) => { if (inputs[i]) inputs[i].value = ch; });
+        setFilled();
+        const next = inputs.findIndex(i => !i.value);
+        (next === -1 ? inputs[inputs.length - 1] : inputs[next]).focus();
+        if (readCode().length === 6) attemptUnlock();
+      });
+    });
+
+    cancelBtn.addEventListener('click', closeLock);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeLock(); });
+  })();
 </script>
 
 </body>
