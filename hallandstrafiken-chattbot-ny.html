@@ -2320,6 +2320,21 @@
     if (e.key === 'Escape' && piiModalOverlay.classList.contains('show')) hidePIIWarning();
   });
 
+  function resetChatInput() {
+    chatInput.disabled = false;
+    const sendBtn = document.getElementById('sendBtn') || document.querySelector('.send-btn-inline');
+    if (sendBtn) sendBtn.disabled = false;
+    chatInput.focus();
+  }
+
+  function showFriendlyFallback() {
+    addMessage(
+      'bot',
+      'Jag kunde tyvärr inte hämta ett svar just nu. Försök igen om en stund.',
+      false
+    );
+  }
+
   async function sendMessage(skipPIICheck = false) {
     // Paste kan kringgå maxlength; trunkera innan skick
     if (chatInput.value.length > 1000) {
@@ -2386,24 +2401,19 @@
         body: JSON.stringify(requestBody)
       });
     } catch (networkErr) {
-      // Nätverks- eller CORS-fel (fetch kastar INNAN response kommer fram)
+      // Nätverks- eller CORS-fel (fetch kastar innan response kommer fram)
       if (sessionId !== originSessionId) return;
       removeTyping();
       console.error('[Chat] Nätverks-/CORS-fel:', networkErr);
-      addMessage(
-        'bot',
-        'Kunde inte nå servern. Kontrollera din uppkoppling eller försök igen om en stund.',
-        false
-      );
-      chatInput.disabled = false;
-      chatInput.focus();
+      showFriendlyFallback();
+      resetChatInput();
       return;
     }
 
     if (sessionId !== originSessionId) return;
     removeTyping();
 
-    // Läs svar som text först — då kan vi hantera tomma svar, felaktig JSON och statuskoder separat
+    // Läs svaret som text först så att fel kan hanteras utan att tekniska detaljer visas i chatten.
     try {
       rawText = await res.text();
     } catch (readErr) {
@@ -2416,26 +2426,17 @@
 
     // Fall 1: HTTP-fel (4xx/5xx)
     if (!res.ok) {
-      addMessage(
-        'bot',
-        'Servern svarade med ett fel (status ' + res.status + '). Försök igen om en stund.',
-        false
-      );
-      chatInput.disabled = false;
-      chatInput.focus();
+      console.warn('[Chat] HTTP-fel:', res.status, res.statusText);
+      showFriendlyFallback();
+      resetChatInput();
       return;
     }
 
-    // Fall 2: Tom body — vanligast orsak: "Respond to Webhook" i n8n returnerar inget
+    // Fall 2: Tomt svar
     if (!rawText || rawText.trim() === '') {
-      addMessage(
-        'bot',
-        'Servern svarade men skickade inget innehåll tillbaka. Kontrollera att "Respond to Webhook"-noden i n8n har Response Body ifylld (t.ex. `={{ $json }}` som pekar på AI Agent-output).',
-        false
-      );
-      console.warn('[Chat] Tomt svar från webhook – se instruktioner om n8n-konfiguration.');
-      chatInput.disabled = false;
-      chatInput.focus();
+      console.warn('[Chat] Tomt svar från backend.');
+      showFriendlyFallback();
+      resetChatInput();
       return;
     }
 
@@ -2444,39 +2445,33 @@
     try {
       data = JSON.parse(rawText);
     } catch (parseErr) {
-      // Svaret är inte JSON — visa det som vanlig text ändå
-      console.warn('[Chat] Svaret är inte giltig JSON. Visar som text.', parseErr);
-      addMessage('bot', rawText, true, interactionId);
-      chatInput.disabled = false;
-      chatInput.focus();
+      // Visa inte tekniska råsvar i chatten.
+      console.warn('[Chat] Svaret är inte giltig JSON.', parseErr);
+      showFriendlyFallback();
+      resetChatInput();
       return;
     }
 
-    // n8n returnerar ofta en array med ett element — packa upp om så är fallet
+    // Backend kan returnera en array med ett element — packa upp om så är fallet
     if (Array.isArray(data)) {
       data = data[0] ?? {};
     }
 
-    // Plocka ut svarstext robust — täcker de flesta n8n-format
+    // Plocka ut svarstext robust — täcker de flesta backend-format
     const reply = extractReply(data);
 
     if (!reply) {
       console.warn('[Chat] Kunde inte hitta svarstext i response:', data);
-      addMessage(
-        'bot',
-        'Servern svarade men jag hittade inget läsbart svar. (Konsolen visar råsvaret — kontrollera att "Respond to Webhook" returnerar ett fält som `output`, `text`, `message` eller liknande.)',
-        false
-      );
+      showFriendlyFallback();
     } else {
       addMessage('bot', reply, true, interactionId);
     }
 
-    chatInput.disabled = false;
-    chatInput.focus();
+    resetChatInput();
   }
 
   /**
-   * Letar rekursivt efter svarstext i olika vanliga n8n/AI-responser.
+   * Letar rekursivt efter svarstext i olika vanliga AI-responser.
    * Täcker:
    *   { output: "..." }
    *   { answer: "..." }
@@ -2487,7 +2482,6 @@
    *   { data: { output: "..." } }
    *   { result: { output: "..." } }
    *   { output: { text: "..." } }
-   *   AI Agent-specifika: { output: "..." }
    */
   function extractReply(obj, depth = 0) {
     if (depth > 4) return null;
