@@ -3,49 +3,84 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HylteGPT</title>
+<title>HylteGPT – Hylte kommun</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --yellow: #F5A623;
-    --yellow-dark: #E8961A;
-    --yellow-light: #FDF0DB;
-    --yellow-hover: #D4880F;
-    --header-bg: #F5A623;
-    --bg: #FAFAFA;
-    --white: #FFFFFF;
-    --text: #333333;
-    --text-light: #777777;
-    --border: #E5E5E5;
-    --bot-bubble: #F0F0F0;
-    --user-bubble: #F5A623;
-    --shadow: 0 8px 32px rgba(0,0,0,0.18);
-    --radius: 14px;
+    --hylte-blue-deep:    #004B87;
+    --hylte-blue:         #0077BE;
+    --hylte-blue-hover:   #005A8C;
+
+    --hylte-accent:       #0092E0;
+    --hylte-accent-hover: #0077BE;
+    --hylte-accent-bright:#3DB0F0;
+
+    --hylte-sky:          #B8DEFA;
+    --hylte-sky-light:    #DBF0FF;
+    --hylte-sky-softer:   #EEF7FD;
+    --hylte-sky-bubble:   #E2F2FC;
+
+    --text:             #0F2A3D;
+    --text-muted:       #4A6274;
+    --text-soft:        #7A8E9A;
+    --border:           #D0DEE6;
+    --border-strong:    #B0C4CE;
+    --bg:               #FFFFFF;
+    --bot-bubble:       #EDF5FA;
+    --user-bubble:      #0077BE;
+
+    --shadow-sm:  0 2px 6px rgba(0,75,135,0.08);
+    --shadow-md:  0 8px 24px rgba(0,75,135,0.12), 0 2px 6px rgba(0,75,135,0.06);
+    --shadow-lg:  0 16px 48px rgba(0,75,135,0.16), 0 4px 12px rgba(0,75,135,0.08);
+
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  16px;
+    --radius-xl:  20px;
+
+    --focus-ring: 0 0 0 3px rgba(0,119,190,0.35);
+
+    --ease-spring:  cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out:     cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   body {
-    font-family: 'DM Sans', sans-serif;
-    background: #E8F4F8;
+    font-family: 'Mulish', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--hylte-sky);
     min-height: 100vh;
     color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* ── Demo background to simulate a page ── */
+  /* ── Demo sida ── */
   .demo-page {
     padding: 60px 40px;
     max-width: 800px;
     margin: 0 auto;
-    opacity: 0.5;
   }
-  .demo-page h1 { font-size: 28px; color: #1a5276; margin-bottom: 12px; }
-  .demo-page p { color: #555; line-height: 1.7; }
+  .demo-page h1 {
+    font-size: 44px;
+    color: var(--hylte-blue-deep);
+    margin-bottom: 18px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+  }
+  .demo-page p {
+    color: var(--hylte-blue-deep);
+    line-height: 1.6;
+    font-size: 17px;
+    max-width: 560px;
+  }
 
-  /* ══════════════════════════════════════════
-     CHAT TOGGLE BUTTON (closed state)
-  ══════════════════════════════════════════ */
+  /* ────────────────────────────────────────
+     CHAT TOGGLE BUTTON
+  ──────────────────────────────────────── */
   .chat-toggle {
     position: fixed;
     bottom: 24px;
@@ -53,54 +88,71 @@
     z-index: 9999;
     display: flex;
     align-items: center;
-    gap: 8px;
-    background: var(--yellow);
-    color: var(--white);
+    gap: 10px;
+    background: var(--hylte-blue);
+    color: #FFFFFF;
     border: none;
     padding: 14px 22px;
-    border-radius: 50px;
-    font-family: 'DM Sans', sans-serif;
+    border-radius: 999px;
+    font-family: inherit;
     font-size: 15px;
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(245,166,35,0.45);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 0.3px;
+    box-shadow: 0 6px 20px rgba(0,119,190,0.28), 0 2px 6px rgba(0,119,190,0.14);
+    transition:
+      opacity   0.55s var(--ease-spring),
+      transform 0.55s var(--ease-spring),
+      background-color 0.25s var(--ease-standard),
+      box-shadow 0.35s var(--ease-standard);
+    letter-spacing: 0.1px;
   }
   .chat-toggle:hover {
-    background: var(--yellow-hover);
-    box-shadow: 0 6px 24px rgba(245,166,35,0.55);
+    background: var(--hylte-blue-hover);
+    box-shadow: 0 10px 28px rgba(0,119,190,0.38), 0 4px 10px rgba(0,119,190,0.2);
     transform: translateY(-2px);
   }
-  .chat-toggle.hidden { 
-    opacity: 0; 
-    pointer-events: none; 
-    transform: scale(0.8) translateY(10px); 
+  .chat-toggle:active:not(.hidden) {
+    transform: translateY(-1px);
   }
-  .chat-toggle svg { flex-shrink: 0; }
+  .chat-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 6px 20px rgba(0,119,190,0.28), var(--focus-ring);
+  }
+  .chat-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.72) translateY(20px);
+  }
+  .chat-toggle svg {
+    flex-shrink: 0;
+  }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      CHAT WINDOW
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   .chat-window {
     position: fixed;
     bottom: 24px;
     right: 24px;
-    width: 380px;
-    max-height: 540px;
-    height: 540px;
+    width: 400px;
+    max-height: 620px;
+    height: 620px;
     z-index: 10000;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background: var(--white);
-    box-shadow: var(--shadow);
+    background: var(--bg);
+    box-shadow: var(--shadow-lg);
     opacity: 0;
     pointer-events: none;
-    transform: translateY(20px) scale(0.95);
-    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-    border: 2px solid var(--yellow);
+    transform: translateY(16px) scale(0.97);
+    transition:
+      opacity   0.45s var(--ease-spring),
+      transform 0.45s var(--ease-spring);
+    border: 1px solid var(--border);
+    transform-origin: center bottom;
+    will-change: transform, opacity;
   }
   .chat-window.open {
     opacity: 1;
@@ -110,129 +162,160 @@
 
   /* ── Header ── */
   .chat-header {
-    background: var(--header-bg);
-    color: var(--white);
+    background:
+      radial-gradient(ellipse 130% 100% at 110% 130%,
+        rgba(0,146,224,0.45) 0%,
+        rgba(0,146,224,0.18) 40%,
+        transparent 70%),
+      linear-gradient(160deg, #005A8C 0%, #0077BE 100%);
+    color: #FFFFFF;
     padding: 14px 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
+    border-bottom: 1.5px solid rgba(0,0,0,0.12);
+    position: relative;
+    z-index: 30;
   }
   .chat-header-title {
-    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+  }
+  .chat-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(255,255,255,0.5);
+    overflow: hidden;
+  }
+  .chat-header-icon img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+  }
+  .chat-header-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .chat-header-name {
+    font-size: 15.5px;
     font-weight: 700;
+    letter-spacing: 0.1px;
+    line-height: 1.2;
+  }
+  .chat-header-subtitle {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
     letter-spacing: 0.3px;
+    line-height: 1.3;
+    margin-top: 1px;
   }
   .chat-header-actions {
     display: flex;
-    gap: 6px;
+    gap: 4px;
   }
   .chat-header-actions button {
-    background: rgba(255,255,255,0.25);
+    background: transparent;
     border: none;
-    color: var(--white);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
+    color: #FFFFFF;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.2s;
+    transition:
+      background  0.3s var(--ease-spring),
+      opacity     0.3s var(--ease-spring),
+      transform   0.25s var(--ease-spring);
+    opacity: 0.82;
+    position: relative;
   }
   .chat-header-actions button:hover {
-    background: rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.18);
+    opacity: 1;
+    transform: scale(1.08);
   }
-
-  /* ── Pre-chat form (topic selector) ── */
-  .chat-prechat {
-    padding: 28px 20px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    background: var(--white);
+  .chat-header-actions button:active {
+    background: rgba(255,255,255,0.28);
+    transform: scale(0.94);
   }
-  .chat-prechat.hidden { display: none; }
-
-  .chat-prechat label {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-  }
-  .chat-prechat select {
-    width: 100%;
-    padding: 12px 14px;
-    border: 2px solid var(--border);
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    background: var(--white);
-    cursor: pointer;
-    transition: border-color 0.2s;
-    appearance: auto;
-  }
-  .chat-prechat select:focus {
+  .chat-header-actions button:focus-visible {
     outline: none;
-    border-color: var(--yellow);
-  }
-  .chat-prechat .start-btn {
-    background: var(--yellow);
-    color: var(--white);
-    border: none;
-    padding: 14px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s;
-    letter-spacing: 0.3px;
-  }
-  .chat-prechat .start-btn:hover {
-    background: var(--yellow-hover);
-  }
-  .chat-prechat .wait-time {
-    text-align: center;
-    font-size: 13px;
-    color: var(--text-light);
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
   }
 
-  /* ── Chat area ── */
-  .chat-body {
-    flex: 1;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-  }
-  .chat-body.active {
-    display: flex;
-  }
-
+  /* ── Disclaimer ── */
   .chat-disclaimer {
-    padding: 10px 16px;
-    font-size: 12px;
-    color: var(--text-light);
+    padding: 14px 16px;
+    font-size: 11.5px;
+    color: var(--text-muted);
     text-align: center;
-    background: var(--yellow-light);
+    background: var(--hylte-sky-softer);
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1.45;
+  }
+  .chat-disclaimer svg {
+    flex-shrink: 0;
+    color: var(--hylte-blue);
+  }
+  .chat-disclaimer a {
+    color: var(--hylte-blue-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 600;
+    transition: color 0.25s var(--ease-standard);
+  }
+  .chat-disclaimer a:hover {
+    color: var(--hylte-blue-deep);
+  }
+
+  /* ── Chat body ── */
+  .chat-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(180deg, var(--hylte-sky-softer) 0%, #FFFFFF 40%, #FFFFFF 100%);
   }
 
   .chat-messages {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 16px;
+    padding: 18px 16px 8px 16px;
     display: flex;
     flex-direction: column;
     gap: 14px;
     scroll-behavior: smooth;
   }
-  .chat-messages::-webkit-scrollbar { width: 5px; }
+  .chat-messages::-webkit-scrollbar { width: 6px; }
   .chat-messages::-webkit-scrollbar-track { background: transparent; }
-  .chat-messages::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: #C0D0D8;
+    border-radius: 10px;
+  }
+  .chat-messages::-webkit-scrollbar-thumb:hover { background: #A0B4BE; }
 
   /* ── Message bubbles ── */
   .msg {
@@ -240,256 +323,469 @@
     gap: 10px;
     max-width: 88%;
     min-width: 0;
-    animation: msgIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: msgIn 0.65s var(--ease-spring) both;
+    transition:
+      opacity   0.45s var(--ease-out),
+      transform 0.45s var(--ease-out);
+    will-change: transform, opacity;
   }
   @keyframes msgIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+    0%   { opacity: 0; transform: translateY(18px) scale(0.95); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .msg.fading-out {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
   }
 
   .msg.bot { align-self: flex-start; }
   .msg.user { align-self: flex-end; flex-direction: row-reverse; }
 
   .msg-avatar {
-    width: 34px;
-    height: 34px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    background: var(--yellow-light);
-    border: 2px solid var(--yellow);
-  }
-  .msg.user .msg-avatar {
-    background: var(--user-bubble);
-    border-color: var(--yellow-dark);
-    color: var(--white);
     font-size: 13px;
     font-weight: 700;
+    background: #FFFFFF;
+    color: var(--hylte-blue-hover);
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+  }
+  .msg-avatar img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+  }
+  .msg.user .msg-avatar {
+    background: var(--hylte-blue);
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .msg.human .msg-avatar {
+    background: #FFF4E0;
+    color: #8B5A1A;
   }
 
   .msg-content {
     display: flex;
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
     min-width: 0;
     overflow: hidden;
   }
-  .msg-name {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-light);
-    padding-left: 2px;
-  }
-  .msg.user .msg-name { text-align: right; padding-right: 2px; }
-
-  .msg-time {
-    font-size: 10px;
-    color: #aaa;
-    margin-top: 2px;
-  }
-  .msg.user .msg-time { text-align: right; }
-
-  .chat-input-wrap {
-    position: relative;
-    flex: 1;
-  }
-  .chat-input-wrap input {
-    width: 100%;
-  }
-  .char-counter {
-    position: absolute;
-    bottom: -14px;
-    right: 12px;
-    font-size: 10px;
-    font-family: 'DM Sans', sans-serif;
-    color: #aaa;
-    pointer-events: none;
-    transition: color 0.2s;
-  }
-  .char-counter.warning { color: #e67e22; }
-  .char-counter.limit { color: #e74c3c; font-weight: 600; }
 
   .msg-bubble {
-    padding: 10px 14px;
-    border-radius: 12px;
-    font-size: 14px;
-    line-height: 1.5;
+    padding: 11px 14px;
+    border-radius: var(--radius-md);
+    font-size: 14.5px;
+    line-height: 1.55;
     word-wrap: break-word;
     overflow-wrap: break-word;
     word-break: break-word;
     max-width: 100%;
     overflow: hidden;
+    color: var(--text);
   }
   .msg.bot .msg-bubble {
     background: var(--bot-bubble);
-    color: var(--text);
     border-bottom-left-radius: 4px;
   }
   .msg.user .msg-bubble {
     background: var(--user-bubble);
-    color: var(--white);
+    color: #FFFFFF;
     border-bottom-right-radius: 4px;
   }
+  .msg.human .msg-bubble {
+    background: #FFF4E0;
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
 
-  .chat-link {
-    color: #1a73e8;
-    text-decoration: none;
+  .msg-time {
+    font-size: 10.5px;
+    color: var(--text-soft);
+    padding: 0 2px;
     font-weight: 500;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s;
+  }
+  .msg.user .msg-time { text-align: right; }
+
+  /* ── Länk i meddelandet ── */
+  .chat-link {
+    color: var(--hylte-blue-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1.2px;
+    font-weight: 600;
+    transition: color 0.3s var(--ease-spring);
   }
   .chat-link:hover {
-    border-bottom-color: #1a73e8;
+    color: var(--hylte-blue-deep);
+    text-decoration-thickness: 2px;
+  }
+  .msg.user .chat-link {
+    color: #FFFFFF;
+    text-decoration-color: rgba(255,255,255,0.7);
   }
   .msg-bubble ul {
-    margin: 4px 0;
-    padding-left: 18px;
+    margin: 6px 0 2px 0;
+    padding-left: 20px;
     list-style: disc;
   }
-  .msg-bubble li {
-    margin-bottom: 4px;
+  .msg-bubble li { margin-bottom: 4px; }
+  .msg-bubble strong { font-weight: 700; }
+
+  /* ── Stjärnbetyg ── */
+  .msg-feedback {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    margin-top: 2px;
+    padding-left: 2px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity   0.55s var(--ease-spring) 0.85s,
+      transform 0.55s var(--ease-spring) 0.85s;
   }
-  .msg-bubble strong {
-    font-weight: 700;
+  .msg-feedback.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .star-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 3px 2px;
+    color: var(--border-strong);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      color     0.15s var(--ease-standard),
+      transform 0.2s  var(--ease-spring);
+  }
+  .star-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .star-btn.hovered {
+    color: var(--hylte-accent-bright);
+    transform: scale(1.18) translateY(-1px);
+  }
+  .star-btn.filled {
+    color: var(--hylte-blue);
+  }
+  .star-btn.locked {
+    cursor: default;
+    transform: none !important;
+  }
+  @keyframes starPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.4); }
+    70%  { transform: scale(0.88); }
+    100% { transform: scale(1); }
+  }
+  .star-btn.pop {
+    animation: starPop 0.5s var(--ease-spring);
+  }
+  .feedback-thanks {
+    font-size: 11px;
+    color: var(--text-soft);
+    font-style: italic;
+    align-self: center;
+    margin-left: 6px;
+    animation: thanksIn 0.55s var(--ease-spring);
+  }
+  @keyframes thanksIn {
+    0%   { opacity: 0; transform: translateX(-10px); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translateX(0); }
   }
 
-  /* typing indicator */
+  /* ── Typing indicator ── */
   .typing-indicator {
     display: flex;
-    gap: 4px;
-    padding: 12px 16px;
+    gap: 5px;
+    padding: 0 2px;
     align-items: center;
+    height: 20px;
   }
   .typing-indicator span {
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: #bbb;
-    animation: typeDot 1.2s infinite;
+    background: var(--hylte-blue);
+    opacity: 0.28;
+    animation: typeDot 1.4s ease-in-out infinite;
+    will-change: opacity;
+    backface-visibility: hidden;
   }
   .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
   .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
   @keyframes typeDot {
-    0%, 60%, 100% { opacity: 0.3; transform: scale(0.8); }
-    30% { opacity: 1; transform: scale(1); }
+    0%, 100% { opacity: 0.28; }
+    50%      { opacity: 1; }
   }
 
-  /* ── Input bar ── */
+  /* ────────────────────────────────────────
+     INPUT BAR
+  ──────────────────────────────────────── */
   .chat-input-bar {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 14px;
+    padding: 12px 14px 14px 14px;
     border-top: 1px solid var(--border);
-    background: var(--white);
+    background: var(--bg);
     flex-shrink: 0;
+    position: relative;
   }
-  .chat-input-bar input {
+
+  .chat-input-wrap {
+    position: relative;
     flex: 1;
-    border: 2px solid var(--border);
-    border-radius: 24px;
-    padding: 10px 16px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
+    min-width: 0;
+  }
+  .chat-input-wrap input {
+    width: 100%;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 999px;
+    padding: 11px 44px 11px 16px;
+    font-family: inherit;
+    font-size: 14.5px;
     color: var(--text);
-    transition: border-color 0.2s;
+    transition:
+      border-color 0.35s var(--ease-spring),
+      box-shadow   0.35s var(--ease-spring),
+      background   0.35s var(--ease-spring);
+    background: #FFFFFF;
   }
-  .chat-input-bar input:focus {
+  .chat-input-wrap input:focus {
     outline: none;
-    border-color: var(--yellow);
+    border-color: var(--hylte-blue);
+    box-shadow: var(--focus-ring);
   }
-  .chat-input-bar input::placeholder { color: #aaa; }
+  .chat-input-wrap input::placeholder {
+    color: var(--text-soft);
+  }
+  .chat-input-wrap input:disabled {
+    background: #F5F5F5;
+    cursor: not-allowed;
+  }
 
-  .new-session-btn {
-    background: var(--yellow);
+  /* Inbäddad send-knapp i input */
+  .send-btn-inline {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--hylte-blue);
     border: none;
-    color: var(--white);
-    width: 40px;
-    height: 40px;
+    color: #FFFFFF;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
+    transition:
+      background   0.3s var(--ease-spring),
+      transform    0.35s var(--ease-spring),
+      box-shadow   0.35s var(--ease-spring);
+    box-shadow: 0 2px 6px rgba(0,119,190,0.25);
   }
-  .new-session-btn:hover {
-    background: var(--yellow-hover);
-    transform: scale(1.05);
+  .send-btn-inline:hover {
+    background: var(--hylte-blue-hover);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 5px 14px rgba(0,119,190,0.38);
   }
-  .new-session-btn:active { transform: scale(0.95); }
+  .send-btn-inline:active {
+    transform: translateY(-50%) scale(0.93);
+    box-shadow: 0 2px 6px rgba(0,119,190,0.2);
+  }
+  .send-btn-inline:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  .send-btn-inline:disabled {
+    background: #B0C4CE;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
 
-  .send-btn {
-    background: var(--yellow);
+  .char-counter {
+    position: absolute;
+    bottom: -16px;
+    right: 14px;
+    font-size: 10.5px;
+    font-family: inherit;
+    color: var(--text-soft);
+    pointer-events: none;
+    transition:
+      opacity 0.4s var(--ease-spring),
+      color   0.4s var(--ease-spring);
+    opacity: 0;
+    font-weight: 500;
+  }
+  .char-counter.visible { opacity: 1; }
+  .char-counter.warning { color: #B87820; opacity: 1; }
+  .char-counter.limit { color: #A84040; font-weight: 700; opacity: 1; }
+
+  /* Utility-knappar */
+  .util-btn {
+    background: var(--hylte-blue);
     border: none;
-    color: var(--white);
-    width: 40px;
-    height: 40px;
+    color: #FFFFFF;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition:
+      background  0.3s var(--ease-spring),
+      transform   0.35s var(--ease-spring),
+      box-shadow  0.35s var(--ease-spring);
     flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,119,190,0.25);
   }
-  .send-btn:hover { background: var(--yellow-hover); transform: scale(1.05); }
-  .send-btn:active { transform: scale(0.95); }
-
-  /* ══════════════════════════════════════════
-     STAR RATING SYSTEM
-  ══════════════════════════════════════════ */
-  .star-rating {
-    display: flex;
-    gap: 2px;
-    margin-top: 4px;
-    padding-left: 2px;
+  .util-btn:hover {
+    background: var(--hylte-blue-hover);
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 5px 14px rgba(0,119,190,0.38);
   }
-  .star-rating .star-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    font-size: 16px;
-    color: #ccc;
-    transition: color 0.15s, transform 0.15s;
+  .util-btn:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 2px 6px rgba(0,119,190,0.2);
   }
-  .star-rating .star-btn:hover {
-    transform: scale(1.2);
-  }
-  .star-rating .star-btn.active {
-    color: var(--yellow);
-  }
-  .star-rating .star-btn svg {
-    width: 16px;
-    height: 16px;
-    display: block;
+  .util-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 2px 6px rgba(0,119,190,0.25), var(--focus-ring);
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
+     TOOLTIPS
+  ──────────────────────────────────────── */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: var(--hylte-blue-deep);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity   0.3s var(--ease-spring),
+      transform 0.3s var(--ease-spring);
+    z-index: 1000;
+    box-shadow: var(--shadow-sm);
+  }
+  [data-tooltip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    border: 5px solid transparent;
+    border-top-color: var(--hylte-blue-deep);
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity   0.3s var(--ease-spring),
+      transform 0.3s var(--ease-spring);
+    z-index: 1000;
+  }
+  [data-tooltip]:hover::after,
+  [data-tooltip]:hover::before,
+  [data-tooltip]:focus-visible::after,
+  [data-tooltip]:focus-visible::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .chat-header-actions [data-tooltip]::after {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
+  .chat-header-actions [data-tooltip]::before {
+    bottom: auto;
+    top: calc(100% + 2px);
+    border-top-color: transparent;
+    border-bottom-color: var(--hylte-blue-deep);
+  }
+  [data-tooltip-align="left"]::after {
+    left: 0;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="left"]:hover::after,
+  [data-tooltip-align="left"]:focus-visible::after {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="left"]::before {
+    left: 18px;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="left"]:hover::before,
+  [data-tooltip-align="left"]:focus-visible::before {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="right"]::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="right"]:hover::after,
+  [data-tooltip-align="right"]:focus-visible::after {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="right"]::before {
+    left: auto;
+    right: 12px;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="right"]:hover::before,
+  [data-tooltip-align="right"]:focus-visible::before {
+    transform: translateX(0) translateY(0);
+  }
+
+  /* ────────────────────────────────────────
      RATE LIMIT TOAST
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   .rate-limit-toast {
     position: absolute;
-    bottom: 70px;
+    bottom: 78px;
     left: 50%;
-    transform: translateX(-50%) translateY(10px);
-    background: #e74c3c;
-    color: #fff;
-    padding: 10px 18px;
+    transform: translateX(-50%) translateY(12px);
+    background: #7A3030;
+    color: #FFFFFF;
+    padding: 10px 16px;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    box-shadow: 0 4px 16px rgba(231,76,60,0.35);
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(122,48,48,0.35);
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s, transform 0.3s;
+    transition:
+      opacity   0.4s var(--ease-spring),
+      transform 0.4s var(--ease-spring);
     z-index: 10;
     white-space: nowrap;
   }
@@ -499,244 +795,628 @@
     transform: translateX(-50%) translateY(0);
   }
 
-  /* ── Responsive ── */
-  @media (max-width: 420px) {
+  /* ────────────────────────────────────────
+     ACTIONS MENU (dropdown)
+  ──────────────────────────────────────── */
+  .actions-menu {
+    position: absolute;
+    top: 58px;
+    right: 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    min-width: 200px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-12px) scale(0.96);
+    transform-origin: top right;
+    transition:
+      opacity   0.4s var(--ease-spring),
+      transform 0.4s var(--ease-spring);
+    z-index: 50;
+    overflow: hidden;
+  }
+  .actions-menu.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0) scale(1);
+  }
+  .actions-menu button {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition:
+      background-color 0.25s var(--ease-standard),
+      color            0.25s var(--ease-standard);
+  }
+  .actions-menu button:hover {
+    background: var(--hylte-sky-softer);
+    color: var(--hylte-blue-hover);
+  }
+  .actions-menu button:focus-visible {
+    outline: none;
+    background: var(--hylte-sky-bubble);
+  }
+  .actions-menu button + button {
+    border-top: 1px solid var(--border);
+  }
+  .actions-menu svg {
+    flex-shrink: 0;
+    color: var(--hylte-blue);
+  }
+
+  /* ────────────────────────────────────────
+     CONTACT OVERLAY
+  ──────────────────────────────────────── */
+  .contact-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition:
+      opacity   0.5s var(--ease-spring),
+      transform 0.5s var(--ease-spring);
+  }
+  .contact-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .contact-header {
+    padding: 14px 16px;
+    background: var(--hylte-sky-softer);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .contact-header-text { min-width: 0; }
+  .contact-header-title-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--hylte-blue-deep);
+    line-height: 1.2;
+  }
+  .contact-header-sub {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.35;
+  }
+  .contact-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--hylte-blue-hover);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background 0.3s var(--ease-spring),
+      color      0.3s var(--ease-spring),
+      transform  0.25s var(--ease-spring);
+    flex-shrink: 0;
+  }
+  .contact-close-btn:hover {
+    background: rgba(0,119,190,0.14);
+    color: var(--hylte-blue);
+    transform: scale(1.1) rotate(5deg);
+  }
+  .contact-close-btn:active {
+    background: rgba(0,119,190,0.22);
+    transform: scale(0.92);
+  }
+  .contact-close-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  .contact-overlay-inner {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px 20px 16px;
+  }
+  .contact-overlay-inner::-webkit-scrollbar { width: 6px; }
+  .contact-overlay-inner::-webkit-scrollbar-track { background: transparent; }
+  .contact-overlay-inner::-webkit-scrollbar-thumb { background: #C0D0D8; border-radius: 10px; }
+
+  .contact-section {
+    background: var(--hylte-sky-bubble);
+    border: 1px solid rgba(0,119,190,0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    transition:
+      background    0.35s var(--ease-spring),
+      border-color  0.35s var(--ease-spring),
+      transform     0.35s var(--ease-spring),
+      box-shadow    0.35s var(--ease-spring);
+  }
+  .contact-section:last-child { margin-bottom: 0; }
+  .contact-section:hover {
+    background: #D6EDFA;
+    border-color: rgba(0,119,190,0.22);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(0,75,135,0.1);
+  }
+  .contact-section-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--hylte-blue-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+  .contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 13.5px;
+  }
+  .contact-row + .contact-row {
+    border-top: 1px solid rgba(0,119,190,0.12);
+  }
+  .contact-label {
+    color: var(--text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .contact-value {
+    color: var(--hylte-blue-deep);
+    font-weight: 700;
+    text-decoration: none;
+    text-align: right;
+    transition: color 0.3s var(--ease-spring);
+  }
+  .contact-value:hover,
+  .contact-value:focus-visible {
+    color: var(--hylte-blue-hover);
+    text-decoration: underline;
+    outline: none;
+  }
+  .contact-address {
+    font-size: 13.5px;
+    color: var(--hylte-blue-deep);
+    font-weight: 600;
+  }
+
+  /* Visuellt gömt men läsbart för skärmläsare */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── Responsivt ── */
+  @media (max-width: 440px) {
     .chat-window {
       width: calc(100vw - 16px);
-      height: calc(100vh - 80px);
-      max-height: calc(100vh - 80px);
+      height: calc(100vh - 16px);
+      max-height: calc(100vh - 16px);
       bottom: 8px;
       right: 8px;
+      border-radius: var(--radius-md);
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
     }
   }
 </style>
 </head>
 <body>
 
-<!-- Demo background page content -->
+<!-- Demo-bakgrund -->
 <div class="demo-page">
   <h1>Hej, vad kan vi hjälpa dig med?</h1>
-  <p>Det här är en demo-sida för att visa chatt-popup-widgeten. Klicka på den gula "Chatt"-knappen längst ner till höger för att öppna chatten.</p>
+  <p>Det här är en demo-sida för att visa chattwidgeten. Klicka på knappen längst ner till höger för att öppna chatten.</p>
 </div>
 
-<!-- ════════ CHAT TOGGLE BUTTON ════════ -->
-<button class="chat-toggle" id="chatToggle" onclick="openChat()">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+<!-- ──────── CHAT TOGGLE BUTTON ──────── -->
+<button class="chat-toggle" id="chatToggle" onclick="openChat()" aria-label="Öppna chatt med HylteGPT">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
   </svg>
-  Chatt
+  HylteGPT
 </button>
 
-<!-- ════════ CHAT WINDOW ════════ -->
-<div class="chat-window" id="chatWindow">
+<!-- ──────── CHAT WINDOW ──────── -->
+<div class="chat-window" id="chatWindow" role="dialog" aria-label="Chatt med HylteGPT">
 
   <!-- Header -->
   <div class="chat-header">
-    <span class="chat-header-title">HylteGPT</span>
+    <div class="chat-header-title">
+      <div class="chat-header-icon" aria-hidden="true">
+        <img src="data:image/png;base64,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" alt="Hylte kommun logotyp">
+      </div>
+      <div class="chat-header-text">
+        <div class="chat-header-name">HylteGPT</div>
+        <div class="chat-header-subtitle">AI-assistent · Hylte kommun</div>
+      </div>
+    </div>
     <div class="chat-header-actions">
-      <button onclick="downloadChat()" title="Ladda ner chatt">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <button onclick="toggleActionsMenu(event)" data-tooltip="Fler alternativ" aria-label="Fler alternativ" id="menuBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <circle cx="5" cy="12" r="2"/>
+          <circle cx="12" cy="12" r="2"/>
+          <circle cx="19" cy="12" r="2"/>
+        </svg>
       </button>
-      <button onclick="minimizeChat()" title="Minimera">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      <button onclick="minimizeChat()" data-tooltip="Minimera" aria-label="Minimera chatt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
       </button>
-      <button onclick="closeChat()" title="Stäng">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      <button onclick="closeChat()" data-tooltip="Avsluta chatt" data-tooltip-align="right" aria-label="Avsluta chatt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
       </button>
     </div>
   </div>
 
+  <!-- Actions dropdown menu -->
+  <div class="actions-menu" id="actionsMenu" role="menu">
+    <button onclick="newSession(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M23 4v6h-6"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Börja om chatten
+    </button>
+    <button onclick="downloadChat(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Ladda ner konversation
+    </button>
+    <button onclick="showContactInfo(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      Kontakta oss direkt
+    </button>
+  </div>
+
   <!-- Chat body -->
-  <div class="chat-body active" id="chatBody">
+  <div class="chat-body" id="chatBody">
     <div class="chat-disclaimer">
-      AI kan begå misstag. Kontrollera viktig information.
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span>Svaren är AI-genererade. Kontrollera alltid viktig information.</span>
     </div>
-    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-messages" id="chatMessages" aria-live="polite" aria-atomic="false"></div>
 
     <!-- Rate limit toast -->
-    <div class="rate-limit-toast" id="rateLimitToast">
-      Du skickar för många meddelanden. Vänta 10 sekunder.
+    <div class="rate-limit-toast" id="rateLimitToast" role="alert">
+      Vänta några sekunder innan du skickar fler meddelanden.
     </div>
 
-    <div class="chat-input-bar" style="padding-bottom:22px;">
-      <button class="new-session-btn" onclick="newSession()" title="Ny chatt">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+    <!-- Contact info overlay -->
+    <div class="contact-overlay" id="contactOverlay" role="dialog" aria-label="Kontakta Hylte kommun">
+      <div class="contact-header">
+        <div class="contact-header-text">
+          <div class="contact-header-title-text">Kontakta Hylte kommun</div>
+          <div class="contact-header-sub">Frågor som chatten inte kan svara på? Här når du oss direkt.</div>
+        </div>
+        <button class="contact-close-btn" onclick="closeContactOverlay()" aria-label="Stäng kontaktinformation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="contact-overlay-inner">
+        <div class="contact-section">
+          <div class="contact-section-title">Kontaktcenter</div>
+          <div class="contact-row">
+            <span class="contact-label">Telefon</span>
+            <a class="contact-value" href="tel:034518000">0345 180 00</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">E-post</span>
+            <a class="contact-value" href="mailto:kommunen@hylte.se">kommunen@hylte.se</a>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Öppettider</div>
+          <div class="contact-row">
+            <span class="contact-label">Mån–Tors</span>
+            <span class="contact-value" style="cursor:default;">10:00–16:30</span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Fredag</span>
+            <span class="contact-value" style="cursor:default;">10:00–14:00</span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Lunchstängt</span>
+            <span class="contact-value" style="cursor:default;">12:00–13:00</span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Telefon från</span>
+            <span class="contact-value" style="cursor:default;">kl 08:00</span>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Webbplats</div>
+          <div class="contact-row">
+            <span class="contact-label">Hylte.se</span>
+            <a class="contact-value" href="https://www.hylte.se" target="_blank" rel="noopener">hylte.se</a>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Besöksadress</div>
+          <div class="contact-address">Storgatan 8, 314 80 Hyltebruk</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-bar">
+      <button class="util-btn" onclick="newSession()" data-tooltip="Ny chatt" data-tooltip-align="left" aria-label="Starta en ny chatt">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M23 4v6h-6"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+      </button>
+      <button class="util-btn" onclick="showContactInfo()" data-tooltip="Kontakta en människa" data-tooltip-align="left" aria-label="Kontakta Hylte kommun direkt">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
         </svg>
       </button>
       <div class="chat-input-wrap">
-        <input type="text" id="chatInput" placeholder="Skriv din fråga här..." maxlength="1000" oninput="updateCharCount()" onkeydown="if(event.key==='Enter')sendMessage()">
-        <span class="char-counter" id="charCounter">0 / 1000</span>
+        <input type="text" id="chatInput" placeholder="Skriv din fråga..." maxlength="1000" oninput="updateCharCount()" onkeydown="if(event.key==='Enter')sendMessage()" aria-label="Skriv din fråga till HylteGPT">
+        <button class="send-btn-inline" onclick="sendMessage()" aria-label="Skicka meddelande" id="sendBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+        <span class="char-counter" id="charCounter" aria-live="polite">0 / 1000</span>
       </div>
-      <button class="send-btn" onclick="sendMessage()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="22" y1="2" x2="11" y2="13"/>
-          <polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>
-      </button>
     </div>
   </div>
 </div>
 
 <script>
-  const chatWindow  = document.getElementById('chatWindow');
-  const chatToggle  = document.getElementById('chatToggle');
-  const chatBody    = document.getElementById('chatBody');
-  const chatMessages= document.getElementById('chatMessages');
-  const chatInput   = document.getElementById('chatInput');
+  const chatWindow   = document.getElementById('chatWindow');
+  const chatToggle   = document.getElementById('chatToggle');
+  const chatBody     = document.getElementById('chatBody');
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput    = document.getElementById('chatInput');
   const rateLimitToast = document.getElementById('rateLimitToast');
+  const actionsMenu    = document.getElementById('actionsMenu');
 
-  /* ══════════════════════════════════════════
-     RATE LIMITING — max 2 messages per 10 seconds
-  ══════════════════════════════════════════ */
+  /* ────────────────────────────────────────
+     RATE LIMITING – max 2 meddelanden per 10 sek
+  ──────────────────────────────────────── */
   const messageTimes = [];
   const RATE_LIMIT_COUNT = 2;
-  const RATE_LIMIT_WINDOW = 10000; // 10 seconds in ms
+  const RATE_LIMIT_WINDOW = 10000;
   let rateLimitTimeout = null;
 
   function isRateLimited() {
     const now = Date.now();
-    // Remove timestamps older than the window
     while (messageTimes.length > 0 && now - messageTimes[0] > RATE_LIMIT_WINDOW) {
       messageTimes.shift();
     }
     return messageTimes.length >= RATE_LIMIT_COUNT;
   }
-
-  function recordMessage() {
-    messageTimes.push(Date.now());
-  }
-
+  function recordMessage() { messageTimes.push(Date.now()); }
   function showRateLimitToast() {
     rateLimitToast.classList.add('show');
     if (rateLimitTimeout) clearTimeout(rateLimitTimeout);
     rateLimitTimeout = setTimeout(() => {
       rateLimitToast.classList.remove('show');
-    }, 4000);
+    }, 3500);
   }
 
-  /* ══════════════════════════════════════════
-     STAR RATING SVG HELPER
-  ══════════════════════════════════════════ */
-  const starFilledSVG = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>`;
-  const starEmptySVG  = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14l-5-4.87 6.91-1.01L12 2z"/></svg>`;
+  /* ────────────────────────────────────────
+     ACTIONS MENU
+  ──────────────────────────────────────── */
+  function toggleActionsMenu(e) {
+    if (e) e.stopPropagation();
+    actionsMenu.classList.toggle('open');
+  }
+  function closeActionsMenu() {
+    actionsMenu.classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!actionsMenu.contains(e.target) && e.target.closest('#menuBtn') === null) {
+      closeActionsMenu();
+    }
+  });
 
-  function createStarRating(msgId) {
+  /* ────────────────────────────────────────
+     STAR RATING FEEDBACK
+  ──────────────────────────────────────── */
+  function createFeedback(interactionId) {
     const container = document.createElement('div');
-    container.className = 'star-rating';
-    container.dataset.rating = '0';
+    container.className = 'msg-feedback';
     container.dataset.locked = 'false';
-    container.dataset.msgId = msgId;
+    container.dataset.interactionId = interactionId || '';
+
+    const starOutline = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    const starFilled = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+    const stars = [];
+
+    const setHover = (upToIndex) => {
+      stars.forEach((s, i) => {
+        s.classList.toggle('hovered', i <= upToIndex);
+        s.classList.toggle('filled', false);
+      });
+    };
+
+    const clearHover = () => {
+      stars.forEach(s => s.classList.remove('hovered'));
+    };
 
     for (let i = 1; i <= 5; i++) {
       const btn = document.createElement('button');
       btn.className = 'star-btn';
-      btn.dataset.value = i;
-      btn.innerHTML = starEmptySVG;
-      btn.title = i + ' av 5 stjärnor';
+      btn.setAttribute('aria-label', `Ge ${i} stjärn${i === 1 ? 'a' : 'or'}`);
+      btn.setAttribute('type', 'button');
+      btn.innerHTML = starOutline;
 
-      btn.addEventListener('click', function() {
-        // If already rated, ignore further clicks
+      btn.addEventListener('mouseenter', () => {
         if (container.dataset.locked === 'true') return;
-
-        const rating = parseInt(this.dataset.value);
-        container.dataset.rating = rating;
-        container.dataset.locked = 'true'; // Lock after first rating
-
-        // Update all stars
-        const stars = container.querySelectorAll('.star-btn');
-        stars.forEach((s, idx) => {
-          if (idx < rating) {
-            s.classList.add('active');
-            s.innerHTML = starFilledSVG;
-          } else {
-            s.classList.remove('active');
-            s.innerHTML = starEmptySVG;
-          }
-          // Disable hover cursor on locked stars
-          s.style.cursor = 'default';
-        });
-
-        // Optional: send rating to backend
-        console.log('Rating for message ' + msgId + ': ' + rating + ' stars');
+        setHover(i - 1);
       });
 
-      // Hover preview (only when not locked)
-      btn.addEventListener('mouseenter', function() {
+      btn.addEventListener('mouseleave', () => {
         if (container.dataset.locked === 'true') return;
-        const hoverVal = parseInt(this.dataset.value);
-        const stars = container.querySelectorAll('.star-btn');
-        stars.forEach((s, idx) => {
-          if (idx < hoverVal) {
-            s.classList.add('active');
-            s.innerHTML = starFilledSVG;
-          } else {
-            s.classList.remove('active');
-            s.innerHTML = starEmptySVG;
-          }
-        });
+        clearHover();
       });
 
-      container.addEventListener('mouseleave', function() {
+      btn.addEventListener('click', async function() {
         if (container.dataset.locked === 'true') return;
-        const currentRating = parseInt(container.dataset.rating);
-        const stars = container.querySelectorAll('.star-btn');
+        const currentInteractionId = container.dataset.interactionId;
+        if (!currentInteractionId) return;
+
+        container.dataset.locked = 'true';
+        clearHover();
+
         stars.forEach((s, idx) => {
-          if (idx < currentRating) {
-            s.classList.add('active');
-            s.innerHTML = starFilledSVG;
-          } else {
-            s.classList.remove('active');
-            s.innerHTML = starEmptySVG;
+          s.classList.add('locked');
+          if (idx < i) {
+            s.classList.add('filled');
+            s.innerHTML = starFilled;
           }
+          if (idx === i - 1) s.classList.add('pop');
         });
+
+        const thanks = document.createElement('span');
+        thanks.className = 'feedback-thanks';
+        thanks.textContent = 'Tack för din feedback';
+        container.appendChild(thanks);
+
+        try {
+          await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'rating',
+              interactionId: currentInteractionId,
+              sessionId: ensureSessionId(),
+              rating: i,
+              feedback: i >= 4 ? 'up' : i <= 2 ? 'down' : 'neutral'
+            })
+          });
+        } catch (err) {
+          console.error('Feedback webhook error:', err);
+        }
       });
 
+      stars.push(btn);
       container.appendChild(btn);
     }
+
+    setTimeout(() => container.classList.add('visible'), 50);
     return container;
   }
 
-  /* ══════════════════════════════════════════
+  /* ────────────────────────────────────────
      CORE CHAT FUNCTIONS
-  ══════════════════════════════════════════ */
+  ──────────────────────────────────────── */
   function openChat() {
     chatWindow.classList.add('open');
     chatToggle.classList.add('hidden');
+
     if (chatMessages.children.length === 0) {
-      sessionId = generateSessionId();
+      ensureSessionId();
       setTimeout(() => {
-        addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?', false);
-      }, 400);
+        addMessage('bot', 'Hej! Jag är Hylte kommuns AI-assistent. Vad kan jag hjälpa dig med idag?', false);
+      }, 650);
     }
-    chatInput.focus();
+    setTimeout(() => chatInput.focus(), 700);
   }
 
   function minimizeChat() {
+    const contactOverlay = document.getElementById('contactOverlay');
+    if (contactOverlay && contactOverlay.classList.contains('visible')) {
+      contactOverlay.classList.remove('visible');
+    }
     chatWindow.classList.remove('open');
     chatToggle.classList.remove('hidden');
+    closeActionsMenu();
   }
 
   function closeChat() {
     chatWindow.classList.remove('open');
     chatToggle.classList.remove('hidden');
-    chatMessages.innerHTML = '';
-    chatInput.disabled = false;
-    sessionId = '';
-    // Reset rate limiter
-    messageTimes.length = 0;
+    closeActionsMenu();
+    document.getElementById('contactOverlay').classList.remove('visible');
+
+    setTimeout(() => {
+      chatMessages.innerHTML = '';
+      chatInput.disabled = false;
+      sessionId = '';
+      localStorage.removeItem('hylte_chat_session_id');
+      messageTimes.length = 0;
+    }, 400);
   }
 
   function newSession() {
-    chatMessages.innerHTML = '';
-    chatInput.disabled = false;
-    sessionId = generateSessionId();
-    // Reset rate limiter
-    messageTimes.length = 0;
+    const existingMessages = chatMessages.querySelectorAll('.msg');
+    existingMessages.forEach(msg => msg.classList.add('fading-out'));
+    document.getElementById('contactOverlay').classList.remove('visible');
+    closeActionsMenu();
+
     setTimeout(() => {
-      addMessage('bot', 'Hejsan! Vad kan jag hjälpa till med?', false);
-    }, 200);
-    chatInput.focus();
+      chatMessages.innerHTML = '';
+      chatInput.disabled = false;
+      sessionId = generateSessionId();
+      localStorage.setItem('hylte_chat_session_id', sessionId);
+      messageTimes.length = 0;
+
+      setTimeout(() => {
+        addMessage('bot', 'Chatten har startats om. Vad kan jag hjälpa dig med?', false);
+      }, 80);
+      chatInput.focus();
+    }, 240);
   }
 
   function downloadChat() {
@@ -745,25 +1425,19 @@
 
     const now = new Date();
     const dateStr = now.toLocaleString('sv-SE');
-    let text = 'HylteGPT — Konversation\n';
+    let text = 'HylteGPT – Konversation\n';
+    text += 'Hylte kommun\n';
     text += 'Datum: ' + dateStr + '\n';
-    text += '═'.repeat(50) + '\n\n';
+    text += '─'.repeat(50) + '\n\n';
 
     messages.forEach(msg => {
       if (msg.id === 'typingIndicator') return;
       const isBot = msg.classList.contains('bot');
-      const sender = isBot ? 'HylteGPT' : 'Du';
+      const isHuman = msg.classList.contains('human');
+      const sender = isBot ? 'HylteGPT (AI)' : isHuman ? 'Kundservice' : 'Du';
       const bubble = msg.querySelector('.msg-bubble');
       if (!bubble) return;
       let content = bubble.innerText || bubble.textContent;
-      // Include star rating if present
-      const starContainer = msg.querySelector('.star-rating');
-      if (starContainer) {
-        const rating = starContainer.dataset.rating;
-        if (rating && parseInt(rating) > 0) {
-          content += '\n[Betyg: ' + '★'.repeat(parseInt(rating)) + '☆'.repeat(5 - parseInt(rating)) + ']';
-        }
-      }
       text += sender + ':\n' + content + '\n\n';
     });
 
@@ -771,7 +1445,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'HylteGPT_chatt_' + now.toISOString().slice(0,10) + '.txt';
+    a.download = 'hyltegpt_' + now.toISOString().slice(0,10) + '.txt';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -780,19 +1454,11 @@
 
   function formatMessage(text) {
     let formatted = text;
-
-    // Bold: **text** or __text__
     formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
-
-    // Italic: *text* or _text_
     formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
     formatted = formatted.replace(/_(.+?)_/g, '<em>$1</em>');
-
-    // Markdown links: [text](url)
-    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" class="chat-link">$1</a>');
-
-    // Plain URLs (not already in an <a> tag)
+    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="chat-link">$1</a>');
     formatted = formatted.replace(/(?<!href="|">)(https?:\/\/[^\s<>"]+)/g, function(url) {
       let title = url;
       try {
@@ -811,19 +1477,12 @@
         } else {
           title = urlObj.hostname.replace('www.', '');
         }
-      } catch(e) {
-        title = 'Läs mer';
-      }
-      return '<a href="' + url + '" target="_blank" class="chat-link">' + title + '</a>';
+      } catch(e) { title = 'Läs mer'; }
+      return '<a href="' + url + '" target="_blank" rel="noopener" class="chat-link">' + title + '</a>';
     });
-
-    // Bullet lists: lines starting with - or •
     formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
     formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
-
-    // Line breaks
     formatted = formatted.replace(/\n/g, '<br>');
-
     return formatted;
   }
 
@@ -835,61 +1494,77 @@
     const counter = document.getElementById('charCounter');
     const len = chatInput.value.length;
     counter.textContent = len + ' / 1000';
-    counter.classList.remove('warning', 'limit');
-    if (len >= 1000) counter.classList.add('limit');
-    else if (len >= 800) counter.classList.add('warning');
+    counter.classList.remove('warning', 'limit', 'visible');
+    if (len >= 1000) counter.classList.add('limit', 'visible');
+    else if (len >= 800) counter.classList.add('warning', 'visible');
+    else if (len >= 700) counter.classList.add('visible');
   }
 
   let botMsgCounter = 0;
 
-  function addMessage(type, text, showStars) {
-    // showStars defaults to true for bot messages, false for user
-    if (showStars === undefined) showStars = (type === 'bot');
+  function addMessage(type, text, showFeedback, interactionId = null) {
+    if (showFeedback === undefined) showFeedback = (type === 'bot');
 
     const msg = document.createElement('div');
     msg.className = 'msg ' + type;
     const time = getTimeStr();
+    const formattedText = (type === 'bot' || type === 'human') ? formatMessage(text) : text;
 
-    const formattedText = type === 'bot' ? formatMessage(text) : text;
+    let avatarHTML;
+    if (type === 'bot') {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">
+        <img src="data:image/png;base64,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" alt="Hylte kommun logotyp">
+      </div>`;
+    } else if (type === 'human') {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>`;
+    } else {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">DU</div>`;
+    }
 
     if (type === 'bot') {
       botMsgCounter++;
-      const msgId = 'bot-msg-' + botMsgCounter;
-      msg.id = msgId;
+      msg.id = 'bot-msg-' + botMsgCounter;
       msg.innerHTML = `
-        <div class="msg-avatar"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAABR1BMVEX///8Ad771m0npUR37ugcAcLsAdb0AcrwAarkAbbr7uAD7tgAAc7z7+/3j6vQffcC3zuY+hsSux+Klwd9Tk8rF1uroRADt8vhdl8z1ljvN3e31mUNNjsf19/voQADW4u/pTRP+9OT3y8N4pdL/+vT2qWr64Nz41M6XuNtAiMVpnc4AZrf97OH87Or7vzT72cL849PqXTT+7dPtgGf1nU/+6cf3tYH8ymT99fSQs9j0t6rxopL81o794rT8znbxm4n5yqj607j4u4792p32o1z7wkfra0r3rnPrYhv5yKT936rpVifvkHz2wrn8x1f0ki/viXP8zW/scFLypY/1mRHqUwDtahrvdxjyiRX4qQj815La09WDiqWaiJG9j3zdlWNcfq3MplX4rjrQk250a5NOe669oZyLn7/wfxfEuJ2Nk4/DpWfYYlJx7l3/AAAPiUlEQVR4nO1c6X/aRhoGG90CIUDcWDjCDuCjjmMn4NiOncRJHadOm832SNvttd3udvf//7wzGkmMZkYC20hq8pvnS2IQaB7ed957lMtxcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHyUuHcEsJn1KpLD0epaHWDtTdYLSQibL+urCPWHxawXkwSO6v1VH/VPUYpP1lYx1O9nvZ6l402I4Gr/YdYLWjaehgmurq59Ygb1SZ0guFp/mvWaFsXg8MPp6fHJeuxFX1AEV/sPUlrgHTE4VTUVQFOv96Ov2uxTBIGa7qS3zNvjRFMLHlTtOPKyByyG9S9SXOhtcawVMGjXEZe9oXV0wY042d4eLHXFN8TrEEFA8SvmZYxNuIi/2D571Xrbar3dOE9g6YthXS0Q0E4Yl+1csXQU4CrmuwfnG61WZwWi09rISo6nFEN1l7GWL9kiBKYm8psHZwcePcRxI0EWMVgn+UEhHlKX3YsiGG1Mzw9aKyG0PkuWSgRONJqhekpeNWHaUcSQHdXsbRD8MhPiMaWkgOEFeRUdzMQzHDzD9TOgmMlOfMxiSG7EnWiCq/V79JfukQrqqeleOpzCYDEsFAiGX0bqKJPhJUuAmW3ErxaQ4SaZUcQynNA70Gd4lhotDM9ZluZx+JqXMSKkGO512ALMjOE+g6H2PHTJ/TgRkgzPowSYmZbmLmg1VcNJ1Ls4ERIMn8UQ/Os4RC3sDu8zDGm9fvVgFZWk8FLN4FUcwZXOdsrcPJDWlLQztAjrV0/v70x2jtwwAPOHgxeRWxAxnKTNzVvXboiiWggnwZQI+/WnXqA2eVjHo7btg3iCKwep8sIwuNCiCeYeEiLsX83UcgLku+YLZi7BzrP0OJF4rqEsX1W1U8LZk6WL+sud8Lt+brG3ModgVoYGYfD6WtU07eKYKkU9DStp/d2EfBv9Zz7BlVamiX4UJldhFX1HvL/Tf+n+G+PnAyV9kf7yF8BRSISM2uE7t4qxAMGVzmXqq18EoYCt36fN/RFszmxHhNphJc3IG4I9uH94cnK4v87aJWFXscbow2weLWBFs1RSYGI0D+rFKVXzfoOLsH7E+ob7uQGTYKfVWjnACjXZhN25k91ZMRj6Cu3i9BCT5U5oE0bVDRmRTKd18Oh8b3uwvffMt7GtTAKa5xoZdgOWuzOSuJ3pX0WUnDYogp3WxnnAZxv9AJ1HKfChcMjInBBJzy/iIWlU+Z7KJjqtV6FqxQSJMJMKRoFZwYAkNfX6MFyeidLRS5Jg6wXJBaaM2dTZWIVEjOTu67/hqS9bRz9rkQI8oy+CvDMp6tPVbkJb1fefx9vR3DaxB1uvWE7vUWfl4C9TSCThcfRiMxKEn+i8PWNedtnKyFXEMQQCxDmyiqIAr8IEDyKilvNWNiJklrvdHQj25y7AjGOEmQlbmVakP/gsQraJg2lpVO3i+b7rK3b+/vU3376HdAvvmSIMWRmmifFwvpJR3jRglUoLQd/Jc/eff/Ptd2rhNf3xkJXprMT4u8uzBFa/EOiNqGL1/Jm7X9s7PH1MddzwYK3zIi5xuMws9aWrwVjnsBg4Q3cXDg5PwuvEY5k5/d3Nkm1Vhs64Vusi1MZOtWw3EiEVBlUNVmfvzXqizP4Zvglbj6IINuzKtGkaeQFAknRdRNAlSRIEozu1kh5uJANTFZvDCBInqnIBMengBFnf3bCGTSMvCRKklWdBFCXBmCYsSWIn4s3foEDDyntxT9iii4R2dWyIgqDn2dRwCHo1OXoA61oUwyDqZoYzWP+FJGgPa1AlI+TGkKQyTpRieJgGa6sFqSEra5pESLBRGSuKoC9KzoPiJErxGtdTrIE/a/syPjTTUYygPRzJgnQzch5FO0mG66EkUQte97dh/Qn9mZmO+kam2HZMRbih7AII5SQZhmM3zW9aBMX8Ou0qBgdhgkUb0JNuSw8yrCTKMHeK92U+eC/6U2ysmPuZr6OdV8APloajaHqu84OI8hipMMS3olrwXvPbFWt0zL3n62jnxaBXrkkM5XR9ugCMjmGOuk2I0cgQFOAbmQwVK2GGA2wr+mrq1br7D+gaoF9b6xx8PzUEcs2iLgiKPmqCsKxdavSKRRS1FIu9hl2eAkfC+D30UsIMca/o+Qu/IdOnp0fPfBG2fhAFkpyijMZDq9SLDMYaFVMhOUrJegsXWPSmubmhb2joeGYSWJkfcXGIkiKbTtXuzb9Zhdi1KYgwhxtUJETP0PRfUsLwU4rWP5RgiYIigyB6AXIIdlhTlaTtDMJscMhNoDxDQzvD7bfeJvzJIwi2nTlt3+xmVVy7hRR01EUw7O3GNV7znnaGXjTTOXAtpiQZTnlh2QVoYAyFZKNSHAFF7XmuiMZJ6aA7EOHPki6I3eHtwq2ikAVBrECs7u9cRSip5ylaP8pGs3JrAzGTYcJ5BQmfonrhNUapk2nftzwrUyvfJXEd+gyF4V3We1M0huYvvhR/7bPcvT36CTXKNu6Wl/cMz0jlk45lQncdgqhqHOzFb12GX4aumEo/e57ijg15x02xRKWWhh/00BvmBVFoFmfm5hsy97UMQfjNFeFd20jIV+ipaijklxdq0LsHfvHrcENtKujK70tp5pZhSCMq3RQFWMnDeyKCs7KG+jk+PNMEAWf5suN6wrnlXTsuoXUJSonnSxiA9sEYSh/5Lxx6vX0N+IpGyXbRFcxyceImvnOH0xpOHMEhiLt1xUnvDHipKbsxom7MIpN9L5n67p9bW1uyAqGD2HPrB2hnOr9VrbjwuuGMYtSvOFbABkzRwhSHfnon4jdd30WKemFVnS6sV7vJgIRcBTA4iqx3x8Myg2jDibUfNkgnpW6KLsIyA88bvuved57nh1uu0a44IwPYGRTMIEsvSoCoNBpXrcZM4UrOVpx4ikNFENLk13OCVJT84TfrHsVr36r07PK/4ETFT3hWAGsVigBoutK0HVmM24G2KQvNNF18OxBgXu8S722urb4nKKKsovWHoUhEwReIUzGa06aQn8buT1kaJ1oWJTGcZaGiRKoWPCPzb0Rx1590G0AdvQTCrDbzdG1Nl/S8ER2Kgw2fn6boAMEv2sTSbNo4uI21r90+fkARdtO8SfReezqSqRIUMLeS6TAz/Up+dIss8i6wDaz4LhqUc4IM+w9zj7XCbLL9WSfkCkvVGoukJBhjsidYMZ1UxQdghXYSw77D5Anmhu5gn4qOBW90yMGtRqXGqPKKIDMeYwalEhsAJANLDheC6B8Y7kN3ggY5f+2D222iZu96VQMWMiiagKSOdl3PqqSrnS4sObycER1BQYbooMjgGmqq9hWccyYibqspg3xEn051VpFXkrtAdpk8oMcOE8zrTfoaWC31j1E8h8NR2vVlJzSmXZrmQSgHDCTMhSsj0oO4JJX8MI1ZBBINUqlYDHeusOb9/q4Gh8B+nTUKG9WuIoiiYAx9FWyPRUZzBmhw6jYml+tSfQaTVqXJgz6W3w9OXYPjnUlsVJoSbNArZhXfYiWHzVFIm2NFoFahMMq5L/uhMtsJNDjwvBCgJ8ImtgSyRfKHKTnMzhLgmKauFg3G78wwNQ/74e79AJ4W1i7+cHv0QDBNZpG7NJZZ7kPKD9OzOBYtQvArNymL/qROFBJL/4FiVP+UwfYTo+MvkE4zbiAKZmoR95Q5SCAZ5ALu1bFnQZTKjplXfv8Fxqn/FcxYD4clLGGOaWX1lJ0JfuRKaLNs9pGzKFnDJkjK4XCMKPwJxIhSxjhYOvMegpFOYtGN7LfDDlKljVqbxV7p3f8qU8eA02i+pxOlLeNYU7HpzAiUDCZFMZ0mmhMz7gLzPEVGAEmggA/+wDjMAUJYv9ZUjXosCIFihKbI0xQYllmGYB6gcan5zuFwV9Mu4p8IluuZbFVJePbJRTHi3jH0YBOtim/S1wVNZT2ECIMdMfelpFDmtm40twTo5btV0jcMjgvUaWECbJsNdnsKXqPKtObM5UhKVI9w/VjbjdXUUsR+Z4WIS0dFYdsBgp2gmI4VHW6tH6uM2fYAxajxxFSq+TY90BJmpwuyMa6W5vzagw8fojW1F8WQKuslg0rUnB0UnWzOZ4cwiGYYabNFI6Wcv+3kZa9Yn59NoQHRDWM0c3H0GAG+h7QY5mC0OR2PDNe/62ZtPK1aS0vkGmbkVhfNZd0kQxSHMR4p3dGERGA7rGlMH3oa3uIOKFlWO3rssNiwq2NGwR+DZKRftrkhGta0Nho1HWdYLZfbCLZVLg+nTs2cN6UvKs0sam83R6M9bBqK1xx2AY9X6HOOIIAIyUy/+H17FGFqbEqKe+Qnlhmipyv5ZuJHnJaPYqNdmTZHEhSiHsFU1HXw/si505BYxij2SlZl6jS7hiJ7KosA/i8LZtOpthsfn/SYKAKudrtdriBY7Ri7y8HBwcHBwcHBwcERoGeHxu3spRQa04S15ZYSg9bsGP69VUN/2NOxKSsy1g4rGm491WNpwo9uEYeWvG8MY6sa8eZW4r02VJeeHTJuwiKnX8+cyu6piPxMbGV43lCS0XrRTIdeY30jAf+sPTXnIiT7PIzcHIZe1VoI2rbFEXxBFJDe3oCh7Gk6xVBKvLEfy9A/XhYU4V0R5iWP8eIMRf8cB8kwhUZbPMMeevBKoEpub16UvL8iGCro+ToeBReBFngMBb9AJyff8o5n6J2/Ek0kRMsVYVCTZzNso0ckoU66aKK/fF1EDIWK7SN5yzyHYc4TImpp1tw3dV+x2AxDX0waEsSQNUSXGOYx9IUI/2+HRRjP0PpYGHpCVKC1b0ruxgpswyfCEJlPsZvLlWRizZ8IwxzyiSDqcUep8Ab1p8IQGVDJybmjDfiSPxWGORTHGG33SrwD/zEx1KdeFb6C6IQYIiGK7juh/vStGYqjGkIax4C9GEv3OylinmKI3CCyqaEhilszzKNnKum6nML8FzNOJhi2gye0hEcMbs8w+L6/CENPiKQIl8Aw8UdD5SgtlVhamrMFlgjvwNC/XXpaqjtVDyZtaQDGaCcSo0y3Zji7XQqzUQt4CwBbYojwo/IW8xiW8qS3h+AMOcN0wBkicIYMcIap4e4MQSyHIaidxTEUyo2Sj6UzIrEMhjNgD7iJjdqkAMnHbUtmODswvVDk7ZW4EsVyGUqzg2kLMkz48cg5vwaPMZTgM38phiIszzMYEsCyIfTFNEPyEynI0F1IYNzG8GnGswdieSi5DQjqMI9JLDeP9eHa6IsJAmXRCCP5B+4VCYuGjBzVTUBXkX2imUX00Jj/ERLLo8LBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcGRMv4PzYSSa/dbFWwAAAAASUVORK5CYII=" alt="Hylte" style="width:100%;height:100%;object-fit:contain;border-radius:50%;background:#fff;"></div>
+        ${avatarHTML}
         <div class="msg-content">
-          <span class="msg-name">HylteGPT</span>
           <div class="msg-bubble">${formattedText}</div>
           <span class="msg-time">${time}</span>
         </div>`;
-      
-      // Add star rating only if showStars is true (not for welcome message)
-      if (showStars) {
+
+      if (showFeedback) {
         const contentDiv = msg.querySelector('.msg-content');
-        const starRating = createStarRating(msgId);
-        contentDiv.appendChild(starRating);
+        contentDiv.appendChild(createFeedback(interactionId));
       }
+    } else if (type === 'human') {
+      msg.innerHTML = `
+        ${avatarHTML}
+        <div class="msg-content">
+          <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">Kundservice · ${time}</span>
+        </div>`;
     } else {
       msg.innerHTML = `
-        <div class="msg-avatar">DU</div>
+        ${avatarHTML}
         <div class="msg-content">
-          <span class="msg-name">Du</span>
           <div class="msg-bubble">${formattedText}</div>
           <span class="msg-time">${time}</span>
         </div>`;
     }
     chatMessages.appendChild(msg);
 
-    /* ── SCROLL BEHAVIOR ──
-       For bot messages: scroll so the TOP of the new message is visible
-       For user messages: scroll to bottom as before
-    */
-    if (type === 'bot') {
-      // Use requestAnimationFrame to ensure DOM has rendered
+    if (type === 'bot' || type === 'human') {
       requestAnimationFrame(() => {
-        // Scroll the message element into view at the top of the container
-        msg.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const msgRect = msg.getBoundingClientRect();
+        const containerRect = chatMessages.getBoundingClientRect();
+        const delta = msgRect.top - containerRect.top;
+        const maxScroll = chatMessages.scrollHeight - chatMessages.clientHeight;
+        const target = Math.min(Math.max(0, chatMessages.scrollTop + delta), maxScroll);
+        chatMessages.scrollTo({ top: target, behavior: 'smooth' });
       });
     } else {
       chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -901,10 +1576,12 @@
     el.className = 'msg bot';
     el.id = 'typingIndicator';
     el.innerHTML = `
-      <div class="msg-avatar"><img src="data:image/png;base64,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" alt="Hylte" style="width:100%;height:100%;object-fit:contain;border-radius:50%;background:#fff;"></div>
+      <div class="msg-avatar" aria-hidden="true">
+        <img src="data:image/png;base64,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" alt="Hylte kommun logotyp">
+      </div>
       <div class="msg-content">
         <div class="msg-bubble">
-          <div class="typing-indicator"><span></span><span></span><span></span></div>
+          <div class="typing-indicator" aria-label="AI-assistenten skriver"><span></span><span></span><span></span></div>
         </div>
       </div>`;
     chatMessages.appendChild(el);
@@ -916,58 +1593,81 @@
     if (el) el.remove();
   }
 
+  function showContactInfo() {
+    const overlay = document.getElementById('contactOverlay');
+    overlay.classList.add('visible');
+    const inner = overlay.querySelector('.contact-overlay-inner');
+    if (inner) inner.scrollTop = 0;
+  }
+  function closeContactOverlay() {
+    document.getElementById('contactOverlay').classList.remove('visible');
+  }
+
+  /* ────────────────────────────────────────
+     SESSION + WEBHOOK
+  ──────────────────────────────────────── */
   const WEBHOOK_URL = 'https://api.halmstadchattbot.se/Hylte';
-  let sessionId = '';
+  let sessionId = localStorage.getItem('hylte_chat_session_id') || '';
 
   function generateSessionId() {
-    return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+  }
+  function generateInteractionId() {
+    return 'interaction_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+  }
+  function ensureSessionId() {
+    if (!sessionId) {
+      sessionId = generateSessionId();
+      localStorage.setItem('hylte_chat_session_id', sessionId);
+    }
+    return sessionId;
   }
 
   async function sendMessage() {
     const text = chatInput.value.trim();
     if (!text) return;
-
-    // Check rate limit BEFORE sending
-    if (isRateLimited()) {
-      showRateLimitToast();
-      return;
-    }
-
-    // Record this message timestamp
+    if (isRateLimited()) { showRateLimitToast(); return; }
     recordMessage();
 
     addMessage('user', text);
     chatInput.value = '';
     updateCharCount();
+
+    const activeSessionId = ensureSessionId();
+    const interactionId = generateInteractionId();
     chatInput.disabled = true;
-
     showTyping();
-
-    const originSessionId = sessionId;
+    const originSessionId = activeSessionId;
 
     try {
       const res = await fetch(WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, sessionId: originSessionId })
+        body: JSON.stringify({
+          type: 'message',
+          interactionId: interactionId,
+          sessionId: originSessionId,
+          message: text
+        })
       });
 
       if (sessionId !== originSessionId) return;
-
       removeTyping();
 
       if (!res.ok) throw new Error('Webhook svarade med status ' + res.status);
-
       const data = await res.json();
-
       if (sessionId !== originSessionId) return;
 
-      const reply = typeof data === 'string' ? data : (data.output || data.message || data.reply || data.response || data.text || JSON.stringify(data));
-      addMessage('bot', reply);
+      const reply =
+        data.answer || data.output || data.message ||
+        data.reply  || data.response || data.text ||
+        JSON.stringify(data);
+
+      addMessage('bot', reply, true, interactionId);
     } catch (err) {
       if (sessionId !== originSessionId) return;
       removeTyping();
-      addMessage('bot', 'Oj, något gick fel. Försök igen om en stund.');
+      addMessage('bot', 'Tyvärr gick något fel. Försök igen om en stund, eller kontakta oss direkt via menyn.', false);
       console.error('Webhook error:', err);
     } finally {
       if (sessionId === originSessionId) {
@@ -976,6 +1676,16 @@
       }
     }
   }
+
+  // Stäng meny med Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeActionsMenu();
+      if (document.getElementById('contactOverlay').classList.contains('visible')) {
+        closeContactOverlay();
+      }
+    }
+  });
 </script>
 </body>
 </html>
