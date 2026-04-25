@@ -2351,16 +2351,11 @@
   /* JönköpingGPT klick-gate: kräv 6-siffrig kod innan navigering */
   (function() {
     const ACCESS_CODE = '123456';
-    const STORAGE_KEY = 'jonkoping_chat_unlocked';
     const overlay  = document.getElementById('jkLockOverlay');
     const inputs   = Array.from(document.querySelectorAll('#jkLockInputs .jk-lock-digit'));
     const errorEl  = document.getElementById('jkLockError');
     const cancelBtn= document.getElementById('jkLockCancel');
     let pendingHref = null;
-
-    function isUnlocked() {
-      return localStorage.getItem(STORAGE_KEY) === 'true';
-    }
 
     function readCode() { return inputs.map(i => i.value).join(''); }
     function setFilled() { inputs.forEach(i => i.classList.toggle('filled', i.value.length === 1)); }
@@ -2389,7 +2384,6 @@
       const code = readCode();
       if (code.length < 6) return;
       if (code === ACCESS_CODE) {
-        localStorage.setItem(STORAGE_KEY, 'true');
         const target = pendingHref;
         closeLock();
         if (target) window.location.href = target;
@@ -2407,7 +2401,6 @@
     document.addEventListener('click', function(e) {
       const link = e.target.closest('a[href="jonkoping-chattbot.html"]');
       if (!link) return;
-      if (isUnlocked()) return; // släpp igenom utan prompt
       e.preventDefault();
       openLock(link.getAttribute('href'));
     });
