@@ -2566,7 +2566,6 @@
     }
 
     // AI-läge: anropa webhook och visa svar
-    const interactionId = generateInteractionId();
     chatInput.disabled = true;
     const sendBtn = document.getElementById('sendBtn') || document.querySelector('.send-btn-inline');
     if (sendBtn) sendBtn.disabled = true;
@@ -2575,7 +2574,6 @@
 
     const requestBody = {
       type: 'message',
-      interactionId: interactionId,
       sessionId: originSessionId,
       message: text
     };
@@ -2649,11 +2647,15 @@
     // Plocka ut svarstext robust — täcker de flesta backend-format
     const reply = extractReply(data);
 
-    if (!reply) {
+   if (!reply) {
       console.warn('[Chat] Kunde inte hitta svarstext i response:', data);
       showFriendlyFallback();
     } else {
-      addMessage('bot', reply, true, interactionId);
+      const serverInteractionId = data.interactionId || data.interaction_id || null;
+      if (!serverInteractionId) {
+        console.warn('[Chat] Backend returnerade inget interactionId — rating kommer inte fungera.');
+      }
+      addMessage('bot', reply, true, serverInteractionId);
     }
 
     resetChatInput();
