@@ -1337,145 +1337,10 @@
       transition-duration: 0.01ms !important;
     }
   }
-
-  /* ────────────────────────────────────────
-     ACCESS LOCK OVERLAY
-  ──────────────────────────────────────── */
-  .lock-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 100000;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,127,200,0.18) 0%, transparent 60%),
-      linear-gradient(160deg, #E5F2FA 0%, #F1F8FC 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    opacity: 1;
-    transition: opacity 0.45s var(--ease-spring);
-  }
-  .lock-overlay.hidden {
-    opacity: 0;
-    pointer-events: none;
-  }
-  .lock-card {
-    width: 100%;
-    max-width: 420px;
-    background: #FFFFFF;
-    border-radius: var(--radius-lg);
-    padding: 36px 32px 32px;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border);
-    text-align: center;
-  }
-  .lock-icon {
-    width: 56px;
-    height: 56px;
-    margin: 0 auto 18px;
-    background: var(--jk-light-soft);
-    color: var(--jk-blue);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .lock-title {
-    font-size: 20px;
-    font-weight: 800;
-    color: var(--jk-blue-deep);
-    letter-spacing: -0.3px;
-    margin-bottom: 8px;
-  }
-  .lock-sub {
-    font-size: 14px;
-    color: var(--text-muted);
-    margin-bottom: 24px;
-    line-height: 1.5;
-  }
-  .lock-inputs {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-    margin-bottom: 18px;
-  }
-  .lock-digit {
-    width: 44px;
-    height: 54px;
-    border: 1.5px solid var(--border-strong);
-    border-radius: var(--radius-md);
-    background: #FFFFFF;
-    font-family: inherit;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--jk-blue-deep);
-    text-align: center;
-    outline: none;
-    transition: border-color 0.2s var(--ease-standard), box-shadow 0.2s var(--ease-standard), transform 0.2s var(--ease-standard);
-    -moz-appearance: textfield;
-  }
-  .lock-digit::-webkit-outer-spin-button,
-  .lock-digit::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-  .lock-digit:focus {
-    border-color: var(--jk-blue);
-    box-shadow: var(--focus-ring);
-  }
-  .lock-digit.filled {
-    background: var(--jk-light-soft);
-    border-color: var(--jk-blue);
-  }
-  .lock-overlay.error .lock-digit {
-    border-color: #C0392B;
-    background: #FDECEA;
-    color: #C0392B;
-    animation: lock-shake 0.45s var(--ease-standard);
-  }
-  @keyframes lock-shake {
-    0%, 100% { transform: translateX(0); }
-    20%      { transform: translateX(-6px); }
-    40%      { transform: translateX(6px); }
-    60%      { transform: translateX(-4px); }
-    80%      { transform: translateX(4px); }
-  }
-  .lock-error {
-    font-size: 13px;
-    color: #C0392B;
-    min-height: 18px;
-    margin-bottom: 6px;
-  }
-  .lock-hint {
-    font-size: 12px;
-    color: var(--text-soft);
-    margin-top: 4px;
-  }
 </style>
 </head>
 <body>
 
-<!-- ──────── ACCESS LOCK ──────── -->
-<div class="lock-overlay" id="lockOverlay" role="dialog" aria-modal="true" aria-labelledby="lockTitle">
-  <div class="lock-card">
-    <div class="lock-icon" aria-hidden="true">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-      </svg>
-    </div>
-    <div class="lock-title" id="lockTitle">Skyddad åtkomst</div>
-    <div class="lock-sub">Ange den 6-siffriga koden för att öppna JönköpingGPT.</div>
-    <div class="lock-inputs" id="lockInputs">
-      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" autocomplete="one-time-code" aria-label="Siffra 1">
-      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 2">
-      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 3">
-      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 4">
-      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 5">
-      <input class="lock-digit" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Siffra 6">
-    </div>
-    <div class="lock-error" id="lockError" aria-live="polite"></div>
-  </div>
 </div>
 
 <!-- Demo-bakgrund -->
@@ -1718,109 +1583,7 @@
 </div>
 
 <script>
-  /* ────────────────────────────────────────
-     ACCESS LOCK (6-siffrig kod)
-  ──────────────────────────────────────── */
-  (function setupLock() {
-    const ACCESS_CODE = '123456';
-    const STORAGE_KEY = 'jonkoping_chat_unlocked';
-    const overlay = document.getElementById('lockOverlay');
-    const inputs  = Array.from(document.querySelectorAll('#lockInputs .lock-digit'));
-    const errorEl = document.getElementById('lockError');
-
-    // Redan upplåst i denna webbläsare → göm direkt och hoppa över setup.
-    if (localStorage.getItem(STORAGE_KEY) === 'true') {
-      overlay.remove();
-      return;
-    }
-
-    // Hindra scroll bakom overlayen
-    document.documentElement.style.overflow = 'hidden';
-    setTimeout(() => inputs[0].focus(), 50);
-
-    function readCode() {
-      return inputs.map(i => i.value).join('');
-    }
-
-    function setFilledStates() {
-      inputs.forEach(i => i.classList.toggle('filled', i.value.length === 1));
-    }
-
-    function clearError() {
-      overlay.classList.remove('error');
-      errorEl.textContent = '';
-    }
-
-    function showError(msg) {
-      overlay.classList.add('error');
-      errorEl.textContent = msg;
-    }
-
-    function attemptUnlock() {
-      const code = readCode();
-      if (code.length < 6) return;
-      if (code === ACCESS_CODE) {
-        localStorage.setItem(STORAGE_KEY, 'true');
-        overlay.classList.add('hidden');
-        document.documentElement.style.overflow = '';
-        setTimeout(() => overlay.remove(), 500);
-      } else {
-        showError('Fel kod. Försök igen.');
-        // Återställ utan att flytta fokus förrän shake-animationen är klar
-        setTimeout(() => {
-          inputs.forEach(i => { i.value = ''; i.classList.remove('filled'); });
-          clearError();
-          inputs[0].focus();
-        }, 500);
-      }
-    }
-
-    inputs.forEach((input, idx) => {
-      input.addEventListener('input', (e) => {
-        // Tillåt bara siffror
-        const digit = e.target.value.replace(/\D/g, '').slice(-1);
-        e.target.value = digit;
-        setFilledStates();
-        clearError();
-
-        if (digit && idx < inputs.length - 1) {
-          inputs[idx + 1].focus();
-        }
-        if (readCode().length === 6) {
-          attemptUnlock();
-        }
-      });
-
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Backspace' && !input.value && idx > 0) {
-          inputs[idx - 1].focus();
-          inputs[idx - 1].value = '';
-          setFilledStates();
-        } else if (e.key === 'ArrowLeft' && idx > 0) {
-          inputs[idx - 1].focus();
-        } else if (e.key === 'ArrowRight' && idx < inputs.length - 1) {
-          inputs[idx + 1].focus();
-        } else if (e.key === 'Enter') {
-          attemptUnlock();
-        }
-      });
-
-      input.addEventListener('paste', (e) => {
-        e.preventDefault();
-        const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
-        if (!pasted) return;
-        pasted.split('').forEach((ch, i) => {
-          if (inputs[i]) inputs[i].value = ch;
-        });
-        setFilledStates();
-        const nextEmpty = inputs.findIndex(i => !i.value);
-        (nextEmpty === -1 ? inputs[inputs.length - 1] : inputs[nextEmpty]).focus();
-        if (readCode().length === 6) attemptUnlock();
-      });
-    });
-  })();
-
-  /* ────────────────────────────────────────
+/* ────────────────────────────────────────
      KONSTANTER OCH LOGOTYP
   ──────────────────────────────────────── */
   // Jönköpings kommuns logotyp (bas64, PNG) – en gång definierad, återanvänd
@@ -2095,7 +1858,7 @@
       // Vänta tills öppnings-animationen är klar innan välkomstmeddelandet läggs till,
       // så att DOM-mutationer inte stör window-animationen.
       setTimeout(() => {
-        addMessage('bot', 'Hej! Jag är JönköpingGPTs AI-assistent. Vad kan jag hjälpa dig med idag?', false);
+        addMessage('bot', 'Hej! Jag är Jönköpings AI-assistent. Vad kan jag hjälpa dig med idag?', false);
       }, 650);
     }
     setTimeout(() => chatInput.focus(), 700);
