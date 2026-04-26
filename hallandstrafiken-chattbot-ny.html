@@ -2379,14 +2379,12 @@
     }
 
     // AI-läge: anropa webhook och visa svar
-    const interactionId = generateInteractionId();
     chatInput.disabled = true;
     showTyping();
     const originSessionId = activeSessionId;
 
     const requestBody = {
       type: 'message',
-      interactionId: interactionId,
       sessionId: originSessionId,
       message: text
     };
@@ -2464,7 +2462,11 @@
       console.warn('[Chat] Kunde inte hitta svarstext i response:', data);
       showFriendlyFallback();
     } else {
-      addMessage('bot', reply, true, interactionId);
+      const serverInteractionId = data.interactionId || data.interaction_id || null;
+      if (!serverInteractionId) {
+        console.warn('[Chat] Backend returnerade inget interactionId — rating kommer inte fungera.');
+      }
+      addMessage('bot', reply, true, serverInteractionId);
     }
 
     resetChatInput();
