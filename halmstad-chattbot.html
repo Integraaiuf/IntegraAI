@@ -65,23 +65,35 @@
 
   /* ── Demo sida ── */
   .demo-page {
+    min-height: 100vh;
+    max-width: none;
+    margin: 0;
     padding: 60px 40px;
-    max-width: 800px;
-    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+
+    background:
+      linear-gradient(rgba(10, 46, 77, 0.34), rgba(10, 46, 77, 0.34)),
+      url("./Halmstad-bakgrundsbild.png") center center / cover no-repeat;
   }
   .demo-page h1 {
     font-size: 44px;
-    color: var(--ht-blue-deep);
+    color: #FFFFFF;
     margin-bottom: 18px;
     font-weight: 800;
     letter-spacing: -0.8px;
     line-height: 1.1;
+    text-shadow: 0 4px 18px rgba(0,0,0,0.45);
   }
   .demo-page p {
-    color: var(--ht-blue-deep);
+    color: #FFFFFF;
     line-height: 1.6;
     font-size: 17px;
     max-width: 560px;
+    text-shadow: 0 3px 14px rgba(0,0,0,0.45);
   }
 
   /* ────────────────────────────────────────
