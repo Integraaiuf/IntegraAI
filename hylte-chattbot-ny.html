@@ -1646,7 +1646,6 @@
     updateCharCount();
 
     const activeSessionId = ensureSessionId();
-    const interactionId = generateInteractionId();
     chatInput.disabled = true;
     showTyping();
     const originSessionId = activeSessionId;
@@ -1657,7 +1656,6 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'message',
-          interactionId: interactionId,
           sessionId: originSessionId,
           message: text
         })
@@ -1667,15 +1665,23 @@
       removeTyping();
 
       if (!res.ok) throw new Error('Webhook svarade med status ' + res.status);
-      const data = await res.json();
+      let data = await res.json();
       if (sessionId !== originSessionId) return;
+
+      if (Array.isArray(data)) {
+        data = data[0] ?? {};
+      }
 
       const reply =
         data.answer || data.output || data.message ||
         data.reply  || data.response || data.text ||
         JSON.stringify(data);
 
-      addMessage('bot', reply, true, interactionId);
+      const serverInteractionId = data.interactionId || data.interaction_id || null;
+      if (!serverInteractionId) {
+        console.warn('[Chat] Backend returnerade inget interactionId — rating kommer inte fungera.');
+      }
+      addMessage('bot', reply, true, serverInteractionId);
     } catch (err) {
       if (sessionId !== originSessionId) return;
       removeTyping();
