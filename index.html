@@ -48,14 +48,6 @@
   /* ─── Base ───────────────────────────────────────────────────────── */
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
-  /* NB: no CSS `scroll-behavior: smooth` — when combined with our rAF-based
-     smoothScrollTo it makes every per-frame scrollTo call queue its own
-     browser-level smooth animation, which stacks into a multi-second delay
-     on Safari and on some Chromium configurations. The JS animation is
-     self-contained and handles all intentional scrolls. */
-  /* While a smooth-scroll animation is running, block pointer events on all
-     scroll triggers. Prevents mouse-hover-while-spamming from stacking
-     extra clicks on the "Scrolla" button and nav links. */
   body.is-scrolling a[href^="#"],
   body.is-scrolling [data-scroll-to] {
     pointer-events: none;
@@ -93,7 +85,6 @@
     border-radius: 3px;
   }
 
-  /* Editorial label — used for eyebrows and tags */
   .label {
     display: inline-flex; align-items: center; gap: 10px;
     font-family: var(--font-mono);
@@ -150,14 +141,12 @@
   }
   .brand-logo {
     display: block;
-    width: 30px;
-    height: 17px;
+    width: 30px; height: 17px;
     background-color: currentColor;
     -webkit-mask-image: url("integraai-logo.png");
             mask-image: url("integraai-logo.png");
     -webkit-mask-repeat: no-repeat;
             mask-repeat: no-repeat;
-    /* Skjut masken upp 2px så symbolens optiska mitt hamnar på textens x-höjd-mitt */
     -webkit-mask-position: center -2px;
             mask-position: center -2px;
     -webkit-mask-size: 100% auto;
@@ -173,8 +162,6 @@
     opacity: 0.82;
     transition: opacity 160ms ease, color 160ms ease;
     position: relative;
-    /* removes the ~300ms tap-delay mobile browsers add while waiting for
-       a possible double-tap zoom gesture */
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
@@ -187,7 +174,6 @@
   }
   .nav-link:hover::after { transform: scaleX(1); }
 
-  /* Chattbotar mega-menu trigger */
   .bot-dropdown { position: relative; margin-left: 4px; }
   .bot-toggle {
     display: inline-flex; align-items: center; gap: 6px;
@@ -206,7 +192,6 @@
   }
   .bot-dropdown.open .bot-toggle .chev { transform: rotate(180deg); }
 
-  /* Mega-menu panel */
   .bot-mega {
     position: absolute; top: calc(100% + 18px); left: -24px;
     width: min(340px, calc(100vw - 48px));
@@ -246,7 +231,6 @@
     color: var(--accent);
     background: var(--accent-soft);
     box-shadow: var(--envelope-inset);
-    /* TODO: ersätt med riktig skärmbild av respektive chattbot */
   }
   .bot-name { font-size: 14.5px; font-weight: 500; letter-spacing: -0.005em; }
 
@@ -293,9 +277,6 @@
     position: relative;
     min-height: 100vh; min-height: 100dvh;
     overflow: hidden; isolation: isolate;
-    /* clip-path forces strict paint-level clipping, which some browsers
-       (Safari/WebKit) don't apply to GPU-composited <video> layers —
-       without this the mountain video can bleed into later sections. */
     clip-path: inset(0);
     z-index: 0;
   }
@@ -314,46 +295,19 @@
     object-position: 60% 55%;
     display: block;
   }
-  /* A cloudy, atmospheric transition from the sky-video down into the
-     page background. A real DOM sibling of .hero-photo (not a pseudo
-     element) so WebKit/Safari's composited <video> layer cannot paint
-     over it — previously the fade lived on .hero-photo::after and iOS
-     Safari rendered the video above it, producing a hard cut. */
   .hero-fade {
     position: absolute;
-    left: 0; right: 0;
-    bottom: -1px;
-    height: 58%;
-    z-index: 3;
+    left: 0; right: 0; bottom: -1px;
+    height: 58%; z-index: 3;
     pointer-events: none;
-    /* Ends in #E6F0F9 — the exact rendered colour at the top of .tjanster
-       (white bg + rgba(200,222,242,0.45) overlay) — so there is no visible
-       seam where hero meets the next section. */
     background:
-      radial-gradient(ellipse 110% 42% at 28% 88%,
-        rgba(230,240,249,0.22) 0%,
-        rgba(230,240,249,0) 62%),
-      radial-gradient(ellipse 95% 52% at 72% 96%,
-        rgba(230,240,249,0.28) 0%,
-        rgba(230,240,249,0) 58%),
-      linear-gradient(to bottom,
-        rgba(230,240,249,0) 0%,
-        rgba(230,240,249,0.08) 22%,
-        rgba(230,240,249,0.26) 46%,
-        rgba(230,240,249,0.56) 72%,
-        rgba(230,240,249,0.84) 90%,
-        #E6F0F9 100%);
+      radial-gradient(ellipse 110% 42% at 28% 88%, rgba(230,240,249,0.22) 0%, rgba(230,240,249,0) 62%),
+      radial-gradient(ellipse 95% 52% at 72% 96%, rgba(230,240,249,0.28) 0%, rgba(230,240,249,0) 58%),
+      linear-gradient(to bottom, rgba(230,240,249,0) 0%, rgba(230,240,249,0.08) 22%, rgba(230,240,249,0.26) 46%, rgba(230,240,249,0.56) 72%, rgba(230,240,249,0.84) 90%, #E6F0F9 100%);
   }
-  /* Soft radial vignette from left for copy legibility */
   .hero-gradient {
     position: absolute; inset: 0; z-index: 2;
-    background:
-      radial-gradient(
-        ellipse 75% 85% at 22% 58%,
-        rgba(15,14,12,0.38) 0%,
-        rgba(15,14,12,0.16) 38%,
-        rgba(15,14,12,0) 70%
-      );
+    background: radial-gradient(ellipse 75% 85% at 22% 58%, rgba(15,14,12,0.38) 0%, rgba(15,14,12,0.16) 38%, rgba(15,14,12,0) 70%);
   }
 
   .hero-inner {
@@ -381,43 +335,30 @@
     animation: eyebrow-pulse 2.1s ease-in-out infinite;
   }
   @keyframes eyebrow-pulse {
-    0%, 100% {
-      transform: scale(1);
-      box-shadow: 0 0 0 2px rgba(243,239,231,0.12),
-                  0 0 10px 2px rgba(243,239,231,0.10);
-    }
-    50% {
-      transform: scale(1.25);
-      box-shadow: 0 0 0 6px rgba(243,239,231,0.02),
-                  0 0 16px 4px rgba(243,239,231,0.42);
-    }
+    0%, 100% { transform: scale(1); box-shadow: 0 0 0 2px rgba(243,239,231,0.12), 0 0 10px 2px rgba(243,239,231,0.10); }
+    50% { transform: scale(1.25); box-shadow: 0 0 0 6px rgba(243,239,231,0.02), 0 0 16px 4px rgba(243,239,231,0.42); }
   }
 
   h1.hero-h1 {
     margin: 30px 0 0;
     font-family: var(--font-sans);
     font-size: clamp(52px, 8.2vw, 112px);
-    line-height: 0.98;
-    letter-spacing: -0.038em;
-    font-weight: 500;
-    color: #FAFBFC;
+    line-height: 0.98; letter-spacing: -0.038em;
+    font-weight: 500; color: #FAFBFC;
     text-wrap: balance;
   }
   h1.hero-h1 .line { display: block; }
   h1.hero-h1 .soft {
     font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 400;
-    letter-spacing: -0.018em;
-    color: #CDD5E1;
+    font-style: italic; font-weight: 400;
+    letter-spacing: -0.018em; color: #CDD5E1;
     padding-left: 0.08em;
   }
 
   .hero-sub {
     margin: 34px 0 0;
     font-size: clamp(16.5px, 1.3vw, 19.5px);
-    line-height: 1.5;
-    color: #D7DEE7;
+    line-height: 1.5; color: #D7DEE7;
     max-width: 54ch; font-weight: 400;
     text-wrap: pretty;
   }
@@ -437,42 +378,29 @@
     font-size: 15px; font-weight: 500; letter-spacing: -0.004em;
     box-shadow: 0 1px 0 rgba(15,14,12,0.08), 0 20px 38px -18px rgba(15,14,12,0.55);
     transition: transform 220ms var(--spring), background 220ms var(--spring), box-shadow 240ms var(--spring);
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
+    position: relative; overflow: hidden; isolation: isolate;
   }
   .btn-primary > * { position: relative; z-index: 1; }
   .btn-primary::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0;
+    content: ""; position: absolute; inset: 0; z-index: 0;
+    pointer-events: none; opacity: 0;
     transition: opacity 320ms var(--spring);
-    background: radial-gradient(140px circle at var(--mx, 50%) var(--my, 50%),
-      rgba(255, 255, 255, 0.55) 0%,
-      rgba(255, 255, 255, 0.28) 30%,
-      rgba(255, 255, 255, 0.1) 55%,
-      rgba(255, 255, 255, 0) 80%);
+    background: radial-gradient(140px circle at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.55) 0%, rgba(255,255,255,0.28) 30%, rgba(255,255,255,0.1) 55%, rgba(255,255,255,0) 80%);
     mix-blend-mode: screen;
   }
   .btn-primary:hover::after { opacity: 1; }
   .btn-primary:hover {
-    background: #ffffff;
-    transform: translateY(-2px);
+    background: #ffffff; transform: translateY(-2px);
     box-shadow: 0 1px 0 rgba(15,14,12,0.08), 0 28px 50px -18px rgba(15,14,12,0.6);
   }
   .btn-primary:active { transform: translateY(0) scale(0.985); }
   .btn-primary .arrow { transition: transform 260ms var(--spring); }
   .btn-primary:hover .arrow { transform: translateX(4px); }
 
-  /* Ghost/underlined secondary */
   .link-secondary {
     display: inline-flex; align-items: center; gap: 8px;
     font-size: 14.5px; font-weight: 500;
-    color: #F4F6F9;
-    padding: 14px 4px;
+    color: #F4F6F9; padding: 14px 4px;
     position: relative;
   }
   .link-secondary::after {
@@ -489,9 +417,6 @@
     z-index: 4;
     font-family: var(--font-mono);
     font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
-    /* dark navy reads clearly on the cloudy/white bottom of the hero.
-       A soft pale halo gives legibility on the darker mountain above,
-       so the hint is visible regardless of where scroll-state places it. */
     color: #5F7BA0; opacity: 0.82;
     text-shadow: 0 0 8px rgba(230,240,249,0.7), 0 1px 2px rgba(230,240,249,0.5);
     display: inline-flex; flex-direction: column; align-items: center; gap: 10px;
@@ -500,11 +425,6 @@
     transition: opacity 220ms var(--spring), transform 280ms var(--spring);
   }
   .scroll-hint:hover { opacity: 1; transform: translate(-50%, 3px); }
-  .scroll-hint:focus-visible {
-    outline: 2px solid #5F7BA0;
-    outline-offset: 6px;
-    border-radius: 4px;
-  }
   .scroll-hint .bar {
     width: 1.5px; height: 36px;
     background: currentColor;
@@ -517,20 +437,15 @@
     animation: scroll-drip 2.4s var(--ease-out) infinite;
   }
   .scroll-hint .chev {
-    width: 18px; height: 10px;
-    display: block;
+    width: 18px; height: 10px; display: block;
     animation: scroll-chev 2.4s var(--ease-out) infinite;
   }
-  .scroll-hint:hover .chev { animation-duration: 1.4s; }
   @keyframes scroll-chev {
     0%, 20% { transform: translateY(-3px); opacity: 0.55; }
     60%     { transform: translateY(2px);  opacity: 1; }
     100%    { transform: translateY(-3px); opacity: 0.55; }
   }
-  @keyframes scroll-drip {
-    0% { top: -100%; }
-    100% { top: 100%; }
-  }
+  @keyframes scroll-drip { 0% { top: -100%; } 100% { top: 100%; } }
 
   /* ─── Section frame ─────────────────────────────────────────────── */
   .section-head {
@@ -542,75 +457,40 @@
   }
   .section-head .head-left { display: flex; flex-direction: column; gap: 20px; }
   .section-title {
-    margin: 0;
-    font-family: var(--font-sans);
+    margin: 0; font-family: var(--font-sans);
     font-size: clamp(36px, 4.8vw, 64px);
-    line-height: 1.01;
-    letter-spacing: -0.028em;
-    font-weight: 500;
-    color: var(--fg);
-    text-wrap: balance;
+    line-height: 1.01; letter-spacing: -0.028em;
+    font-weight: 500; color: var(--fg); text-wrap: balance;
   }
   .section-title .soft {
     font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 400;
-    color: var(--accent-ink);
-    letter-spacing: -0.01em;
+    font-style: italic; font-weight: 400;
+    color: var(--accent-ink); letter-spacing: -0.01em;
   }
   .section-lede {
     color: var(--fg-soft);
     font-size: clamp(16px, 1.25vw, 18.5px);
-    line-height: 1.55;
-    max-width: 42ch;
-    margin: 0;
+    line-height: 1.55; max-width: 42ch; margin: 0;
   }
 
   /* ─── Tjänster (bento) ──────────────────────────────────────────── */
   .tjanster {
-    position: relative;
-    z-index: 1;
+    position: relative; z-index: 1;
     padding: clamp(96px, 12vw, 144px) 0 clamp(72px, 8vw, 104px);
-    background: #FFFFFF;
-    isolation: isolate;
-    overflow: hidden;
+    background: #FFFFFF; isolation: isolate; overflow: hidden;
   }
-  /* soft sky wisp echoing the hero video — bridges the fade at hero's
-     bottom into the threaded white tjanster canvas */
   .tjanster::before {
-    content: "";
-    position: absolute;
+    content: ""; position: absolute;
     left: 0; right: 0; top: 0;
-    height: clamp(120px, 14vw, 180px);
-    z-index: 1;
+    height: clamp(120px, 14vw, 180px); z-index: 1;
     pointer-events: none;
-    background: linear-gradient(to bottom,
-      rgba(200, 222, 242, 0.45) 0%,
-      rgba(200, 222, 242, 0.18) 48%,
-      rgba(200, 222, 242, 0.05) 82%,
-      rgba(200, 222, 242, 0) 100%);
+    background: linear-gradient(to bottom, rgba(200,222,242,0.45) 0%, rgba(200,222,242,0.18) 48%, rgba(200,222,242,0.05) 82%, rgba(200,222,242,0) 100%);
   }
   .tjanster-smoke {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    z-index: 0;
-    pointer-events: none;
-    /* Fade the shader canvas to transparent at the top and bottom edges
-       so the threads don't get sliced off at the section boundary —
-       they dissolve into the section background before the seam. */
-    -webkit-mask-image: linear-gradient(to bottom,
-      transparent 0%,
-      black 10%,
-      black 82%,
-      transparent 100%);
-    mask-image: linear-gradient(to bottom,
-      transparent 0%,
-      black 10%,
-      black 82%,
-      transparent 100%);
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    display: block; z-index: 0; pointer-events: none;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 10%, black 82%, transparent 100%);
   }
   .tjanster-inner { position: relative; z-index: 2; max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); }
 
@@ -621,26 +501,17 @@
     gap: 16px;
   }
   .bento-head {
-    grid-column: 1 / span 7;
-    grid-row: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    align-self: end;
-    padding: 4px 4px 24px 4px;
+    grid-column: 1 / span 7; grid-row: 1;
+    display: flex; flex-direction: column; gap: 18px;
+    align-self: end; padding: 4px 4px 24px 4px;
   }
   .bento-head .label { margin-bottom: 2px; }
   .bento-head .section-title { margin: 0; }
   .tile {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--line);
-    border-radius: var(--radius-lg);
-    padding: 36px;
-    display: flex; flex-direction: column;
-    overflow: hidden;
-    transition: transform 320ms var(--spring), border-color 320ms var(--spring),
-                box-shadow 320ms var(--spring), background-color 320ms var(--spring);
+    position: relative; background: var(--surface);
+    border: 1px solid var(--line); border-radius: var(--radius-lg);
+    padding: 36px; display: flex; flex-direction: column; overflow: hidden;
+    transition: transform 320ms var(--spring), border-color 320ms var(--spring), box-shadow 320ms var(--spring), background-color 320ms var(--spring);
   }
   .tile::before {
     content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px;
@@ -651,34 +522,17 @@
   .tile:hover { border-color: var(--line-strong); box-shadow: var(--envelope-2); transform: translateY(-2px); }
   .tile:hover::before { transform: scaleX(1); }
 
-  /* Near-white tiles with a soft light-blue glow. The cards should feel
-     luminous — not blue-filled — so they lift off the threaded background
-     without competing with it for colour. */
   .tjanster .tile {
     background: #FDFEFF;
     border-color: rgba(120, 170, 220, 0.28);
-    box-shadow:
-      0 1px 2px rgba(62, 105, 160, 0.06),
-      0 10px 28px -14px rgba(80, 135, 200, 0.22),
-      0 0 36px rgba(160, 200, 235, 0.16);
+    box-shadow: 0 1px 2px rgba(62,105,160,0.06), 0 10px 28px -14px rgba(80,135,200,0.22), 0 0 36px rgba(160,200,235,0.16);
   }
   .tjanster .tile:hover {
-    background: #FFFFFF;
-    border-color: rgba(90, 150, 215, 0.45);
-    transform: translateY(-3px);
-    box-shadow:
-      0 2px 4px rgba(62, 105, 160, 0.08),
-      0 18px 38px -16px rgba(80, 135, 200, 0.35),
-      0 0 48px rgba(150, 195, 235, 0.28);
+    background: #FFFFFF; border-color: rgba(90,150,215,0.45); transform: translateY(-3px);
+    box-shadow: 0 2px 4px rgba(62,105,160,0.08), 0 18px 38px -16px rgba(80,135,200,0.35), 0 0 48px rgba(150,195,235,0.28);
   }
-  .tjanster .tile-icon {
-    background: rgba(200, 222, 242, 0.55);
-    color: #3E6DA6;
-    box-shadow: inset 0 0 0 1px rgba(120, 170, 220, 0.22);
-  }
-  .tjanster .tile:hover .tile-icon {
-    background: rgba(200, 222, 242, 0.85);
-  }
+  .tjanster .tile-icon { background: rgba(200,222,242,0.55); color: #3E6DA6; box-shadow: inset 0 0 0 1px rgba(120,170,220,0.22); }
+  .tjanster .tile:hover .tile-icon { background: rgba(200,222,242,0.85); }
   .tjanster .tile-number { color: #4A7AB3; opacity: 0.55; }
   .tjanster .tile-flag .tile-number { color: #3A6AA3; opacity: 0.72; }
 
@@ -687,505 +541,119 @@
   .tile-a    { grid-column: 8 / span 5; grid-row: 2; }
   .tile-b    { grid-column: 8 / span 5; grid-row: 3; }
 
-  .tile-head {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 28px;
-  }
+  .tile-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
   .tile-flag .tile-head { margin-bottom: 48px; }
 
   .tile-icon {
-    width: 46px; height: 46px;
-    border-radius: 10px;
-    background: var(--accent-soft);
-    color: var(--accent);
+    width: 46px; height: 46px; border-radius: 10px;
+    background: var(--accent-soft); color: var(--accent);
     display: grid; place-items: center;
     box-shadow: var(--envelope-inset);
     transition: transform 340ms var(--spring), background 240ms var(--spring);
   }
   .tile-icon svg { width: 22px; height: 22px; }
-  .tile:hover .tile-icon {
-    transform: translateY(-2px) rotate(-2deg);
-    background: rgba(38,59,51,0.14);
-  }
-  .tile-flag .tile-icon {
-    width: 60px; height: 60px;
-    border-radius: 12px;
-  }
+  .tile:hover .tile-icon { transform: translateY(-2px) rotate(-2deg); background: rgba(38,59,51,0.14); }
+  .tile-flag .tile-icon { width: 60px; height: 60px; border-radius: 12px; }
   .tile-flag .tile-icon svg { width: 28px; height: 28px; }
 
   .tile-number {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 28px;
-    line-height: 1;
-    color: var(--fg-muted);
-    letter-spacing: 0.02em;
-    font-feature-settings: "tnum";
+    font-family: var(--font-display); font-style: italic;
+    font-size: 28px; line-height: 1;
+    color: var(--fg-muted); letter-spacing: 0.02em;
   }
   .tile-flag .tile-number { font-size: 40px; color: var(--accent); opacity: 0.7; }
 
-  .tile-title {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: 26px;
-    line-height: 1.14;
-    letter-spacing: -0.018em;
-    font-weight: 500;
-  }
+  .tile-title { margin: 0; font-family: var(--font-sans); font-size: 26px; line-height: 1.14; letter-spacing: -0.018em; font-weight: 500; }
   .tile-flag .tile-title { font-size: 40px; letter-spacing: -0.024em; line-height: 1.02; }
-  .tile-desc {
-    margin: 16px 0 0;
-    color: var(--fg-soft);
-    font-size: 15.5px;
-    line-height: 1.58;
-    max-width: 48ch;
-    text-wrap: pretty;
-  }
+  .tile-desc { margin: 16px 0 0; color: var(--fg-soft); font-size: 15.5px; line-height: 1.58; max-width: 48ch; text-wrap: pretty; }
   .tile-flag .tile-desc { font-size: 17px; max-width: 42ch; }
 
-  .tile-foot {
-    margin-top: auto; padding-top: 28px;
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 16px;
-  }
-  .tile-meta {
-    font-family: var(--font-mono);
-    font-size: 11px; font-weight: 500;
-    letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--fg-muted);
-  }
+  .tile-foot { margin-top: auto; padding-top: 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .tile-meta { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-muted); }
 
   /* ─── Om oss ────────────────────────────────────────────────────── */
-  .om {
-    padding: clamp(96px, 12vw, 140px) 0;
-    background: var(--bg);
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-  }
-  /* Short direct gradient from the previous section's white into Om oss'
-     own cool off-white. Kept brief (~44-68px) so the distinct section
-     tone takes over quickly and the shade difference remains visible. */
-  .om::before {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; top: 0;
-    height: clamp(44px, 5.5vw, 68px);
-    z-index: 0;
-    pointer-events: none;
-    background: linear-gradient(to bottom, #FFFFFF 0%, var(--bg) 100%);
-  }
+  .om { padding: clamp(96px, 12vw, 140px) 0; background: var(--bg); position: relative; isolation: isolate; overflow: hidden; }
+  .om::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: clamp(44px, 5.5vw, 68px); z-index: 0; pointer-events: none; background: linear-gradient(to bottom, #FFFFFF 0%, var(--bg) 100%); }
   .om-inner { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); position: relative; z-index: 1; }
-
-  .om-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(40px, 6vw, 96px);
-    align-items: start;
-  }
+  .om-layout { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 96px); align-items: start; }
   .om-head { display: flex; flex-direction: column; gap: 22px; }
-  .om-lede {
-    font-family: var(--font-sans);
-    font-size: clamp(19px, 1.7vw, 23px);
-    line-height: 1.42;
-    color: var(--fg-soft);
-    max-width: 34ch;
-    margin: 0;
-  }
-
-  .om-body {
-    column-count: 2;
-    column-gap: 40px;
-    font-size: 15.5px;
-    line-height: 1.72;
-    color: var(--fg);
-    max-width: none;
-  }
-  .om-body p {
-    margin: 0 0 18px;
-    break-inside: avoid;
-    text-wrap: pretty;
-  }
+  .om-lede { font-family: var(--font-sans); font-size: clamp(19px, 1.7vw, 23px); line-height: 1.42; color: var(--fg-soft); max-width: 34ch; margin: 0; }
+  .om-body { column-count: 2; column-gap: 40px; font-size: 15.5px; line-height: 1.72; color: var(--fg); }
+  .om-body p { margin: 0 0 18px; break-inside: avoid; text-wrap: pretty; }
   .om-body p:last-child { margin-bottom: 0; }
-  /* Editorial stats */
-  .om-stats {
-    grid-column: 1 / -1;
-    margin-top: clamp(72px, 8vw, 112px);
-    padding-top: clamp(36px, 4vw, 56px);
-    border-top: 1px solid var(--line-strong);
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: clamp(24px, 3vw, 56px);
-  }
-  .om-stat {
-    display: grid;
-    grid-template-rows: auto auto auto;
-    gap: 14px;
-    align-content: start;
-  }
-  .om-stat-label {
-    font-family: var(--font-mono);
-    font-size: 10.5px; font-weight: 500;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--fg-muted);
-  }
-  .om-stat-num {
-    font-family: var(--font-display);
-    font-size: clamp(56px, 7vw, 96px);
-    line-height: 0.95;
-    letter-spacing: -0.028em;
-    color: var(--fg);
-    font-weight: 400;
-    font-feature-settings: "tnum", "lnum";
-  }
-  .om-stat-num em {
-    font-style: italic;
-    color: var(--accent-ink);
-  }
-  .om-stat-note {
-    font-size: 14px;
-    color: var(--fg-soft);
-    line-height: 1.5;
-    max-width: 28ch;
-  }
+  .om-stats { grid-column: 1 / -1; margin-top: clamp(72px, 8vw, 112px); padding-top: clamp(36px, 4vw, 56px); border-top: 1px solid var(--line-strong); display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(24px, 3vw, 56px); }
+  .om-stat { display: grid; grid-template-rows: auto auto auto; gap: 14px; align-content: start; }
+  .om-stat-label { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-muted); }
+  .om-stat-num { font-family: var(--font-display); font-size: clamp(56px, 7vw, 96px); line-height: 0.95; letter-spacing: -0.028em; color: var(--fg); font-weight: 400; }
+  .om-stat-num em { font-style: italic; color: var(--accent-ink); }
+  .om-stat-note { font-size: 14px; color: var(--fg-soft); line-height: 1.5; max-width: 28ch; }
 
   /* ─── FAQ ───────────────────────────────────────────────────────── */
-  .faq {
-    padding: clamp(96px, 12vw, 140px) 0;
-    background: var(--bg-warm);
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-  }
-  /* Same short-gradient approach as .om::before — keeps FAQ's darker
-     #F4F6F9 clearly distinct below a brief blend band. */
-  .faq::before {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; top: 0;
-    height: clamp(44px, 5.5vw, 68px);
-    z-index: 0;
-    pointer-events: none;
-    background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-warm) 100%);
-  }
-  .faq-inner {
-    max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x);
-    display: grid;
-    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
-    gap: clamp(40px, 6vw, 96px);
-    align-items: start;
-    position: relative;
-    z-index: 1;
-  }
-  .faq-head {
-    display: flex; flex-direction: column; gap: 22px;
-    position: sticky; top: 100px;
-  }
-
-  .faq-list {
-    display: flex; flex-direction: column;
-    border-top: 1px solid var(--line-strong);
-  }
-  .faq-item {
-    border-bottom: 1px solid transparent;
-    background-image: radial-gradient(circle, var(--line-strong) 1px, transparent 1.2px);
-    background-size: 6px 1px;
-    background-repeat: repeat-x;
-    background-position: left bottom;
-  }
+  .faq { padding: clamp(96px, 12vw, 140px) 0; background: var(--bg-warm); position: relative; isolation: isolate; overflow: hidden; }
+  .faq::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: clamp(44px, 5.5vw, 68px); z-index: 0; pointer-events: none; background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-warm) 100%); }
+  .faq-inner { max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(40px, 6vw, 96px); align-items: start; position: relative; z-index: 1; }
+  .faq-head { display: flex; flex-direction: column; gap: 22px; position: sticky; top: 100px; }
+  .faq-list { display: flex; flex-direction: column; border-top: 1px solid var(--line-strong); }
+  .faq-item { border-bottom: 1px solid transparent; background-image: radial-gradient(circle, var(--line-strong) 1px, transparent 1.2px); background-size: 6px 1px; background-repeat: repeat-x; background-position: left bottom; }
   .faq-item:last-child { background-image: none; }
-  .faq-q {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 56px 1fr auto;
-    align-items: center;
-    gap: 20px;
-    padding: 26px 0;
-    background: transparent; border: 0;
-    font-family: inherit;
-    font-size: clamp(17px, 1.4vw, 20px);
-    font-weight: 500;
-    color: var(--fg);
-    text-align: left;
-    cursor: pointer;
-    letter-spacing: -0.008em;
-    transition: color 200ms var(--spring);
-  }
+  .faq-q { width: 100%; display: grid; grid-template-columns: 56px 1fr auto; align-items: center; gap: 20px; padding: 26px 0; background: transparent; border: 0; font-family: inherit; font-size: clamp(17px, 1.4vw, 20px); font-weight: 500; color: var(--fg); text-align: left; cursor: pointer; letter-spacing: -0.008em; transition: color 200ms var(--spring); }
   .faq-q:hover { color: var(--accent-ink); }
-  .faq-idx {
-    font-family: var(--font-mono);
-    font-size: 11px; font-weight: 500;
-    letter-spacing: 0.12em;
-    color: var(--fg-muted);
-    font-feature-settings: "tnum";
-  }
-  .faq-icon {
-    flex: 0 0 auto;
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    border: 1px solid var(--line-strong);
-    display: grid; place-items: center;
-    color: var(--fg);
-    transition: background 280ms var(--spring), border-color 280ms var(--spring),
-                color 280ms var(--spring), transform 380ms var(--spring);
-  }
-  .faq-icon svg {
-    transition: transform 400ms var(--spring);
-    transform-origin: center;
-  }
+  .faq-idx { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.12em; color: var(--fg-muted); }
+  .faq-icon { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-strong); display: grid; place-items: center; color: var(--fg); transition: background 280ms var(--spring), border-color 280ms var(--spring), color 280ms var(--spring), transform 380ms var(--spring); }
+  .faq-icon svg { transition: transform 400ms var(--spring); transform-origin: center; }
   .faq-item.open .faq-q { color: var(--accent-ink); }
-  .faq-item.open .faq-icon {
-    background: var(--accent);
-    color: #F4F6F9;
-    border-color: var(--accent);
-    transform: rotate(45deg);
-  }
-  .faq-a {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 420ms var(--spring);
-  }
-  .faq-a-inner {
-    padding: 0 72px 28px 76px;
-    font-size: 15.5px; line-height: 1.7;
-    color: var(--fg-soft);
-    max-width: 72ch;
-  }
+  .faq-item.open .faq-icon { background: var(--accent); color: #F4F6F9; border-color: var(--accent); transform: rotate(45deg); }
+  .faq-a { max-height: 0; overflow: hidden; transition: max-height 420ms var(--spring); }
+  .faq-a-inner { padding: 0 72px 28px 76px; font-size: 15.5px; line-height: 1.7; color: var(--fg-soft); max-width: 72ch; }
   .faq-a-inner p { margin: 0 0 14px; text-wrap: pretty; }
   .faq-a-inner p:last-child { margin-bottom: 0; }
 
   /* ─── Kontakt ───────────────────────────────────────────────────── */
-  .kontakt {
-    padding: clamp(112px, 14vw, 168px) 0 clamp(96px, 12vw, 140px);
-    background: var(--bg);
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-  }
-  /* Top blend from FAQ's #F4F6F9 down to Kontakt's own #FAFBFC.
-     Previous decorative corner radials removed — they clashed with the
-     new fade boundary, causing visible elliptical blobs near the section
-     edges where the fade ended. */
-  .kontakt::before {
-    content: ""; position: absolute;
-    left: 0; right: 0; top: 0;
-    height: clamp(44px, 5.5vw, 68px);
-    pointer-events: none;
-    z-index: 0;
-    background: linear-gradient(to bottom, var(--bg-warm) 0%, var(--bg) 100%);
-  }
-  .kontakt-inner {
-    position: relative;
-    z-index: 1;
-    max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x);
-    display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(40px, 6vw, 96px);
-    align-items: end;
-  }
+  .kontakt { padding: clamp(112px, 14vw, 168px) 0 clamp(96px, 12vw, 140px); background: var(--bg); position: relative; isolation: isolate; overflow: hidden; }
+  .kontakt::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: clamp(44px, 5.5vw, 68px); pointer-events: none; z-index: 0; background: linear-gradient(to bottom, var(--bg-warm) 0%, var(--bg) 100%); }
+  .kontakt-inner { position: relative; z-index: 1; max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: clamp(40px, 6vw, 96px); align-items: end; }
   .kontakt-head { display: flex; flex-direction: column; gap: 24px; }
-  h2.kontakt-h2 {
-    margin: 0;
-    font-family: var(--font-sans);
-    font-size: clamp(44px, 6.4vw, 88px);
-    line-height: 0.98;
-    letter-spacing: -0.03em;
-    font-weight: 500;
-    text-wrap: balance;
-  }
-  h2.kontakt-h2 .soft {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-weight: 400;
-    color: var(--accent-ink);
-    letter-spacing: -0.012em;
-  }
-  .kontakt-lede {
-    font-size: 16.5px;
-    color: var(--fg-soft);
-    line-height: 1.55;
-    max-width: 38ch;
-    margin: 0;
-  }
-
-  .kontakt-actions {
-    display: flex; flex-direction: column; gap: 20px;
-    align-items: flex-start;
-    padding-top: 8px;
-  }
-  .kontakt-email {
-    display: inline-flex; align-items: baseline; gap: 14px;
-    font-family: var(--font-display);
-    font-size: clamp(28px, 3.6vw, 46px);
-    font-weight: 400;
-    letter-spacing: -0.018em;
-    color: var(--fg);
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--line-strong);
-    transition: border-color 220ms var(--spring), color 220ms var(--spring);
-    line-height: 1;
-  }
-  .kontakt-email:hover {
-    border-bottom-color: var(--accent);
-    color: var(--accent-ink);
-  }
+  h2.kontakt-h2 { margin: 0; font-family: var(--font-sans); font-size: clamp(44px, 6.4vw, 88px); line-height: 0.98; letter-spacing: -0.03em; font-weight: 500; text-wrap: balance; }
+  h2.kontakt-h2 .soft { font-family: var(--font-display); font-style: italic; font-weight: 400; color: var(--accent-ink); letter-spacing: -0.012em; }
+  .kontakt-lede { font-size: 16.5px; color: var(--fg-soft); line-height: 1.55; max-width: 38ch; margin: 0; }
+  .kontakt-actions { display: flex; flex-direction: column; gap: 20px; align-items: flex-start; padding-top: 8px; }
+  .kontakt-email { display: inline-flex; align-items: baseline; gap: 14px; font-family: var(--font-display); font-size: clamp(28px, 3.6vw, 46px); font-weight: 400; letter-spacing: -0.018em; color: var(--fg); padding-bottom: 8px; border-bottom: 1px solid var(--line-strong); transition: border-color 220ms var(--spring), color 220ms var(--spring); line-height: 1; }
+  .kontakt-email:hover { border-bottom-color: var(--accent); color: var(--accent-ink); }
   .kontakt-email svg { transition: transform 280ms var(--spring); }
   .kontakt-email:hover svg { transform: translate(3px, -3px); }
-
-  .kontakt-promise {
-    display: flex; align-items: center; gap: 12px;
-    margin-top: 6px;
-    font-family: var(--font-mono);
-    font-size: 11.5px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--fg-muted);
-  }
-  .kontakt-promise .pulse {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--accent);
-    box-shadow: 0 0 0 4px rgba(38,59,51,0.16);
-    animation: breathe 3s ease-in-out infinite;
-  }
+  .kontakt-promise { display: flex; align-items: center; gap: 12px; margin-top: 6px; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--fg-muted); }
+  .kontakt-promise .pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px rgba(38,59,51,0.16); animation: breathe 3s ease-in-out infinite; }
 
   /* ─── Footer ────────────────────────────────────────────────────── */
-  .footer {
-    background: var(--bg-warm);
-    padding: clamp(56px, 7vw, 84px) 0 32px;
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-  }
-  /* Top blend from Kontakt's #FAFBFC down to footer's own #F4F6F9 */
-  .footer::before {
-    content: "";
-    position: absolute;
-    left: 0; right: 0; top: 0;
-    height: clamp(44px, 5.5vw, 68px);
-    z-index: 0;
-    pointer-events: none;
-    background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-warm) 100%);
-  }
-  .footer-inner {
-    position: relative;
-    z-index: 1;
-    max-width: var(--max); margin: 0 auto;
-    padding: 0 var(--pad-x);
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) repeat(4, minmax(0, 1fr));
-    gap: clamp(24px, 3vw, 48px);
-  }
+  .footer { background: var(--bg-warm); padding: clamp(56px, 7vw, 84px) 0 32px; position: relative; isolation: isolate; overflow: hidden; }
+  .footer::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: clamp(44px, 5.5vw, 68px); z-index: 0; pointer-events: none; background: linear-gradient(to bottom, var(--bg) 0%, var(--bg-warm) 100%); }
+  .footer-inner { position: relative; z-index: 1; max-width: var(--max); margin: 0 auto; padding: 0 var(--pad-x); display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(4, minmax(0, 1fr)); gap: clamp(24px, 3vw, 48px); }
   .footer-brand { display: flex; flex-direction: column; gap: 14px; max-width: 36ch; }
   .footer-brand .brand { font-size: 17px; }
-  .footer-tag {
-    font-size: 14px; line-height: 1.55;
-    color: var(--fg-soft);
-    font-family: var(--font-display);
-    font-style: italic;
-    letter-spacing: 0.005em;
-  }
-  .footer-col h4 {
-    margin: 0 0 16px;
-    font-family: var(--font-mono);
-    font-size: 10.5px; font-weight: 500;
-    letter-spacing: 0.16em; text-transform: uppercase;
-    color: var(--fg-muted);
-  }
+  .footer-tag { font-size: 14px; line-height: 1.55; color: var(--fg-soft); font-family: var(--font-display); font-style: italic; letter-spacing: 0.005em; }
+  .footer-col h4 { margin: 0 0 16px; font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--fg-muted); }
   .footer-col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
-  .footer-col a {
-    font-size: 14px;
-    color: var(--fg-soft);
-    transition: color 200ms var(--spring);
-  }
+  .footer-col a { font-size: 14px; color: var(--fg-soft); transition: color 200ms var(--spring); }
   .footer-col a:hover { color: var(--fg); }
-
-  .footer-base {
-    max-width: var(--max); margin: 56px auto 0;
-    padding: 22px var(--pad-x) 0;
-    border-top: 1px solid var(--line);
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 12px;
-    font-size: 12.5px;
-    color: var(--fg-muted);
-    font-family: var(--font-mono);
-    letter-spacing: 0.04em;
-  }
-  .footer-sig {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 14px;
-    color: var(--fg-soft);
-    letter-spacing: 0.005em;
-  }
+  .footer-base { max-width: var(--max); margin: 56px auto 0; padding: 22px var(--pad-x) 0; border-top: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 12.5px; color: var(--fg-muted); font-family: var(--font-mono); letter-spacing: 0.04em; }
+  .footer-sig { font-family: var(--font-display); font-style: italic; font-size: 14px; color: var(--fg-soft); letter-spacing: 0.005em; }
 
   /* ─── Mobile menu ───────────────────────────────────────────────── */
-  .mobile-menu {
-    position: fixed; top: 0; right: 0; bottom: 0;
-    width: min(88vw, 380px);
-    background: var(--bg);
-    border-left: 1px solid var(--line);
-    box-shadow: -20px 0 60px -20px rgba(15,14,12,0.3);
-    transform: translateX(100%);
-    transition: transform 360ms var(--spring);
-    z-index: 80;
-    display: flex; flex-direction: column;
-    padding: 100px 28px 28px;
-    overflow-y: auto;
-  }
+  .mobile-menu { position: fixed; top: 0; right: 0; bottom: 0; width: min(88vw, 380px); background: var(--bg); border-left: 1px solid var(--line); box-shadow: -20px 0 60px -20px rgba(15,14,12,0.3); transform: translateX(100%); transition: transform 360ms var(--spring); z-index: 80; display: flex; flex-direction: column; padding: 100px 28px 28px; overflow-y: auto; }
   body.menu-open .mobile-menu { transform: translateX(0); }
-  .mobile-menu a {
-    display: block;
-    padding: 16px 0;
-    font-size: 19px; font-weight: 500;
-    color: var(--fg);
-    border-bottom: 1px solid var(--line);
-    letter-spacing: -0.008em;
-  }
-  .mm-group-title {
-    font-family: var(--font-mono);
-    font-size: 10.5px; font-weight: 500;
-    letter-spacing: 0.18em; text-transform: uppercase;
-    color: var(--fg-muted);
-    margin: 32px 0 4px;
-  }
-  .mobile-menu .mm-bot {
-    padding: 14px 0; font-size: 16.5px; font-weight: 500;
-    color: var(--fg); opacity: 0.85;
-    border-bottom: 1px solid var(--line);
-  }
-  .mobile-menu .mm-cta {
-    margin-top: 32px;
-    padding: 16px 22px;
-    background: var(--accent); color: #F4F6F9;
-    border: 1px solid var(--accent);
-    border-radius: var(--radius);
-    text-align: center;
-    font-size: 16px; font-weight: 500;
-    border-bottom: 0;
-  }
-  .menu-scrim {
-    position: fixed; inset: 0;
-    background: rgba(15,14,12,0.42);
-    backdrop-filter: blur(3px);
-    opacity: 0; visibility: hidden;
-    transition: opacity 280ms var(--spring), visibility 280ms var(--spring);
-    z-index: 75;
-  }
+  .mobile-menu a { display: block; padding: 16px 0; font-size: 19px; font-weight: 500; color: var(--fg); border-bottom: 1px solid var(--line); letter-spacing: -0.008em; }
+  .mm-group-title { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-muted); margin: 32px 0 4px; }
+  .mobile-menu .mm-bot { padding: 14px 0; font-size: 16.5px; font-weight: 500; color: var(--fg); opacity: 0.85; border-bottom: 1px solid var(--line); }
+  .mobile-menu .mm-cta { margin-top: 32px; padding: 16px 22px; background: var(--accent); color: #F4F6F9; border: 1px solid var(--accent); border-radius: var(--radius); text-align: center; font-size: 16px; font-weight: 500; border-bottom: 0; }
+  .menu-scrim { position: fixed; inset: 0; background: rgba(15,14,12,0.42); backdrop-filter: blur(3px); opacity: 0; visibility: hidden; transition: opacity 280ms var(--spring), visibility 280ms var(--spring); z-index: 75; }
   body.menu-open .menu-scrim { opacity: 1; visibility: visible; }
   body.menu-open { overflow: hidden; }
 
-  /* ─── Vänster-shift för allt innehåll på landing page ─────────────── */
-  .tjanster-inner,
-  .om-inner,
-  .faq-inner,
-  .kontakt-inner,
-  .footer-inner,
-  .footer-base {
+  /* ─── Content shift ─────────────────────────────────────────────── */
+  .tjanster-inner, .om-inner, .faq-inner, .kontakt-inner, .footer-inner, .footer-base {
     margin-left: max(0px, calc((100vw - var(--max)) / 2 - var(--content-shift)));
     margin-right: auto;
   }
-  /* Hero-texten shiftas extra — ungefär halvvägs till vänsterkanten */
   .hero-inner {
     margin-left: max(0px, calc((100vw - var(--max)) / 2 - 160px));
     margin-right: auto;
@@ -1201,117 +669,67 @@
     .tile-flag { grid-column: 1 / -1; grid-row: 3; padding: 36px; }
     .tile-a    { grid-column: 1 / span 6; grid-row: 4; }
     .tile-b    { grid-column: 7 / span 6; grid-row: 4; }
-    .om-body { column-count: 1; column-gap: 0; }
+    .om-body { column-count: 1; }
     .faq-inner { grid-template-columns: 1fr; gap: 32px; }
     .faq-head { position: static; }
     .om-head { position: static; }
     .om-layout { grid-template-columns: 1fr; gap: 32px; }
     .footer-inner { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   }
-
   @media (max-width: 900px) {
     .nav-links .nav-link, .nav-links .nav-cta { display: none; }
     .nav-menu-toggle { display: inline-flex; }
     .bot-dropdown { display: none; }
     .kontakt-inner { grid-template-columns: 1fr; gap: 40px; }
-    .kontakt-actions { align-items: stretch; }
   }
-  @media (min-width: 901px) {
-    .mobile-menu, .menu-scrim { display: none; }
-  }
-
-  @media (max-width: 900px), (pointer: coarse) {
-    /* parallax is JS-driven — this CSS override is a safety net so the
-       photo stays rock-solid even if something races it */
-    .hero-photo { transform: none !important; will-change: auto; }
-  }
-
+  @media (min-width: 901px) { .mobile-menu, .menu-scrim { display: none; } }
+  @media (max-width: 900px), (pointer: coarse) { .hero-photo { transform: none !important; will-change: auto; } }
   @media (max-width: 768px) {
     .nav-inner { padding: 16px 20px; gap: 16px; }
     .brand { font-size: 15.5px; }
     .hero-photo video { display: none; }
-
-    .hero-inner {
-      grid-template-columns: 1fr;
-      padding: 112px 22px 56px;
-      align-items: end;
-      min-height: 92vh; min-height: 92dvh;
-      gap: 16px;
-    }
+    .hero-inner { grid-template-columns: 1fr; padding: 112px 22px 56px; align-items: end; min-height: 92vh; min-height: 92dvh; gap: 16px; }
     .hero-copy { grid-column: 1 / -1; max-width: none; }
     .hero-photo { background-position: 72% 22% !important; }
-    .hero-gradient {
-      background: linear-gradient(
-        to top,
-        rgba(10,14,26,0.72) 0%,
-        rgba(10,14,26,0.4) 40%,
-        rgba(10,14,26,0.14) 70%,
-        rgba(10,14,26,0) 95%
-      );
-    }
+    .hero-gradient { background: linear-gradient(to top, rgba(10,14,26,0.72) 0%, rgba(10,14,26,0.4) 40%, rgba(10,14,26,0.14) 70%, rgba(10,14,26,0) 95%); }
     h1.hero-h1 { font-size: clamp(44px, 11vw, 64px); line-height: 1.02; }
     .hero-sub { font-size: 15.5px; margin-top: 22px; }
     .hero-actions { margin-top: 32px; gap: 14px; width: 100%; flex-direction: column; align-items: stretch; }
     .btn-primary { padding: 15px 22px; justify-content: center; min-height: 48px; }
-    .link-secondary { padding: 10px 0; min-height: 44px; align-items: center; justify-content: flex-start; }
+    .link-secondary { padding: 10px 0; min-height: 44px; }
     .scroll-hint { display: none; }
-
     .tjanster { padding: 80px 0 64px; }
     .bento { grid-template-columns: 1fr; grid-template-rows: auto; }
     .bento-head { grid-column: 1; grid-row: auto; padding: 0 0 20px; gap: 16px; order: 0; }
-    .tile, .tile-flag, .tile-a, .tile-b, .tile-top {
-      grid-column: 1;
-      grid-row: auto;
-      padding: 28px 24px;
-      min-height: 0;
-    }
-    /* Stack tiles in their natural numeric order on phones: 01→02→03→04.
-       Desktop uses explicit grid-area placement so DOM order doesn't
-       matter there, but on mobile we need this override since tile-top
-       (02) currently sits before tile-flag (01) in DOM. */
-    .tile-flag { order: 1; }
-    .tile-top  { order: 2; }
-    .tile-a    { order: 3; }
-    .tile-b    { order: 4; }
+    .tile, .tile-flag, .tile-a, .tile-b, .tile-top { grid-column: 1; grid-row: auto; padding: 28px 24px; min-height: 0; }
+    .tile-flag { order: 1; } .tile-top { order: 2; } .tile-a { order: 3; } .tile-b { order: 4; }
     .tile-flag .tile-number { font-size: 28px; }
     .tile-flag .tile-title { font-size: 30px; }
     .tile-flag .tile-icon { width: 46px; height: 46px; border-radius: 10px; }
     .tile-flag .tile-icon svg { width: 22px; height: 22px; }
     .tile-head, .tile-flag .tile-head { margin-bottom: 24px; }
-
     .om { padding: 80px 0; }
-    .om-lede { font-size: 18px; }
-    .om-body { font-size: 15.5px; }
     .om-stats { grid-template-columns: 1fr; gap: 32px; margin-top: 56px; padding-top: 28px; }
     .om-stat-num { font-size: 56px; }
-
     .faq { padding: 80px 0; }
     .faq-q { grid-template-columns: 42px 1fr auto; padding: 20px 0; font-size: 16.5px; gap: 14px; }
     .faq-a-inner { padding: 0 0 22px 56px; font-size: 15px; }
-
     .kontakt { padding: 96px 0 80px; }
     .kontakt-email { font-size: 26px; }
-
     .footer-inner { grid-template-columns: 1fr 1fr; gap: 32px 24px; }
     .footer-brand { grid-column: 1 / -1; }
     .footer-base { flex-direction: column; align-items: flex-start; padding-top: 18px; margin-top: 36px; }
   }
-
   @media (hover: none) and (pointer: coarse) {
     .nav-link::after { display: none; }
     .tile:hover { transform: none; box-shadow: none; border-color: var(--line); }
   }
-
   @media (prefers-reduced-motion: reduce) {
     .fade-up { opacity: 1 !important; transform: none !important; transition: none !important; }
-    .btn-primary, .nav-cta, .tile, .faq-icon, .faq-a, .kontakt-email {
-      transition: none;
-    }
+    .btn-primary, .nav-cta, .tile, .faq-icon, .faq-a, .kontakt-email { transition: none; }
     .hero-photo { transform: none !important; }
     .kontakt-promise .pulse { animation: none; }
     .scroll-hint .bar::after { animation: none; display: none; }
-    .sig-mkt .line { stroke-dashoffset: 0; transition: none; }
-    .sig-mkt .end { opacity: 1; transition: none; }
   }
 </style>
 </head>
@@ -1355,6 +773,10 @@
           <span class="bot-thumb" aria-hidden="true">J</span>
           <span class="bot-name">JönköpingGPT</span>
         </a>
+        <a class="bot-row" href="skane-chattbot.html" role="menuitem">
+          <span class="bot-thumb" aria-hidden="true">Sk</span>
+          <span class="bot-name">SkåneGPT</span>
+        </a>
       </div>
     </div>
 
@@ -1390,6 +812,7 @@
   <a class="mm-bot" href="halmstad-chattbot.html">HalmstadGPT</a>
   <a class="mm-bot" href="hallandstrafiken-chattbot-ny.html">Hallandstrafiken</a>
   <a class="mm-bot" href="jonkoping-chattbot.html">JönköpingGPT</a>
+  <a class="mm-bot" href="skane-chattbot.html">SkåneGPT</a>
 
   <a class="mm-cta" href="#kontakt">Boka kostnadsfri rådgivning</a>
 </aside>
@@ -1431,9 +854,7 @@
     <button class="scroll-hint" type="button" aria-label="Scrolla till tjänster" data-scroll-to="#tjanster" data-scroll-offset="100">
       <span>Scrolla</span>
       <span class="bar" aria-hidden="true"></span>
-      <svg class="chev" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M1 1.5 L9 8.5 L17 1.5" />
-      </svg>
+      <svg class="chev" viewBox="0 0 18 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1.5 L9 8.5 L17 1.5" /></svg>
     </button>
   </section>
 
@@ -1448,11 +869,7 @@
 
         <article class="tile tile-top fade-up" data-delay="80">
           <div class="tile-head">
-            <div class="tile-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-              </svg>
-            </div>
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
             <span class="tile-number">02</span>
           </div>
           <h3 class="tile-title">AI-chattbotar</h3>
@@ -1461,31 +878,17 @@
 
         <article class="tile tile-flag fade-up" data-delay="140">
           <div class="tile-head">
-            <div class="tile-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="8" height="8" rx="2"/>
-                <rect x="13" y="13" width="8" height="8" rx="2"/>
-                <path d="M7 11v3a2 2 0 0 0 2 2h4"/>
-              </svg>
-            </div>
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/><path d="M7 11v3a2 2 0 0 0 2 2h4"/></svg></div>
             <span class="tile-number">01</span>
           </div>
           <h3 class="tile-title">AI-agenter</h3>
           <p class="tile-desc">Skräddarsydda AI-agenter som automatiserar era arbetsflöden och frigör tid till det som faktiskt driver verksamheten framåt.</p>
-          <div class="tile-foot">
-            <span class="tile-meta">Flaggskepp</span>
-          </div>
+          <div class="tile-foot"><span class="tile-meta">Flaggskepp</span></div>
         </article>
 
         <article class="tile tile-a fade-up" data-delay="200">
           <div class="tile-head">
-            <div class="tile-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2"/>
-                <path d="M3 9h18"/>
-                <path d="M9 9v12"/>
-              </svg>
-            </div>
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 9v12"/></svg></div>
             <span class="tile-number">03</span>
           </div>
           <h3 class="tile-title">Webbutveckling</h3>
@@ -1494,12 +897,7 @@
 
         <article class="tile tile-b fade-up" data-delay="260">
           <div class="tile-head">
-            <div class="tile-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 17 9 11 13 15 21 7"/>
-                <path d="M15 7h6v6"/>
-              </svg>
-            </div>
+            <div class="tile-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17 9 11 13 15 21 7"/><path d="M15 7h6v6"/></svg></div>
             <span class="tile-number">04</span>
           </div>
           <h3 class="tile-title">Marknadsföring &amp; kommunikation</h3>
@@ -1515,22 +913,13 @@
         <div class="om-head fade-up" data-delay="0">
           <span class="label">Om oss</span>
           <h2 class="section-title" id="om-title">Ett ungt team <span class="soft">med stor nyfikenhet</span></h2>
-          <p class="om-lede">
-            Integra AI är ett UF-företag från Halmstad. Vi är en liten grupp studenter som bygger det vi själva saknade: en AI-partner som talar klarspråk och levererar verkligt värde.
-          </p>
+          <p class="om-lede">Integra AI är ett UF-företag från Halmstad. Vi är en liten grupp studenter som bygger det vi själva saknade: en AI-partner som talar klarspråk och levererar verkligt värde.</p>
         </div>
         <div class="om-body fade-up" data-delay="120">
-          <p>
-            Vi startade Integra AI för att hjälpa verksamheterna runt omkring oss — kommuner, offentliga organisationer och företag — att ta steget in i AI-eran. Utan jargong, utan onödig komplexitet och utan långa bindningstider.
-          </p>
-          <p>
-            Det vi saknar i erfarenhet kompenserar vi med energi, djup nyfikenhet och en arbetsetik som säger ja till att lära oss det som krävs. Vi testar, mäter och justerar tills lösningen faktiskt fungerar i er vardag.
-          </p>
-          <p>
-            Varje uppdrag börjar med ett samtal. Vi lyssnar mer än vi pratar, förstår hur ni arbetar idag och föreslår bara det som gör verklig skillnad. Inga paketlösningar — bara det som passar er.
-          </p>
+          <p>Vi startade Integra AI för att hjälpa verksamheterna runt omkring oss — kommuner, offentliga organisationer och företag — att ta steget in i AI-eran. Utan jargong, utan onödig komplexitet och utan långa bindningstider.</p>
+          <p>Det vi saknar i erfarenhet kompenserar vi med energi, djup nyfikenhet och en arbetsetik som säger ja till att lära oss det som krävs. Vi testar, mäter och justerar tills lösningen faktiskt fungerar i er vardag.</p>
+          <p>Varje uppdrag börjar med ett samtal. Vi lyssnar mer än vi pratar, förstår hur ni arbetar idag och föreslår bara det som gör verklig skillnad. Inga paketlösningar — bara det som passar er.</p>
         </div>
-
         <div class="om-stats fade-up" data-delay="0">
           <div class="om-stat">
             <span class="om-stat-label">Svarstid</span>
@@ -1557,100 +946,36 @@
       <div class="faq-head fade-up" data-delay="0">
         <span class="label">Vanliga frågor</span>
         <h2 class="section-title" id="faq-title">Svar på det ni <span class="soft">brukar undra</span></h2>
-        <p class="section-lede">
-          Har ni en fråga som inte står här? Skicka ett mail — vi svarar inom 24 timmar.
-        </p>
+        <p class="section-lede">Har ni en fråga som inte står här? Skicka ett mail — vi svarar inom 24 timmar.</p>
       </div>
       <div class="faq-list fade-up" data-delay="120" role="list">
         <div class="faq-item" role="listitem">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-idx">01</span>
-            <span>Vad kostar det att börja med AI?</span>
-            <span class="faq-icon" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">
-            <p>Första samtalet är alltid kostnadsfritt. Där kartlägger vi vad ni vill uppnå och vad som är rimligt att börja med. Därefter får ni en tydlig offert — inga dolda avgifter, inga långa bindningstider.</p>
-          </div></div>
+          <button class="faq-q" aria-expanded="false"><span class="faq-idx">01</span><span>Vad kostar det att börja med AI?</span><span class="faq-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Första samtalet är alltid kostnadsfritt. Där kartlägger vi vad ni vill uppnå och vad som är rimligt att börja med. Därefter får ni en tydlig offert — inga dolda avgifter, inga långa bindningstider.</p></div></div>
         </div>
-
         <div class="faq-item" role="listitem">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-idx">02</span>
-            <span>Vi har ingen teknisk kunskap internt — fungerar det ändå?</span>
-            <span class="faq-icon" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">
-            <p>Ja, det är faktiskt de flesta vi jobbar med. Vi tar hand om allt tekniskt och ser till att lösningen är enkel att använda. Vi lämnar aldrig över något som kräver en utvecklare för att fungera.</p>
-          </div></div>
+          <button class="faq-q" aria-expanded="false"><span class="faq-idx">02</span><span>Vi har ingen teknisk kunskap internt — fungerar det ändå?</span><span class="faq-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Ja, det är faktiskt de flesta vi jobbar med. Vi tar hand om allt tekniskt och ser till att lösningen är enkel att använda. Vi lämnar aldrig över något som kräver en utvecklare för att fungera.</p></div></div>
         </div>
-
         <div class="faq-item" role="listitem">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-idx">03</span>
-            <span>Hur lång tid tar ett typiskt projekt?</span>
-            <span class="faq-icon" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">
-            <p>En enklare chattbot eller automatisering kan vara igång på två till fyra veckor. Större integrationer tar längre tid — men vi jobbar iterativt så ni ser resultat löpande, inte först vid leverans.</p>
-          </div></div>
+          <button class="faq-q" aria-expanded="false"><span class="faq-idx">03</span><span>Hur lång tid tar ett typiskt projekt?</span><span class="faq-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>En enklare chattbot eller automatisering kan vara igång på två till fyra veckor. Större integrationer tar längre tid — men vi jobbar iterativt så ni ser resultat löpande, inte först vid leverans.</p></div></div>
         </div>
-
         <div class="faq-item" role="listitem">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-idx">04</span>
-            <span>Vad händer med vår data?</span>
-            <span class="faq-icon" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">
-            <p>Er data är er data. Vi använder GDPR-kompatibla lösningar, lagrar data inom EU där det är möjligt, tränar inte publika modeller på ert innehåll och är transparenta med var informationen finns. För offentlig sektor kan vi också anpassa lösningen efter era krav på informationssäkerhet och offentlighetsprincipen.</p>
-          </div></div>
+          <button class="faq-q" aria-expanded="false"><span class="faq-idx">04</span><span>Vad händer med vår data?</span><span class="faq-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Er data är er data. Vi använder GDPR-kompatibla lösningar, lagrar data inom EU där det är möjligt, tränar inte publika modeller på ert innehåll och är transparenta med var informationen finns.</p></div></div>
         </div>
-
         <div class="faq-item" role="listitem">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-idx">05</span>
-            <span>Är ni inte lite unga för det här?</span>
-            <span class="faq-icon" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">
-            <p>Fråga rimlig. Vi är ett UF-företag, men AI är ett område där aktuell kunskap väger tyngre än år i branschen. Vi är ärliga om vad vi kan och inte kan — och vi levererar bara det vi vet att vi kan göra bra.</p>
-          </div></div>
+          <button class="faq-q" aria-expanded="false"><span class="faq-idx">05</span><span>Är ni inte lite unga för det här?</span><span class="faq-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Fråga rimlig. Vi är ett UF-företag, men AI är ett område där aktuell kunskap väger tyngre än år i branschen. Vi är ärliga om vad vi kan och inte kan — och vi levererar bara det vi vet att vi kan göra bra.</p></div></div>
         </div>
-
         <div class="faq-item" role="listitem">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-idx">06</span>
-            <span>Jobbar ni bara med verksamheter i Halmstad?</span>
-            <span class="faq-icon" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">
-            <p>Vi utgår från Halmstad men arbetar digitalt med verksamheter i hela Sverige. Första samtalet kan vara på plats, över video eller telefon — vad som passar er bäst.</p>
-          </div></div>
+          <button class="faq-q" aria-expanded="false"><span class="faq-idx">06</span><span>Jobbar ni bara med verksamheter i Halmstad?</span><span class="faq-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Vi utgår från Halmstad men arbetar digitalt med verksamheter i hela Sverige. Första samtalet kan vara på plats, över video eller telefon — vad som passar er bäst.</p></div></div>
         </div>
-
         <div class="faq-item" role="listitem">
-          <button class="faq-q" aria-expanded="false">
-            <span class="faq-idx">07</span>
-            <span>Kan ni arbeta med kommuner och offentliga verksamheter?</span>
-            <span class="faq-icon" aria-hidden="true">
-              <svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
-            </span>
-          </button>
-          <div class="faq-a"><div class="faq-a-inner">
-            <p>Ja. Vi anpassar vårt arbetssätt efter de krav som gäller i offentlig sektor — från informationssäkerhet och dataskydd till dokumentation och avtalsform. Är ni en kommun eller myndighet som vill utforska vad AI kan göra hos er, boka ett kostnadsfritt samtal så berättar vi hur vi brukar lägga upp det.</p>
-          </div></div>
+          <button class="faq-q" aria-expanded="false"><span class="faq-idx">07</span><span>Kan ni arbeta med kommuner och offentliga verksamheter?</span><span class="faq-icon" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M6 2 V10 M2 6 H10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></button>
+          <div class="faq-a"><div class="faq-a-inner"><p>Ja. Vi anpassar vårt arbetssätt efter de krav som gäller i offentlig sektor — från informationssäkerhet och dataskydd till dokumentation och avtalsform. Är ni en kommun eller myndighet som vill utforska vad AI kan göra hos er, boka ett kostnadsfritt samtal så berättar vi hur vi brukar lägga upp det.</p></div></div>
         </div>
       </div>
     </div>
@@ -1661,9 +986,7 @@
       <div class="kontakt-head fade-up" data-delay="0">
         <span class="label">Kontakt</span>
         <h2 class="kontakt-h2" id="kontakt-title">Kontakta <span class="soft">oss</span></h2>
-        <p class="kontakt-lede">
-          Berätta hur ni vill arbeta idag — och vad som skaver. Vi lyssnar först, föreslår sedan.
-        </p>
+        <p class="kontakt-lede">Berätta hur ni vill arbeta idag — och vad som skaver. Vi lyssnar först, föreslår sedan.</p>
       </div>
       <div class="kontakt-actions fade-up" data-delay="120">
         <a class="kontakt-email" href="mailto:integraaiuf@gmail.com">
@@ -1682,14 +1005,9 @@
 <footer class="footer" role="contentinfo">
   <div class="footer-inner">
     <div class="footer-brand">
-      <a href="#" class="brand" aria-label="Integra AI startsida">
-          <span>Integra&nbsp;AI</span>
-      </a>
-      <p class="footer-tag">
-        En AI-partner från Halmstad. Lugn takt och tydliga leveranser.
-      </p>
+      <a href="#" class="brand" aria-label="Integra AI startsida"><span>Integra&nbsp;AI</span></a>
+      <p class="footer-tag">En AI-partner från Halmstad. Lugn takt och tydliga leveranser.</p>
     </div>
-
     <div class="footer-col">
       <h4>Tjänster</h4>
       <ul>
@@ -1699,7 +1017,6 @@
         <li><a href="#tjanster">Marknadsföring</a></li>
       </ul>
     </div>
-
     <div class="footer-col">
       <h4>Chattbotar</h4>
       <ul>
@@ -1709,9 +1026,9 @@
         <li><a href="halmstad-chattbot.html">HalmstadGPT</a></li>
         <li><a href="hallandstrafiken-chattbot-ny.html">Hallandstrafiken</a></li>
         <li><a href="jonkoping-chattbot.html">JönköpingGPT</a></li>
+        <li><a href="skane-chattbot.html">SkåneGPT</a></li>
       </ul>
     </div>
-
     <div class="footer-col">
       <h4>Företag</h4>
       <ul>
@@ -1720,17 +1037,15 @@
         <li><a href="#kontakt">Kontakt</a></li>
       </ul>
     </div>
-
     <div class="footer-col">
       <h4>Följ</h4>
       <ul>
-        <li><a href="#" data-todo="LinkedIn-URL">LinkedIn</a></li>
-        <li><a href="#" data-todo="Instagram-URL">Instagram</a></li>
-        <li><a href="#" data-todo="Integritetspolicy-URL">Integritetspolicy</a></li>
+        <li><a href="#">LinkedIn</a></li>
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">Integritetspolicy</a></li>
       </ul>
     </div>
   </div>
-
   <div class="footer-base">
     <span>© 2026 Integra AI</span>
     <span>Halmstad · Sverige</span>
@@ -1743,54 +1058,29 @@
   const nav = document.getElementById('nav');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Custom rAF-based smooth scroll — guaranteed animation, works regardless of
-  // prefers-reduced-motion (intentional user click is not an ambient animation).
-  //
-  // Spam-safe: tracks the single active rAF and target Y. Clicking the same
-  // link repeatedly while an animation runs is a no-op. Clicking a *different*
-  // link mid-scroll cancels the in-flight animation and starts a fresh one
-  // from the current position — so total time never exceeds one 900 ms run,
-  // regardless of how many clicks the user fires.
   let scrollRafId = null;
   let scrollTargetY = null;
   const smoothScrollTo = (targetY, duration = 900) => {
     if (scrollRafId !== null && scrollTargetY === targetY) return;
-    if (scrollRafId !== null) {
-      cancelAnimationFrame(scrollRafId);
-      scrollRafId = null;
-    }
+    if (scrollRafId !== null) { cancelAnimationFrame(scrollRafId); scrollRafId = null; }
     const startY = window.scrollY;
     const diff = targetY - startY;
     if (Math.abs(diff) < 2) { scrollTargetY = null; return; }
     scrollTargetY = targetY;
-    // Mark body so CSS can disable pointer events on all scroll triggers.
     document.body.classList.add('is-scrolling');
     const startTime = performance.now();
     const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
     const step = (now) => {
       const t = Math.min(1, (now - startTime) / duration);
-      // explicit `auto` so even if a style rule re-enables scroll-behavior
-      // globally later, our per-frame scrollTo stays instant and doesn't
-      // trigger a browser-level animation on top of ours.
       window.scrollTo({ top: Math.round(startY + diff * ease(t)), left: 0, behavior: 'auto' });
-      if (t < 1) {
-        scrollRafId = requestAnimationFrame(step);
-      } else {
-        scrollRafId = null;
-        scrollTargetY = null;
-        document.body.classList.remove('is-scrolling');
-      }
+      if (t < 1) { scrollRafId = requestAnimationFrame(step); }
+      else { scrollRafId = null; scrollTargetY = null; document.body.classList.remove('is-scrolling'); }
     };
     scrollRafId = requestAnimationFrame(step);
   };
 
-  // Resolve a target element and perform the smooth scroll.
-  // A bare "#" is treated as "scroll to the top of the page" (used by the logo).
   const scrollToSelector = (selector, extra = 0) => {
-    if (!selector || selector === '#') {
-      smoothScrollTo(0, 950);
-      return true;
-    }
+    if (!selector || selector === '#') { smoothScrollTo(0, 950); return true; }
     const target = document.querySelector(selector);
     if (!target) return false;
     const navH = nav ? nav.offsetHeight : 0;
@@ -1799,60 +1089,38 @@
     return true;
   };
 
-  // Extra spam guard for rapid repeat clicks: 250 ms cooldown between any
-  // two scroll-trigger clicks, and body-level `scrolling` class that
-  // disables pointer events on all triggers while an animation runs.
   let lastScrollClickAt = 0;
   const SCROLL_CLICK_COOLDOWN = 250;
   const bindScrollTrigger = (el, selector) => {
     el.addEventListener('click', (e) => {
       const now = performance.now();
-      if (now - lastScrollClickAt < SCROLL_CLICK_COOLDOWN) {
-        e.preventDefault();
-        return;
-      }
+      if (now - lastScrollClickAt < SCROLL_CLICK_COOLDOWN) { e.preventDefault(); return; }
       lastScrollClickAt = now;
       const extra = parseInt(el.dataset.scrollOffset || '0', 10);
       if (scrollToSelector(selector, extra)) e.preventDefault();
     });
   };
 
-  // Explicit [data-scroll-to] triggers (e.g. the hero "Scrolla" button)
-  document.querySelectorAll('[data-scroll-to]').forEach((el) => {
-    bindScrollTrigger(el, el.getAttribute('data-scroll-to'));
-  });
-
-  // Any internal hash link gets the same smooth behavior (nav links, CTA,
-  // footer links, mobile menu, the logo "#" which goes back to the top).
+  document.querySelectorAll('[data-scroll-to]').forEach((el) => { bindScrollTrigger(el, el.getAttribute('data-scroll-to')); });
   document.querySelectorAll('a[href^="#"]').forEach((a) => {
     const href = a.getAttribute('href');
     if (!href) return;
-    // Non-top hashes require an existing element; "#" always works (→ top).
     if (href !== '#' && !document.querySelector(href)) return;
     bindScrollTrigger(a, href);
   });
 
-  // Nav scroll state — smoothly interpolate over the first 80px instead of snapping
   const NAV_RANGE = 80;
   let navTicking = false;
   const applyNav = () => {
     const raw = window.scrollY / NAV_RANGE;
     const p = raw < 0 ? 0 : raw > 1 ? 1 : raw;
-    // ease the progress slightly so the transition feels more organic
     const eased = p * p * (3 - 2 * p);
     nav.style.setProperty('--nav-p', eased.toFixed(4));
     navTicking = false;
   };
-  const onScroll = () => {
-    if (!navTicking) {
-      navTicking = true;
-      requestAnimationFrame(applyNav);
-    }
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('scroll', () => { if (!navTicking) { navTicking = true; requestAnimationFrame(applyNav); } }, { passive: true });
   applyNav();
 
-  // Cursor-following glow on primary buttons
   document.querySelectorAll('.btn-primary').forEach(btn => {
     btn.addEventListener('pointermove', (e) => {
       const rect = btn.getBoundingClientRect();
@@ -1861,52 +1129,34 @@
     });
   });
 
-  // Scroll progress bar — rAF-lerped so the bar glides smoothly from left
-  // to right instead of jumping one scroll-event at a time. target = actual
-  // scroll fraction; displayed eases toward it every frame.
   (() => {
     const bar = document.querySelector('.scroll-progress');
     if (!bar) return;
-    let target = 0;
-    let displayed = 0;
-    let rafId = null;
-
+    let target = 0, displayed = 0, rafId = null;
     const readTarget = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       target = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
       bar.classList.toggle('hidden', window.scrollY < 60);
       if (rafId == null) rafId = requestAnimationFrame(tick);
     };
-
     const tick = () => {
-      // ~7% of remaining distance per frame. at 60fps that converges in
-      // ~35 frames (~580ms) — a pronounced, cinematic glide that visibly
-      // trails behind the scroll position.
       const diff = target - displayed;
-      if (Math.abs(diff) < 0.0005) {
-        displayed = target;
-        bar.style.setProperty('--progress', displayed.toFixed(4));
-        rafId = null;
-        return;
-      }
+      if (Math.abs(diff) < 0.0005) { displayed = target; bar.style.setProperty('--progress', displayed.toFixed(4)); rafId = null; return; }
       displayed += diff * 0.07;
       bar.style.setProperty('--progress', displayed.toFixed(4));
       rafId = requestAnimationFrame(tick);
     };
-
     window.addEventListener('scroll', readTarget, { passive: true });
     window.addEventListener('resize', readTarget);
     readTarget();
   })();
 
   document.addEventListener('DOMContentLoaded', () => {
-    // Staggered fade-up for hero (runs on load)
     document.querySelectorAll('.hero .fade-up').forEach(el => {
       const d = parseInt(el.getAttribute('data-delay') || '0', 10);
       setTimeout(() => el.classList.add('in'), 100 + d);
     });
 
-    // Intersection-triggered fade-up for everything else
     const fadeObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) return;
@@ -1916,65 +1166,41 @@
         fadeObserver.unobserve(el);
       });
     }, { threshold: 0.14, rootMargin: '0px 0px -80px 0px' });
+    document.querySelectorAll('.fade-up').forEach(el => { if (el.closest('.hero')) return; fadeObserver.observe(el); });
 
-    document.querySelectorAll('.fade-up').forEach(el => {
-      if (el.closest('.hero')) return;
-      fadeObserver.observe(el);
-    });
-
-    // Subtle hero parallax — desktop only. On mobile the parallax combined
-    // with iOS Safari's dynamic viewport (address bar collapsing) produces
-    // a visible "drift + zoom" artefact, so we keep the photo fully static.
     const heroPhoto = document.querySelector('.hero-photo');
     const heroSection = document.querySelector('.hero');
     if (heroPhoto && heroSection && !reduceMotion) {
       const mobileMQ = window.matchMedia('(max-width: 900px), (pointer: coarse)');
       let ticking = false;
       const update = () => {
-        if (mobileMQ.matches) {
-          heroPhoto.style.transform = '';
-          ticking = false;
-          return;
-        }
+        if (mobileMQ.matches) { heroPhoto.style.transform = ''; ticking = false; return; }
         const y = window.scrollY;
         const h = heroSection.offsetHeight;
         if (y < h) heroPhoto.style.transform = `translate3d(0, ${y * 0.28}px, 0)`;
         ticking = false;
       };
-      window.addEventListener('scroll', () => {
-        if (!ticking) { requestAnimationFrame(update); ticking = true; }
-      }, { passive: true });
+      window.addEventListener('scroll', () => { if (!ticking) { requestAnimationFrame(update); ticking = true; } }, { passive: true });
       mobileMQ.addEventListener('change', update);
       update();
     }
 
-    // Scroll-scrubbed count-up + per-card parallax on Om oss-stats
     const omStats = document.querySelector('.om-stats');
-    const countEls = Array.from(document.querySelectorAll('[data-count-to]')).map(el => ({
-      el,
-      target: parseInt(el.getAttribute('data-count-to'), 10),
-      suffix: el.getAttribute('data-count-suffix') || '',
-    }));
+    const countEls = Array.from(document.querySelectorAll('[data-count-to]')).map(el => ({ el, target: parseInt(el.getAttribute('data-count-to'), 10), suffix: el.getAttribute('data-count-suffix') || '' }));
     const statCards = omStats ? Array.from(omStats.querySelectorAll('.om-stat')) : [];
-
-    if (reduceMotion) {
-      countEls.forEach(c => c.el.textContent = c.target + c.suffix);
-    } else if (omStats && (countEls.length || statCards.length)) {
+    if (reduceMotion) { countEls.forEach(c => c.el.textContent = c.target + c.suffix); }
+    else if (omStats && (countEls.length || statCards.length)) {
       const easeOut = (t) => 1 - Math.pow(1 - t, 3);
       let ticking = false;
       const updateStats = () => {
         ticking = false;
         const r = omStats.getBoundingClientRect();
         const wh = window.innerHeight;
-        // Progress: 0 when stats top hits 85% of viewport, 1 when it hits 35%
-        const startY = wh * 0.85;
-        const endY = wh * 0.35;
+        const startY = wh * 0.85, endY = wh * 0.35;
         const raw = (startY - r.top) / (startY - endY);
         const p = Math.min(1, Math.max(0, raw));
         const eased = easeOut(p);
-        countEls.forEach(c => {
-          c.el.textContent = Math.round(c.target * eased) + c.suffix;
-        });
+        countEls.forEach(c => { c.el.textContent = Math.round(c.target * eased) + c.suffix; });
         statCards.forEach((card, i) => {
           const delay = i * 0.12;
           const cp = Math.min(1, Math.max(0, (p - delay) / (1 - delay)));
@@ -1985,84 +1211,37 @@
       };
       countEls.forEach(c => c.el.textContent = '0' + c.suffix);
       statCards.forEach(card => { card.style.willChange = 'transform, opacity'; });
-      window.addEventListener('scroll', () => {
-        if (!ticking) { requestAnimationFrame(updateStats); ticking = true; }
-      }, { passive: true });
+      window.addEventListener('scroll', () => { if (!ticking) { requestAnimationFrame(updateStats); ticking = true; } }, { passive: true });
       window.addEventListener('resize', updateStats);
       updateStats();
     }
 
-    // Chattbotar mega-menu
     const dropdown = document.getElementById('bot-dropdown');
     const toggle = document.getElementById('bot-toggle');
     if (toggle) {
-      toggle.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const open = dropdown.classList.toggle('open');
-        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-      document.addEventListener('click', (e) => {
-        if (!dropdown.contains(e.target)) {
-          dropdown.classList.remove('open');
-          toggle.setAttribute('aria-expanded', 'false');
-        }
-      });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          dropdown.classList.remove('open');
-          toggle.setAttribute('aria-expanded', 'false');
-        }
-      });
+      toggle.addEventListener('click', (e) => { e.stopPropagation(); const open = dropdown.classList.toggle('open'); toggle.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+      document.addEventListener('click', (e) => { if (!dropdown.contains(e.target)) { dropdown.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); } });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { dropdown.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); } });
     }
 
-    // FAQ accordion — spring expand
     document.querySelectorAll('.faq-item').forEach(item => {
       const btn = item.querySelector('.faq-q');
       const panel = item.querySelector('.faq-a');
-      btn.addEventListener('click', () => {
-        const isOpen = item.classList.toggle('open');
-        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        panel.style.maxHeight = isOpen ? panel.scrollHeight + 'px' : '0';
-      });
+      btn.addEventListener('click', () => { const isOpen = item.classList.toggle('open'); btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false'); panel.style.maxHeight = isOpen ? panel.scrollHeight + 'px' : '0'; });
     });
-    // Keep open-panel heights correct on resize
-    window.addEventListener('resize', () => {
-      document.querySelectorAll('.faq-item.open .faq-a').forEach(panel => {
-        panel.style.maxHeight = panel.scrollHeight + 'px';
-      });
-    });
+    window.addEventListener('resize', () => { document.querySelectorAll('.faq-item.open .faq-a').forEach(panel => { panel.style.maxHeight = panel.scrollHeight + 'px'; }); });
 
-    // Mobile menu
     const menuToggle = document.getElementById('menu-toggle');
     const menuScrim = document.getElementById('menu-scrim');
     const mobileMenu = document.getElementById('mobile-menu');
     const iconMenu = menuToggle?.querySelector('.icon-menu');
     const iconClose = menuToggle?.querySelector('.icon-close');
-
-    const closeMenu = () => {
-      document.body.classList.remove('menu-open');
-      menuToggle.setAttribute('aria-expanded', 'false');
-      menuToggle.setAttribute('aria-label', 'Öppna meny');
-      if (iconMenu) iconMenu.style.display = '';
-      if (iconClose) iconClose.style.display = 'none';
-    };
-    const openMenu = () => {
-      document.body.classList.add('menu-open');
-      menuToggle.setAttribute('aria-expanded', 'true');
-      menuToggle.setAttribute('aria-label', 'Stäng meny');
-      if (iconMenu) iconMenu.style.display = 'none';
-      if (iconClose) iconClose.style.display = '';
-    };
-
-    menuToggle?.addEventListener('click', () => {
-      if (document.body.classList.contains('menu-open')) closeMenu();
-      else openMenu();
-    });
+    const closeMenu = () => { document.body.classList.remove('menu-open'); menuToggle.setAttribute('aria-expanded', 'false'); if (iconMenu) iconMenu.style.display = ''; if (iconClose) iconClose.style.display = 'none'; };
+    const openMenu = () => { document.body.classList.add('menu-open'); menuToggle.setAttribute('aria-expanded', 'true'); if (iconMenu) iconMenu.style.display = 'none'; if (iconClose) iconClose.style.display = ''; };
+    menuToggle?.addEventListener('click', () => { if (document.body.classList.contains('menu-open')) closeMenu(); else openMenu(); });
     menuScrim?.addEventListener('click', closeMenu);
     mobileMenu?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && document.body.classList.contains('menu-open')) closeMenu();
-    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.body.classList.contains('menu-open')) closeMenu(); });
   });
 
   /* ─── Tjänster smoke animation (WebGL) ─────────────────────────── */
@@ -2070,11 +1249,7 @@
     const canvas = document.querySelector('.tjanster-smoke');
     if (!canvas) return;
     const gl = canvas.getContext('webgl2', { antialias: false, alpha: true, premultipliedAlpha: true });
-    if (!gl) {
-      // No WebGL2 — CSS gradient fallback on .tjanster takes over.
-      console.warn('[tjanster-smoke] WebGL2 not available; using CSS fallback.');
-      return;
-    }
+    if (!gl) return;
 
     const vertexSrc = `#version 300 es
       precision highp float;
@@ -2094,99 +1269,62 @@
       float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);return mix(mix(rnd(i),rnd(i+vec2(1,0)),u.x),mix(rnd(i+vec2(0,1)),rnd(i+1.),u.x),u.y);}
       float fbm(vec2 p){float t=.0,a=1.;for(int i=0;i<5;i++){t+=a*noise(p);p*=mat2(1,-1.2,.2,1.2)*2.;a*=.5;}return t;}
       void main(){
-        // Symmetric coordinate system — threads spread across both sides evenly.
         vec2 uv = (FC - .5*R) / R.y;
         uv *= vec2(1.3, 1.0);
-
-        // Low-frequency flow warp — slow, sweeping distortion
         float flow = fbm(uv * 0.55 + vec2(T * 0.018, 0.0));
         float field = fbm(uv * 1.10 + flow * 0.85 + vec2(0.0, T * 0.012));
-
-        // Multiple iso-contours spread across the full value range of the field,
-        // so threads appear everywhere the field takes a value — left, center, right.
-        // Narrower bands = thinner threads.
         float alpha = 0.0;
         alpha += (1.0 - smoothstep(0.0, 0.045, abs(field - 0.22))) * 0.28;
         alpha += (1.0 - smoothstep(0.0, 0.050, abs(field - 0.38))) * 0.36;
         alpha += (1.0 - smoothstep(0.0, 0.045, abs(field - 0.54))) * 0.40;
         alpha += (1.0 - smoothstep(0.0, 0.040, abs(field - 0.70))) * 0.34;
         alpha += (1.0 - smoothstep(0.0, 0.035, abs(field - 0.84))) * 0.26;
-
         alpha = clamp(alpha, 0.0, 0.85);
         alpha *= min(time * 0.5, 1.0);
-
-        // Premultiplied-alpha output: pale sky-blue threads on transparent
         O = vec4(u_color * alpha, alpha);
       }`;
 
-    const compile = (type, src) => {
-      const s = gl.createShader(type);
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
-        console.error(gl.getShaderInfoLog(s));
-      }
-      return s;
-    };
-
+    const compile = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
     const vs = compile(gl.VERTEX_SHADER, vertexSrc);
     const fs = compile(gl.FRAGMENT_SHADER, fragmentSrc);
     const program = gl.createProgram();
-    gl.attachShader(program, vs);
-    gl.attachShader(program, fs);
-    gl.linkProgram(program);
-
+    gl.attachShader(program, vs); gl.attachShader(program, fs); gl.linkProgram(program);
     const buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,1,-1,-1,1,1,1,-1]), gl.STATIC_DRAW);
     const posLoc = gl.getAttribLocation(program, 'position');
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
     const uRes = gl.getUniformLocation(program, 'resolution');
     const uTime = gl.getUniformLocation(program, 'time');
     const uColor = gl.getUniformLocation(program, 'u_color');
-
-    // Very light sky-blue so the threads blend softly into the white background
-    const smokeColor = [0xC8/255, 0xDE/255, 0xF2/255]; // #C8DEF2
-
+    const smokeColor = [0xC8/255, 0xDE/255, 0xF2/255];
     const section = document.getElementById('tjanster');
     const updateSize = () => {
       const dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
-      const w = section.clientWidth;
-      const h = section.clientHeight;
-      canvas.width  = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
+      canvas.width = Math.floor(section.clientWidth * dpr);
+      canvas.height = Math.floor(section.clientHeight * dpr);
       gl.viewport(0, 0, canvas.width, canvas.height);
     };
     updateSize();
     window.addEventListener('resize', updateSize);
-    if (typeof ResizeObserver !== 'undefined') {
-      new ResizeObserver(updateSize).observe(section);
-    }
-
-    // Only render when the section is on-screen, to save GPU
+    if (typeof ResizeObserver !== 'undefined') new ResizeObserver(updateSize).observe(section);
     let onScreen = false;
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach(e => { onScreen = e.isIntersecting; });
-    }, { rootMargin: '200px 0px' });
+    const io = new IntersectionObserver((entries) => { entries.forEach(e => { onScreen = e.isIntersecting; }); }, { rootMargin: '200px 0px' });
     io.observe(section);
-
     gl.clearColor(0, 0, 0, 0);
-    let raf;
     const loop = (now) => {
       if (onScreen) {
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        gl.useProgram(program);
+        gl.clear(gl.COLOR_BUFFER_BIT); gl.useProgram(program);
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
         gl.uniform2f(uRes, canvas.width, canvas.height);
         gl.uniform1f(uTime, now * 1e-3);
         gl.uniform3fv(uColor, smokeColor);
         gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       }
-      raf = requestAnimationFrame(loop);
+      requestAnimationFrame(loop);
     };
-    raf = requestAnimationFrame(loop);
+    requestAnimationFrame(loop);
   })();
 })();
 </script>
