@@ -448,27 +448,33 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 6px;
-    border-radius: 10px;
-    background: var(--markaryd-blue);
-    color: #FFFFFF;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    border: 1.5px solid var(--markaryd-blue);
+    background: transparent;
+    color: var(--markaryd-blue);
     text-decoration: none;
-    font-size: 0.78em;
+    font-size: 0.72em;
     font-weight: 700;
-    line-height: 20px;
+    line-height: 18px;
     text-align: center;
     margin: 0 3px;
     vertical-align: middle;
-    transition: background 0.2s ease, transform 0.2s ease;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
   }
   .chat-link-fn:hover {
-    background: var(--markaryd-blue-hover);
+    background: var(--markaryd-blue);
+    color: #FFFFFF;
     transform: translateY(-1px);
     text-decoration: none;
   }
   .msg.user .chat-link-fn {
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+  }
+  .msg.user .chat-link-fn:hover {
     background: #FFFFFF;
     color: var(--markaryd-blue-deep);
   }
