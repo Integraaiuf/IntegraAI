@@ -444,6 +444,33 @@
     color: #FFFFFF;
     text-decoration-color: rgba(255,255,255,0.7);
   }
+  .chat-link-fn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: var(--markaryd-blue);
+    color: #FFFFFF;
+    text-decoration: none;
+    font-size: 0.72em;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0 2px;
+    vertical-align: super;
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+  .chat-link-fn:hover {
+    background: var(--markaryd-blue-hover);
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+  .msg.user .chat-link-fn {
+    background: #FFFFFF;
+    color: var(--markaryd-blue-deep);
+  }
   .msg-bubble ul {
     margin: 6px 0 2px 0;
     padding-left: 20px;
@@ -1464,24 +1491,47 @@
     URL.revokeObjectURL(url);
   }
 
+  function escHTML(s) {
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
   function formatMessage(text) {
-    let formatted = text;
+    // 1. HTML-escape ALL incoming text first — defense against AI returning HTML / XSS payloads.
+    let formatted = escHTML(text);
+
+    // 2. Markdown bold/italic (operates on already-escaped text — safe).
     formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
     formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
-    formatted = formatted.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    formatted = formatted.replace(/_(.+?)_/g, '<em>$1</em>');
-    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="chat-link">$1</a>');
-    formatted = formatted.replace(/(?<!href="|">)(https?:\/\/[^\s<>"]+)/g, function(url) {
+    formatted = formatted.replace(/(?<!\w)\*([^*\n]+?)\*(?!\w)/g, '<em>$1</em>');
+    formatted = formatted.replace(/(?<!\w)_([^_\n]+?)_(?!\w)/g, '<em>$1</em>');
+
+    // 3a. Footnote-style superscript links: [1](url) or [¹](url). Pure digit titles, 1-2 chars.
+    //     Renders as small rounded badge. Match before generic markdown links to avoid double-wrap.
+    formatted = formatted.replace(/\[([\d¹²³⁴⁵⁶⁷⁸⁹⁰]{1,2})\]\((https?:\/\/[^\s<>"'`)]+)\)/g, function(_, num, url) {
+      var supMap = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+      var display = num.split('').map(function(c){ return supMap[c] || c; }).join('');
+      return '<a href="' + escHTML(url) + '" target="_blank" rel="noopener noreferrer" class="chat-link-fn" aria-label="Källa ' + num + '">' + display + '</a>';
+    });
+
+    // 3b. Markdown links — strict URL regex (excludes ", <, >, ', `, space, paren).
+    //    URL is double-escaped via escHTML for href safety; title is already HTML-escaped above.
+    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s<>"'`)]+)\)/g, function(_, title, url) {
+      return '<a href="' + escHTML(url) + '" target="_blank" rel="noopener noreferrer" class="chat-link">' + title + '</a>';
+    });
+
+    // 4. Auto-link bare URLs not already inside an <a> tag.
+    formatted = formatted.replace(/(?<!href=")(https?:\/\/[^\s<>"'`]+)/g, function(url) {
       let title = url;
       try {
         const urlObj = new URL(url);
         const path = urlObj.pathname.replace(/\.html$|\.htm$/i, '').replace(/\.[a-z]+\d*$/i, '');
-        const parts = path.split('/').filter(p => p.length > 0);
+        const parts = path.split('/').filter(function(p) { return p.length > 0; });
         if (parts.length > 0) {
-          let lastPart = parts[parts.length - 1];
+          let lastPart = decodeURIComponent(parts[parts.length - 1]);
           lastPart = lastPart
             .replace(/([a-z])([A-Z])/g, '$1 $2')
-            .replace(/och/g, ' och ')
             .replace(/[-_]/g, ' ')
             .replace(/\s+/g, ' ')
             .trim();
@@ -1490,8 +1540,10 @@
           title = urlObj.hostname.replace('www.', '');
         }
       } catch(e) { title = 'Läs mer'; }
-      return '<a href="' + url + '" target="_blank" rel="noopener" class="chat-link">' + title + '</a>';
+      return '<a href="' + escHTML(url) + '" target="_blank" rel="noopener noreferrer" class="chat-link">' + escHTML(title) + '</a>';
     });
+
+    // 5. Lists + line breaks.
     formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
     formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
     formatted = formatted.replace(/\n/g, '<br>');
@@ -1681,7 +1733,7 @@
       if (!serverInteractionId) {
         console.warn('[Chat] Backend returnerade inget interactionId — rating kommer inte fungera.');
       }
-      addMessage('bot', reply, true, serverInteractionId);
+      addMessage('bot', reply, !!serverInteractionId, serverInteractionId);
     } catch (err) {
       if (sessionId !== originSessionId) return;
       removeTyping();
