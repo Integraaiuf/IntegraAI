@@ -1,0 +1,1769 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BromöllaGPT – Bromölla kommun</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bromolla-blue-deep:    #0F4861;
+    --bromolla-blue:         #218fb6;
+    --bromolla-blue-hover:   #1A6F8F;
+
+    --bromolla-accent:       #E8B843;
+    --bromolla-accent-hover: #218fb6;
+    --bromolla-accent-bright:#FFD356;
+
+    --bromolla-sky:          #B0CED7;
+    --bromolla-sky-light:    #D6E5EB;
+    --bromolla-sky-softer:   #F3F0EA;
+    --bromolla-sky-bubble:   #E0EBF1;
+
+    --text:             #0F2A3D;
+    --text-muted:       #4A6274;
+    --text-soft:        #7A8E9A;
+    --border:           #D0DEE6;
+    --border-strong:    #B0C4CE;
+    --bg:               #FFFFFF;
+    --bot-bubble:       #EDF5FA;
+    --user-bubble:      #218fb6;
+
+    --shadow-sm:  0 2px 6px rgba(15,72,97,0.08);
+    --shadow-md:  0 8px 24px rgba(15,72,97,0.12), 0 2px 6px rgba(15,72,97,0.06);
+    --shadow-lg:  0 16px 48px rgba(15,72,97,0.16), 0 4px 12px rgba(15,72,97,0.08);
+
+    --radius-sm:  8px;
+    --radius-md:  12px;
+    --radius-lg:  16px;
+    --radius-xl:  20px;
+
+    --focus-ring: 0 0 0 3px rgba(33,143,182,0.35);
+
+    --ease-spring:  cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-out:     cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  body {
+    font-family: 'Mulish', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bromolla-sky);
+    min-height: 100vh;
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ── Demo sida ── */
+  .demo-page {
+    min-height: 100vh;
+    max-width: none;
+    margin: 0;
+    padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background:
+      linear-gradient(rgba(0, 35, 65, 0.35), rgba(0, 35, 65, 0.35)),
+      url("./Bromolla-bakgrundsbild.png") center center / cover no-repeat;
+  }
+  .demo-page h1 {
+    font-size: 44px;
+    color: #FFFFFF;
+    margin-bottom: 18px;
+    font-weight: 800;
+    letter-spacing: -0.8px;
+    line-height: 1.1;
+    text-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  }
+  .demo-page p {
+    color: #FFFFFF;
+    line-height: 1.6;
+    font-size: 17px;
+    max-width: 560px;
+    text-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
+  }
+
+  /* ────────────────────────────────────────
+     CHAT TOGGLE BUTTON
+  ──────────────────────────────────────── */
+  .chat-toggle {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bromolla-blue);
+    color: #FFFFFF;
+    border: none;
+    padding: 14px 22px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(33,143,182,0.28), 0 2px 6px rgba(33,143,182,0.14);
+    transition:
+      opacity   0.55s var(--ease-spring),
+      transform 0.55s var(--ease-spring),
+      background-color 0.25s var(--ease-standard),
+      box-shadow 0.35s var(--ease-standard);
+    letter-spacing: 0.1px;
+  }
+  .chat-toggle:hover {
+    background: var(--bromolla-blue-hover);
+    box-shadow: 0 10px 28px rgba(33,143,182,0.38), 0 4px 10px rgba(33,143,182,0.2);
+    transform: translateY(-2px);
+  }
+  .chat-toggle:active:not(.hidden) {
+    transform: translateY(-1px);
+  }
+  .chat-toggle:focus-visible {
+    outline: none;
+    box-shadow: 0 6px 20px rgba(33,143,182,0.28), var(--focus-ring);
+  }
+  .chat-toggle.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.72) translateY(20px);
+  }
+  .chat-toggle svg {
+    flex-shrink: 0;
+  }
+
+  /* ────────────────────────────────────────
+     CHAT WINDOW
+  ──────────────────────────────────────── */
+  .chat-window {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 400px;
+    max-height: 620px;
+    height: 620px;
+    z-index: 10000;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(16px) scale(0.97);
+    transition:
+      opacity   0.45s var(--ease-spring),
+      transform 0.45s var(--ease-spring);
+    border: 1px solid var(--border);
+    transform-origin: center bottom;
+    will-change: transform, opacity;
+  }
+  .chat-window.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0) scale(1);
+  }
+
+  /* ── Header ── */
+  .chat-header {
+    background:
+      radial-gradient(ellipse 130% 100% at 110% 130%,
+        rgba(232,184,67,0.45) 0%,
+        rgba(232,184,67,0.18) 40%,
+        transparent 70%),
+      linear-gradient(160deg, #1A6F8F 0%, #218fb6 100%);
+    color: #FFFFFF;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    border-bottom: 1.5px solid rgba(0,0,0,0.12);
+    position: relative;
+    z-index: 30;
+  }
+  .chat-header-title {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 0;
+  }
+  .chat-header-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1.5px solid rgba(255,255,255,0.5);
+    overflow: hidden;
+  }
+  .chat-header-icon img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+  }
+  .chat-header-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+  .chat-header-name {
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+    line-height: 1.2;
+  }
+  .chat-header-subtitle {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+    margin-top: 1px;
+  }
+  .chat-header-actions {
+    display: flex;
+    gap: 4px;
+  }
+  .chat-header-actions button {
+    background: transparent;
+    border: none;
+    color: #FFFFFF;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background  0.3s var(--ease-spring),
+      opacity     0.3s var(--ease-spring),
+      transform   0.25s var(--ease-spring);
+    opacity: 0.82;
+    position: relative;
+  }
+  .chat-header-actions button:hover {
+    background: rgba(255,255,255,0.18);
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  .chat-header-actions button:active {
+    background: rgba(255,255,255,0.28);
+    transform: scale(0.94);
+  }
+  .chat-header-actions button:focus-visible {
+    outline: none;
+    background: rgba(255,255,255,0.18);
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.5);
+  }
+
+  /* ── Disclaimer ── */
+  .chat-disclaimer {
+    padding: 14px 16px;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    text-align: center;
+    background: var(--bromolla-sky-softer);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1.45;
+  }
+  .chat-disclaimer svg {
+    flex-shrink: 0;
+    color: var(--bromolla-blue);
+  }
+  .chat-disclaimer a {
+    color: var(--bromolla-blue-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 600;
+    transition: color 0.25s var(--ease-standard);
+  }
+  .chat-disclaimer a:hover {
+    color: var(--bromolla-blue-deep);
+  }
+
+  /* ── Chat body ── */
+  .chat-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(180deg, var(--bromolla-sky-softer) 0%, #FFFFFF 40%, #FFFFFF 100%);
+  }
+
+  .chat-messages {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 18px 16px 8px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    scroll-behavior: smooth;
+  }
+  .chat-messages::-webkit-scrollbar { width: 6px; }
+  .chat-messages::-webkit-scrollbar-track { background: transparent; }
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: #C0D0D8;
+    border-radius: 10px;
+  }
+  .chat-messages::-webkit-scrollbar-thumb:hover { background: #A0B4BE; }
+
+  /* ── Message bubbles ── */
+  .msg {
+    display: flex;
+    gap: 10px;
+    max-width: 88%;
+    min-width: 0;
+    animation: msgIn 0.65s var(--ease-spring) both;
+    transition:
+      opacity   0.45s var(--ease-out),
+      transform 0.45s var(--ease-out);
+    will-change: transform, opacity;
+  }
+  @keyframes msgIn {
+    0%   { opacity: 0; transform: translateY(18px) scale(0.95); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .msg.fading-out {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.96);
+  }
+
+  .msg.bot { align-self: flex-start; }
+  .msg.user { align-self: flex-end; flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    background: #FFFFFF;
+    color: var(--bromolla-blue-hover);
+    border: 1.5px solid var(--border);
+    overflow: hidden;
+  }
+  .msg-avatar img {
+    width: 80%;
+    height: 80%;
+    object-fit: contain;
+  }
+  .msg.user .msg-avatar {
+    background: var(--bromolla-blue);
+    color: #FFFFFF;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .msg.human .msg-avatar {
+    background: #FFF4E0;
+    color: #8B5A1A;
+  }
+
+  .msg-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .msg-bubble {
+    padding: 11px 14px;
+    border-radius: var(--radius-md);
+    font-size: 14.5px;
+    line-height: 1.55;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    max-width: 100%;
+    overflow: hidden;
+    color: var(--text);
+  }
+  .msg.bot .msg-bubble {
+    background: var(--bot-bubble);
+    border-bottom-left-radius: 4px;
+  }
+  .msg.user .msg-bubble {
+    background: var(--user-bubble);
+    color: #FFFFFF;
+    border-bottom-right-radius: 4px;
+  }
+  .msg.human .msg-bubble {
+    background: #FFF4E0;
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+  }
+
+  .msg-time {
+    font-size: 10.5px;
+    color: var(--text-soft);
+    padding: 0 2px;
+    font-weight: 500;
+  }
+  .msg.user .msg-time { text-align: right; }
+
+  /* ── Länk i meddelandet ── */
+  .chat-link {
+    color: var(--bromolla-blue-hover);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1.2px;
+    font-weight: 600;
+    transition: color 0.3s var(--ease-spring);
+  }
+  .chat-link:hover {
+    color: var(--bromolla-blue-deep);
+    text-decoration-thickness: 2px;
+  }
+  .msg.user .chat-link {
+    color: #FFFFFF;
+    text-decoration-color: rgba(255,255,255,0.7);
+  }
+  .chat-link-fn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    border: 1.5px solid var(--bromolla-blue);
+    background: transparent;
+    color: var(--bromolla-blue);
+    text-decoration: none;
+    font-size: 0.72em;
+    font-weight: 700;
+    line-height: 18px;
+    text-align: center;
+    margin: 0 3px;
+    vertical-align: middle;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  }
+  .chat-link-fn:hover {
+    background: var(--bromolla-blue);
+    color: #FFFFFF;
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+  .msg.user .chat-link-fn {
+    border-color: #FFFFFF;
+    color: #FFFFFF;
+  }
+  .msg.user .chat-link-fn:hover {
+    background: #FFFFFF;
+    color: var(--bromolla-blue-deep);
+  }
+  .msg-bubble ul {
+    margin: 6px 0 2px 0;
+    padding-left: 20px;
+    list-style: disc;
+  }
+  .msg-bubble li { margin-bottom: 4px; }
+  .msg-bubble strong { font-weight: 700; }
+
+  /* ── Stjärnbetyg ── */
+  .msg-feedback {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+    margin-top: 2px;
+    padding-left: 2px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity   0.55s var(--ease-spring) 0.85s,
+      transform 0.55s var(--ease-spring) 0.85s;
+  }
+  .msg-feedback.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .star-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 3px 2px;
+    color: var(--border-strong);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      color     0.15s var(--ease-standard),
+      transform 0.2s  var(--ease-spring);
+  }
+  .star-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .star-btn.hovered {
+    color: var(--bromolla-accent-bright);
+    transform: scale(1.18) translateY(-1px);
+  }
+  .star-btn.filled {
+    color: var(--bromolla-blue);
+  }
+  .star-btn.locked {
+    cursor: default;
+    transform: none !important;
+  }
+  @keyframes starPop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.4); }
+    70%  { transform: scale(0.88); }
+    100% { transform: scale(1); }
+  }
+  .star-btn.pop {
+    animation: starPop 0.5s var(--ease-spring);
+  }
+  .feedback-thanks {
+    font-size: 11px;
+    color: var(--text-soft);
+    font-style: italic;
+    align-self: center;
+    margin-left: 6px;
+    animation: thanksIn 0.55s var(--ease-spring);
+  }
+  @keyframes thanksIn {
+    0%   { opacity: 0; transform: translateX(-10px); }
+    60%  { opacity: 1; }
+    100% { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── Typing indicator ── */
+  .typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 0 2px;
+    align-items: center;
+    height: 20px;
+  }
+  .typing-indicator span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--bromolla-blue);
+    opacity: 0.28;
+    animation: typeDot 1.4s ease-in-out infinite;
+    will-change: opacity;
+    backface-visibility: hidden;
+  }
+  .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typeDot {
+    0%, 100% { opacity: 0.28; }
+    50%      { opacity: 1; }
+  }
+
+  /* ────────────────────────────────────────
+     INPUT BAR
+  ──────────────────────────────────────── */
+  .chat-input-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px 14px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .chat-input-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+  .chat-input-wrap input {
+    width: 100%;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 999px;
+    padding: 11px 44px 11px 16px;
+    font-family: inherit;
+    font-size: 14.5px;
+    color: var(--text);
+    transition:
+      border-color 0.35s var(--ease-spring),
+      box-shadow   0.35s var(--ease-spring),
+      background   0.35s var(--ease-spring);
+    background: #FFFFFF;
+  }
+  .chat-input-wrap input:focus {
+    outline: none;
+    border-color: var(--bromolla-blue);
+    box-shadow: var(--focus-ring);
+  }
+  .chat-input-wrap input::placeholder {
+    color: var(--text-soft);
+  }
+  .chat-input-wrap input:disabled {
+    background: #F5F5F5;
+    cursor: not-allowed;
+  }
+
+  /* Inbäddad send-knapp i input */
+  .send-btn-inline {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bromolla-blue);
+    border: none;
+    color: #FFFFFF;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background   0.3s var(--ease-spring),
+      transform    0.35s var(--ease-spring),
+      box-shadow   0.35s var(--ease-spring);
+    box-shadow: 0 2px 6px rgba(33,143,182,0.25);
+  }
+  .send-btn-inline:hover {
+    background: var(--bromolla-blue-hover);
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 0 5px 14px rgba(33,143,182,0.38);
+  }
+  .send-btn-inline:active {
+    transform: translateY(-50%) scale(0.93);
+    box-shadow: 0 2px 6px rgba(33,143,182,0.2);
+  }
+  .send-btn-inline:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+  .send-btn-inline:disabled {
+    background: #B0C4CE;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .char-counter {
+    position: absolute;
+    bottom: -16px;
+    right: 14px;
+    font-size: 10.5px;
+    font-family: inherit;
+    color: var(--text-soft);
+    pointer-events: none;
+    transition:
+      opacity 0.4s var(--ease-spring),
+      color   0.4s var(--ease-spring);
+    opacity: 0;
+    font-weight: 500;
+  }
+  .char-counter.visible { opacity: 1; }
+  .char-counter.warning { color: #B87820; opacity: 1; }
+  .char-counter.limit { color: #A84040; font-weight: 700; opacity: 1; }
+
+  /* Utility-knappar */
+  .util-btn {
+    background: var(--bromolla-blue);
+    border: none;
+    color: #FFFFFF;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background  0.3s var(--ease-spring),
+      transform   0.35s var(--ease-spring),
+      box-shadow  0.35s var(--ease-spring);
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(33,143,182,0.25);
+  }
+  .util-btn:hover {
+    background: var(--bromolla-blue-hover);
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 5px 14px rgba(33,143,182,0.38);
+  }
+  .util-btn:active {
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 2px 6px rgba(33,143,182,0.2);
+  }
+  .util-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 2px 6px rgba(33,143,182,0.25), var(--focus-ring);
+  }
+
+  /* ────────────────────────────────────────
+     TOOLTIPS
+  ──────────────────────────────────────── */
+  [data-tooltip] { position: relative; }
+  [data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    background: var(--bromolla-blue-deep);
+    color: #FFFFFF;
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity   0.3s var(--ease-spring),
+      transform 0.3s var(--ease-spring);
+    z-index: 1000;
+    box-shadow: var(--shadow-sm);
+  }
+  [data-tooltip]::before {
+    content: '';
+    position: absolute;
+    bottom: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    border: 5px solid transparent;
+    border-top-color: var(--bromolla-blue-deep);
+    pointer-events: none;
+    opacity: 0;
+    transition:
+      opacity   0.3s var(--ease-spring),
+      transform 0.3s var(--ease-spring);
+    z-index: 1000;
+  }
+  [data-tooltip]:hover::after,
+  [data-tooltip]:hover::before,
+  [data-tooltip]:focus-visible::after,
+  [data-tooltip]:focus-visible::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .chat-header-actions [data-tooltip]::after {
+    bottom: auto;
+    top: calc(100% + 8px);
+  }
+  .chat-header-actions [data-tooltip]::before {
+    bottom: auto;
+    top: calc(100% + 2px);
+    border-top-color: transparent;
+    border-bottom-color: var(--bromolla-blue-deep);
+  }
+  [data-tooltip-align="left"]::after {
+    left: 0;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="left"]:hover::after,
+  [data-tooltip-align="left"]:focus-visible::after {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="left"]::before {
+    left: 18px;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="left"]:hover::before,
+  [data-tooltip-align="left"]:focus-visible::before {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="right"]::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="right"]:hover::after,
+  [data-tooltip-align="right"]:focus-visible::after {
+    transform: translateX(0) translateY(0);
+  }
+  [data-tooltip-align="right"]::before {
+    left: auto;
+    right: 12px;
+    transform: translateX(0) translateY(6px);
+  }
+  [data-tooltip-align="right"]:hover::before,
+  [data-tooltip-align="right"]:focus-visible::before {
+    transform: translateX(0) translateY(0);
+  }
+
+  /* ────────────────────────────────────────
+     RATE LIMIT TOAST
+  ──────────────────────────────────────── */
+  .rate-limit-toast {
+    position: absolute;
+    bottom: 78px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: #7A3030;
+    color: #FFFFFF;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 600;
+    font-family: inherit;
+    box-shadow: 0 6px 20px rgba(122,48,48,0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity   0.4s var(--ease-spring),
+      transform 0.4s var(--ease-spring);
+    z-index: 10;
+    white-space: nowrap;
+  }
+  .rate-limit-toast.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ────────────────────────────────────────
+     ACTIONS MENU (dropdown)
+  ──────────────────────────────────────── */
+  .actions-menu {
+    position: absolute;
+    top: 58px;
+    right: 10px;
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    min-width: 200px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-12px) scale(0.96);
+    transform-origin: top right;
+    transition:
+      opacity   0.4s var(--ease-spring),
+      transform 0.4s var(--ease-spring);
+    z-index: 50;
+    overflow: hidden;
+  }
+  .actions-menu.open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0) scale(1);
+  }
+  .actions-menu button {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 11px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    cursor: pointer;
+    text-align: left;
+    transition:
+      background-color 0.25s var(--ease-standard),
+      color            0.25s var(--ease-standard);
+  }
+  .actions-menu button:hover {
+    background: var(--bromolla-sky-softer);
+    color: var(--bromolla-blue-hover);
+  }
+  .actions-menu button:focus-visible {
+    outline: none;
+    background: var(--bromolla-sky-bubble);
+  }
+  .actions-menu button + button {
+    border-top: 1px solid var(--border);
+  }
+  .actions-menu svg {
+    flex-shrink: 0;
+    color: var(--bromolla-blue);
+  }
+
+  /* ────────────────────────────────────────
+     CONTACT OVERLAY
+  ──────────────────────────────────────── */
+  .contact-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    background: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition:
+      opacity   0.5s var(--ease-spring),
+      transform 0.5s var(--ease-spring);
+  }
+  .contact-overlay.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .contact-header {
+    padding: 14px 16px;
+    background: var(--bromolla-sky-softer);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .contact-header-text { min-width: 0; }
+  .contact-header-title-text {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--bromolla-blue-deep);
+    line-height: 1.2;
+  }
+  .contact-header-sub {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    line-height: 1.35;
+  }
+  .contact-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--bromolla-blue-hover);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+      background 0.3s var(--ease-spring),
+      color      0.3s var(--ease-spring),
+      transform  0.25s var(--ease-spring);
+    flex-shrink: 0;
+  }
+  .contact-close-btn:hover {
+    background: rgba(33,143,182,0.14);
+    color: var(--bromolla-blue);
+    transform: scale(1.1) rotate(5deg);
+  }
+  .contact-close-btn:active {
+    background: rgba(33,143,182,0.22);
+    transform: scale(0.92);
+  }
+  .contact-close-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  .contact-overlay-inner {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 16px 20px 16px;
+  }
+  .contact-overlay-inner::-webkit-scrollbar { width: 6px; }
+  .contact-overlay-inner::-webkit-scrollbar-track { background: transparent; }
+  .contact-overlay-inner::-webkit-scrollbar-thumb { background: #C0D0D8; border-radius: 10px; }
+
+  .contact-section {
+    background: var(--bromolla-sky-bubble);
+    border: 1px solid rgba(33,143,182,0.12);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    transition:
+      background    0.35s var(--ease-spring),
+      border-color  0.35s var(--ease-spring),
+      transform     0.35s var(--ease-spring),
+      box-shadow    0.35s var(--ease-spring);
+  }
+  .contact-section:last-child { margin-bottom: 0; }
+  .contact-section:hover {
+    background: #D6EDFA;
+    border-color: rgba(33,143,182,0.22);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(15,72,97,0.1);
+  }
+  .contact-section-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--bromolla-blue-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+  }
+  .contact-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 0;
+    font-size: 13.5px;
+  }
+  .contact-row + .contact-row {
+    border-top: 1px solid rgba(33,143,182,0.12);
+  }
+  .contact-label {
+    color: var(--text-muted);
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .contact-value {
+    color: var(--bromolla-blue-deep);
+    font-weight: 700;
+    text-decoration: none;
+    text-align: right;
+    transition: color 0.3s var(--ease-spring);
+  }
+  .contact-value:hover,
+  .contact-value:focus-visible {
+    color: var(--bromolla-blue-hover);
+    text-decoration: underline;
+    outline: none;
+  }
+  .contact-address {
+    font-size: 13.5px;
+    color: var(--bromolla-blue-deep);
+    font-weight: 600;
+  }
+
+  /* Visuellt gömt men läsbart för skärmläsare */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /* ── Responsivt ── */
+  @media (max-width: 440px) {
+    .chat-window {
+      width: calc(100vw - 16px);
+      height: calc(100vh - 16px);
+      max-height: calc(100vh - 16px);
+      bottom: 8px;
+      right: 8px;
+      border-radius: var(--radius-md);
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Demo-bakgrund -->
+<div class="demo-page"></div>
+
+<!-- ──────── CHAT TOGGLE BUTTON ──────── -->
+<button class="chat-toggle" id="chatToggle" onclick="openChat()" aria-label="Öppna chatt med BromöllaGPT">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+  </svg>
+  BromöllaGPT
+</button>
+
+<!-- ──────── CHAT WINDOW ──────── -->
+<div class="chat-window" id="chatWindow" role="dialog" aria-label="Chatt med BromöllaGPT">
+
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-header-title">
+      <div class="chat-header-icon" aria-hidden="true">
+        <img src="./bromolla-logo.svg" alt="Bromölla kommun logotyp">
+      </div>
+      <div class="chat-header-text">
+        <div class="chat-header-name">BromöllaGPT</div>
+        <div class="chat-header-subtitle">AI-assistent · Bromölla kommun</div>
+      </div>
+    </div>
+    <div class="chat-header-actions">
+      <button onclick="toggleActionsMenu(event)" data-tooltip="Fler alternativ" aria-label="Fler alternativ" id="menuBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <circle cx="5" cy="12" r="2"/>
+          <circle cx="12" cy="12" r="2"/>
+          <circle cx="19" cy="12" r="2"/>
+        </svg>
+      </button>
+      <button onclick="minimizeChat()" data-tooltip="Minimera" aria-label="Minimera chatt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </button>
+      <button onclick="closeChat()" data-tooltip="Avsluta chatt" data-tooltip-align="right" aria-label="Avsluta chatt">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Actions dropdown menu -->
+  <div class="actions-menu" id="actionsMenu" role="menu">
+    <button onclick="newSession(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M23 4v6h-6"/>
+        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+      </svg>
+      Börja om chatten
+    </button>
+    <button onclick="downloadChat(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Ladda ner konversation
+    </button>
+    <button onclick="showContactInfo(); closeActionsMenu();" role="menuitem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      Kontakta oss direkt
+    </button>
+  </div>
+
+  <!-- Chat body -->
+  <div class="chat-body" id="chatBody">
+    <div class="chat-disclaimer">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="16" x2="12" y2="12"/>
+        <line x1="12" y1="8" x2="12.01" y2="8"/>
+      </svg>
+      <span>Svaren är AI-genererade. Kontrollera alltid viktig information. <a href="https://www.bromolla.se/kommun-och-politik/politik-och-demokrati/personuppgifter/" target="_blank" rel="noopener">Så behandlas dina uppgifter</a>.</span>
+    </div>
+    <div class="chat-messages" id="chatMessages" aria-live="polite" aria-atomic="false"></div>
+
+    <!-- Rate limit toast -->
+    <div class="rate-limit-toast" id="rateLimitToast" role="alert">
+      Vänta några sekunder innan du skickar fler meddelanden.
+    </div>
+
+    <!-- Contact info overlay -->
+    <div class="contact-overlay" id="contactOverlay" role="dialog" aria-label="Kontakta Bromölla kommun">
+      <div class="contact-header">
+        <div class="contact-header-text">
+          <div class="contact-header-title-text">Kontakta Bromölla kommun</div>
+          <div class="contact-header-sub">Frågor som chatten inte kan svara på? Här når du oss direkt.</div>
+        </div>
+        <button class="contact-close-btn" onclick="closeContactOverlay()" aria-label="Stäng kontaktinformation">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="contact-overlay-inner">
+        <div class="contact-section">
+          <div class="contact-section-title">Kontaktcenter</div>
+          <div class="contact-row">
+            <span class="contact-label">Telefon</span>
+            <a class="contact-value" href="tel:0456822000">0456-82 20 00</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">E-post</span>
+            <a class="contact-value" href="mailto:kommunstyrelsen@bromolla.se">kommunstyrelsen@bromolla.se</a>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Öppettider</div>
+          <div class="contact-row">
+            <span class="contact-label">Mån–Tors</span>
+            <span class="contact-value" style="cursor:default;">07:45–16:30 (lunchstängt 12–13)</span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Fredag</span>
+            <span class="contact-value" style="cursor:default;">07:45–16:00 (lunchstängt 12–13)</span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Lunchstängt</span>
+            <span class="contact-value" style="cursor:default;">12:00–13:00</span>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Telefon från</span>
+            <span class="contact-value" style="cursor:default;">kl 08:00</span>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Webbplats</div>
+          <div class="contact-row">
+            <span class="contact-label">Bromölla.se</span>
+            <a class="contact-value" href="https://www.bromolla.se" target="_blank" rel="noopener">bromolla.se</a>
+          </div>
+          <div class="contact-row">
+            <span class="contact-label">Personuppgifter</span>
+            <a class="contact-value" href="https://www.bromolla.se/kommun-och-politik/politik-och-demokrati/personuppgifter/" target="_blank" rel="noopener">Så behandlas dina uppgifter</a>
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <div class="contact-section-title">Besöksadress</div>
+          <div class="contact-address">Kommunhuset, Storgatan 48, 295 21 Bromölla</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-bar">
+      <button class="util-btn" onclick="newSession()" data-tooltip="Ny chatt" data-tooltip-align="left" aria-label="Starta en ny chatt">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M23 4v6h-6"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+      </button>
+      <button class="util-btn" onclick="showContactInfo()" data-tooltip="Kontakta en människa" data-tooltip-align="left" aria-label="Kontakta Bromölla kommun direkt">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </button>
+      <div class="chat-input-wrap">
+        <input type="text" id="chatInput" placeholder="Skriv din fråga..." maxlength="1000" oninput="updateCharCount()" onkeydown="if(event.key==='Enter')sendMessage()" aria-label="Skriv din fråga till BromöllaGPT">
+        <button class="send-btn-inline" onclick="sendMessage()" aria-label="Skicka meddelande" id="sendBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+        <span class="char-counter" id="charCounter" aria-live="polite">0 / 1000</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const chatWindow   = document.getElementById('chatWindow');
+  const chatToggle   = document.getElementById('chatToggle');
+  const chatBody     = document.getElementById('chatBody');
+  const chatMessages = document.getElementById('chatMessages');
+  const chatInput    = document.getElementById('chatInput');
+  const rateLimitToast = document.getElementById('rateLimitToast');
+  const actionsMenu    = document.getElementById('actionsMenu');
+
+  /* ────────────────────────────────────────
+     RATE LIMITING – max 2 meddelanden per 10 sek
+  ──────────────────────────────────────── */
+  const messageTimes = [];
+  const RATE_LIMIT_COUNT = 2;
+  const RATE_LIMIT_WINDOW = 10000;
+  let rateLimitTimeout = null;
+
+  function isRateLimited() {
+    const now = Date.now();
+    while (messageTimes.length > 0 && now - messageTimes[0] > RATE_LIMIT_WINDOW) {
+      messageTimes.shift();
+    }
+    return messageTimes.length >= RATE_LIMIT_COUNT;
+  }
+  function recordMessage() { messageTimes.push(Date.now()); }
+  function showRateLimitToast() {
+    rateLimitToast.classList.add('show');
+    if (rateLimitTimeout) clearTimeout(rateLimitTimeout);
+    rateLimitTimeout = setTimeout(() => {
+      rateLimitToast.classList.remove('show');
+    }, 3500);
+  }
+
+  /* ────────────────────────────────────────
+     ACTIONS MENU
+  ──────────────────────────────────────── */
+  function toggleActionsMenu(e) {
+    if (e) e.stopPropagation();
+    actionsMenu.classList.toggle('open');
+  }
+  function closeActionsMenu() {
+    actionsMenu.classList.remove('open');
+  }
+  document.addEventListener('click', function(e) {
+    if (!actionsMenu.contains(e.target) && e.target.closest('#menuBtn') === null) {
+      closeActionsMenu();
+    }
+  });
+
+  /* ────────────────────────────────────────
+     STAR RATING FEEDBACK
+  ──────────────────────────────────────── */
+  function createFeedback(interactionId) {
+    const container = document.createElement('div');
+    container.className = 'msg-feedback';
+    container.dataset.locked = 'false';
+    container.dataset.interactionId = interactionId || '';
+
+    const starOutline = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+    const starFilled = `<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+
+    const stars = [];
+
+    const setHover = (upToIndex) => {
+      stars.forEach((s, i) => {
+        s.classList.toggle('hovered', i <= upToIndex);
+        s.classList.toggle('filled', false);
+      });
+    };
+
+    const clearHover = () => {
+      stars.forEach(s => s.classList.remove('hovered'));
+    };
+
+    for (let i = 1; i <= 5; i++) {
+      const btn = document.createElement('button');
+      btn.className = 'star-btn';
+      btn.setAttribute('aria-label', `Ge ${i} stjärn${i === 1 ? 'a' : 'or'}`);
+      btn.setAttribute('type', 'button');
+      btn.innerHTML = starOutline;
+
+      btn.addEventListener('mouseenter', () => {
+        if (container.dataset.locked === 'true') return;
+        setHover(i - 1);
+      });
+
+      btn.addEventListener('mouseleave', () => {
+        if (container.dataset.locked === 'true') return;
+        clearHover();
+      });
+
+      btn.addEventListener('click', async function() {
+        if (container.dataset.locked === 'true') return;
+        const currentInteractionId = container.dataset.interactionId;
+        if (!currentInteractionId) return;
+
+        container.dataset.locked = 'true';
+        clearHover();
+
+        stars.forEach((s, idx) => {
+          s.classList.add('locked');
+          if (idx < i) {
+            s.classList.add('filled');
+            s.innerHTML = starFilled;
+          }
+          if (idx === i - 1) s.classList.add('pop');
+        });
+
+        const thanks = document.createElement('span');
+        thanks.className = 'feedback-thanks';
+        thanks.textContent = 'Tack för din feedback';
+        container.appendChild(thanks);
+
+        try {
+          await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              type: 'rating',
+              interactionId: currentInteractionId,
+              sessionId: ensureSessionId(),
+              rating: i,
+              feedback: i >= 4 ? 'up' : i <= 2 ? 'down' : 'neutral'
+            })
+          });
+        } catch (err) {
+          console.error('Feedback webhook error:', err);
+        }
+      });
+
+      stars.push(btn);
+      container.appendChild(btn);
+    }
+
+    setTimeout(() => container.classList.add('visible'), 50);
+    return container;
+  }
+
+  /* ────────────────────────────────────────
+     CORE CHAT FUNCTIONS
+  ──────────────────────────────────────── */
+  function openChat() {
+    chatWindow.classList.add('open');
+    chatToggle.classList.add('hidden');
+
+    if (chatMessages.children.length === 0) {
+      ensureSessionId();
+      setTimeout(() => {
+        addMessage('bot', 'Hej! Jag är Bromölla kommuns AI-assistent. Vad kan jag hjälpa dig med idag?', false);
+      }, 650);
+    }
+    setTimeout(() => chatInput.focus(), 700);
+  }
+
+  function minimizeChat() {
+    const contactOverlay = document.getElementById('contactOverlay');
+    if (contactOverlay && contactOverlay.classList.contains('visible')) {
+      contactOverlay.classList.remove('visible');
+    }
+    chatWindow.classList.remove('open');
+    chatToggle.classList.remove('hidden');
+    closeActionsMenu();
+  }
+
+  function closeChat() {
+    chatWindow.classList.remove('open');
+    chatToggle.classList.remove('hidden');
+    closeActionsMenu();
+    document.getElementById('contactOverlay').classList.remove('visible');
+
+    setTimeout(() => {
+      chatMessages.innerHTML = '';
+      chatInput.disabled = false;
+      sessionId = '';
+      localStorage.removeItem('bromolla_chat_session_id');
+      messageTimes.length = 0;
+    }, 400);
+  }
+
+  function newSession() {
+    const existingMessages = chatMessages.querySelectorAll('.msg');
+    existingMessages.forEach(msg => msg.classList.add('fading-out'));
+    document.getElementById('contactOverlay').classList.remove('visible');
+    closeActionsMenu();
+
+    setTimeout(() => {
+      chatMessages.innerHTML = '';
+      chatInput.disabled = false;
+      sessionId = generateSessionId();
+      localStorage.setItem('bromolla_chat_session_id', sessionId);
+      messageTimes.length = 0;
+
+      setTimeout(() => {
+        addMessage('bot', 'Chatten har startats om. Vad kan jag hjälpa dig med?', false);
+      }, 80);
+      chatInput.focus();
+    }, 240);
+  }
+
+  function downloadChat() {
+    const messages = chatMessages.querySelectorAll('.msg');
+    if (messages.length === 0) return;
+
+    const now = new Date();
+    const dateStr = now.toLocaleString('sv-SE');
+    let text = 'BromöllaGPT – Konversation\n';
+    text += 'Bromölla kommun\n';
+    text += 'Datum: ' + dateStr + '\n';
+    text += '─'.repeat(50) + '\n\n';
+
+    messages.forEach(msg => {
+      if (msg.id === 'typingIndicator') return;
+      const isBot = msg.classList.contains('bot');
+      const isHuman = msg.classList.contains('human');
+      const sender = isBot ? 'BromöllaGPT (AI)' : isHuman ? 'Kundservice' : 'Du';
+      const bubble = msg.querySelector('.msg-bubble');
+      if (!bubble) return;
+      let content = bubble.innerText || bubble.textContent;
+      text += sender + ':\n' + content + '\n\n';
+    });
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bromollagpt_' + now.toISOString().slice(0,10) + '.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function escHTML(s) {
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+
+  function formatMessage(text) {
+    // 1. HTML-escape ALL incoming text first — defense against AI returning HTML / XSS payloads.
+    let formatted = escHTML(text);
+
+    // 2. Markdown bold/italic (operates on already-escaped text — safe).
+    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    formatted = formatted.replace(/(?<!\w)\*([^*\n]+?)\*(?!\w)/g, '<em>$1</em>');
+    formatted = formatted.replace(/(?<!\w)_([^_\n]+?)_(?!\w)/g, '<em>$1</em>');
+
+    // 3a. Footnote-style links: [1](url) or [¹](url). Pure digit titles, 1-2 chars.
+    //     Renders as small rounded badge with regular digits (centered, readable).
+    //     Match before generic markdown links to avoid double-wrap.
+    formatted = formatted.replace(/\[([\d¹²³⁴⁵⁶⁷⁸⁹⁰]{1,2})\]\((https?:\/\/[^\s<>"'`)]+)\)/g, function(_, num, url) {
+      var supToDigit = {'⁰':'0','¹':'1','²':'2','³':'3','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9'};
+      var display = num.split('').map(function(c){ return supToDigit[c] || c; }).join('');
+      return '<a href="' + escHTML(url) + '" target="_blank" rel="noopener noreferrer" class="chat-link-fn" aria-label="Källa ' + display + '">' + display + '</a>';
+    });
+
+    // 3b. Markdown links — strict URL regex (excludes ", <, >, ', `, space, paren).
+    //    URL is double-escaped via escHTML for href safety; title is already HTML-escaped above.
+    formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\s<>"'`)]+)\)/g, function(_, title, url) {
+      return '<a href="' + escHTML(url) + '" target="_blank" rel="noopener noreferrer" class="chat-link">' + title + '</a>';
+    });
+
+    // 4. Auto-link bare URLs not already inside an <a> tag.
+    formatted = formatted.replace(/(?<!href=")(https?:\/\/[^\s<>"'`]+)/g, function(url) {
+      let title = url;
+      try {
+        const urlObj = new URL(url);
+        const path = urlObj.pathname.replace(/\.html$|\.htm$/i, '').replace(/\.[a-z]+\d*$/i, '');
+        const parts = path.split('/').filter(function(p) { return p.length > 0; });
+        if (parts.length > 0) {
+          let lastPart = decodeURIComponent(parts[parts.length - 1]);
+          lastPart = lastPart
+            .replace(/([a-z])([A-Z])/g, '$1 $2')
+            .replace(/[-_]/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+          title = lastPart.charAt(0).toUpperCase() + lastPart.slice(1);
+        } else {
+          title = urlObj.hostname.replace('www.', '');
+        }
+      } catch(e) { title = 'Läs mer'; }
+      return '<a href="' + escHTML(url) + '" target="_blank" rel="noopener noreferrer" class="chat-link">' + escHTML(title) + '</a>';
+    });
+
+    // 5. Lists + line breaks.
+    formatted = formatted.replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>');
+    formatted = formatted.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+    formatted = formatted.replace(/\n/g, '<br>');
+    return formatted;
+  }
+
+  function getTimeStr() {
+    return new Date().toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function updateCharCount() {
+    const counter = document.getElementById('charCounter');
+    const len = chatInput.value.length;
+    counter.textContent = len + ' / 1000';
+    counter.classList.remove('warning', 'limit', 'visible');
+    if (len >= 1000) counter.classList.add('limit', 'visible');
+    else if (len >= 800) counter.classList.add('warning', 'visible');
+    else if (len >= 700) counter.classList.add('visible');
+  }
+
+  let botMsgCounter = 0;
+
+  function addMessage(type, text, showFeedback, interactionId = null) {
+    if (showFeedback === undefined) showFeedback = (type === 'bot');
+
+    const msg = document.createElement('div');
+    msg.className = 'msg ' + type;
+    const time = getTimeStr();
+    const formattedText = (type === 'bot' || type === 'human') ? formatMessage(text) : text;
+
+    let avatarHTML;
+    if (type === 'bot') {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">
+        <img src="./bromolla-logo.svg" alt="Bromölla kommun logotyp">
+      </div>`;
+    } else if (type === 'human') {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+      </div>`;
+    } else {
+      avatarHTML = `<div class="msg-avatar" aria-hidden="true">DU</div>`;
+    }
+
+    if (type === 'bot') {
+      botMsgCounter++;
+      msg.id = 'bot-msg-' + botMsgCounter;
+      msg.innerHTML = `
+        ${avatarHTML}
+        <div class="msg-content">
+          <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">${time}</span>
+        </div>`;
+
+      if (showFeedback) {
+        const contentDiv = msg.querySelector('.msg-content');
+        contentDiv.appendChild(createFeedback(interactionId));
+      }
+    } else if (type === 'human') {
+      msg.innerHTML = `
+        ${avatarHTML}
+        <div class="msg-content">
+          <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">Kundservice · ${time}</span>
+        </div>`;
+    } else {
+      msg.innerHTML = `
+        ${avatarHTML}
+        <div class="msg-content">
+          <div class="msg-bubble">${formattedText}</div>
+          <span class="msg-time">${time}</span>
+        </div>`;
+    }
+    chatMessages.appendChild(msg);
+
+    if (type === 'bot' || type === 'human') {
+      requestAnimationFrame(() => {
+        const msgRect = msg.getBoundingClientRect();
+        const containerRect = chatMessages.getBoundingClientRect();
+        const delta = msgRect.top - containerRect.top;
+        const maxScroll = chatMessages.scrollHeight - chatMessages.clientHeight;
+        const target = Math.min(Math.max(0, chatMessages.scrollTop + delta), maxScroll);
+        chatMessages.scrollTo({ top: target, behavior: 'smooth' });
+      });
+    } else {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  }
+
+  function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'msg bot';
+    el.id = 'typingIndicator';
+    el.innerHTML = `
+      <div class="msg-avatar" aria-hidden="true">
+        <img src="./bromolla-logo.svg" alt="Bromölla kommun logotyp">
+      </div>
+      <div class="msg-content">
+        <div class="msg-bubble">
+          <div class="typing-indicator" aria-label="AI-assistenten skriver"><span></span><span></span><span></span></div>
+        </div>
+      </div>`;
+    chatMessages.appendChild(el);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function removeTyping() {
+    const el = document.getElementById('typingIndicator');
+    if (el) el.remove();
+  }
+
+  function showContactInfo() {
+    const overlay = document.getElementById('contactOverlay');
+    overlay.classList.add('visible');
+    const inner = overlay.querySelector('.contact-overlay-inner');
+    if (inner) inner.scrollTop = 0;
+  }
+  function closeContactOverlay() {
+    document.getElementById('contactOverlay').classList.remove('visible');
+  }
+
+  /* ────────────────────────────────────────
+     SESSION + WEBHOOK
+  ──────────────────────────────────────── */
+  const WEBHOOK_URL = 'https://api.halmstadchattbot.se/bromolla';
+  let sessionId = localStorage.getItem('bromolla_chat_session_id') || '';
+
+  function generateSessionId() {
+    return 'session_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+  }
+  function generateInteractionId() {
+    return 'interaction_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
+  }
+  function ensureSessionId() {
+    if (!sessionId) {
+      sessionId = generateSessionId();
+      localStorage.setItem('bromolla_chat_session_id', sessionId);
+    }
+    return sessionId;
+  }
+
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text) return;
+    if (isRateLimited()) { showRateLimitToast(); return; }
+    recordMessage();
+
+    addMessage('user', text);
+    chatInput.value = '';
+    updateCharCount();
+
+    const activeSessionId = ensureSessionId();
+    chatInput.disabled = true;
+    showTyping();
+    const originSessionId = activeSessionId;
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'message',
+          sessionId: originSessionId,
+          message: text
+        })
+      });
+
+      if (sessionId !== originSessionId) return;
+      removeTyping();
+
+      if (!res.ok) throw new Error('Webhook svarade med status ' + res.status);
+      let data = await res.json();
+      if (sessionId !== originSessionId) return;
+
+      if (Array.isArray(data)) {
+        data = data[0] ?? {};
+      }
+
+      const reply =
+        data.answer || data.output || data.message ||
+        data.reply  || data.response || data.text ||
+        JSON.stringify(data);
+
+      const serverInteractionId = data.interactionId || data.interaction_id || null;
+      if (!serverInteractionId) {
+        console.warn('[Chat] Backend returnerade inget interactionId — rating kommer inte fungera.');
+      }
+      addMessage('bot', reply, !!serverInteractionId, serverInteractionId);
+    } catch (err) {
+      if (sessionId !== originSessionId) return;
+      removeTyping();
+      addMessage('bot', 'Tyvärr gick något fel. Försök igen om en stund, eller kontakta oss direkt via menyn.', false);
+      console.error('Webhook error:', err);
+    } finally {
+      if (sessionId === originSessionId) {
+        chatInput.disabled = false;
+        chatInput.focus();
+      }
+    }
+  }
+
+  // Stäng meny med Escape
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeActionsMenu();
+      if (document.getElementById('contactOverlay').classList.contains('visible')) {
+        closeContactOverlay();
+      }
+    }
+  });
+</script>
+</body>
+</html>
