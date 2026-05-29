@@ -1110,23 +1110,23 @@
       </div>
       <div class="chat-header-text">
         <div class="chat-header-name">SvalövGPT</div>
-        <div class="chat-header-subtitle">AI-assistent · Svalövs kommun</div>
+        <div class="chat-header-subtitle" data-i18n="header_subtitle">AI-assistent · Svalövs kommun</div>
       </div>
     </div>
     <div class="chat-header-actions">
-      <button onclick="toggleActionsMenu(event)" data-tooltip="Fler alternativ" aria-label="Fler alternativ" id="menuBtn">
+      <button onclick="toggleActionsMenu(event)" data-tooltip="Fler alternativ" data-i18n-tt="tt_more" aria-label="Fler alternativ" id="menuBtn">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
           <circle cx="5" cy="12" r="2"/>
           <circle cx="12" cy="12" r="2"/>
           <circle cx="19" cy="12" r="2"/>
         </svg>
       </button>
-      <button onclick="minimizeChat()" data-tooltip="Minimera" aria-label="Minimera chatt">
+      <button onclick="minimizeChat()" data-tooltip="Minimera" data-i18n-tt="tt_minimize" aria-label="Minimera chatt">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
           <path d="M6 9l6 6 6-6"/>
         </svg>
       </button>
-      <button onclick="closeChat()" data-tooltip="Avsluta chatt" data-tooltip-align="right" aria-label="Avsluta chatt">
+      <button onclick="closeChat()" data-tooltip="Avsluta chatt" data-tooltip-align="right" data-i18n-tt="tt_close" aria-label="Avsluta chatt">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
           <path d="M18 6L6 18M6 6l12 12"/>
         </svg>
@@ -1141,7 +1141,7 @@
         <path d="M23 4v6h-6"/>
         <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
       </svg>
-      Börja om chatten
+      <span data-i18n="menu_restart">Börja om chatten</span>
     </button>
     <button onclick="downloadChat(); closeActionsMenu();" role="menuitem">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -1149,13 +1149,13 @@
         <polyline points="7 10 12 15 17 10"/>
         <line x1="12" y1="15" x2="12" y2="3"/>
       </svg>
-      Ladda ner konversation
+      <span data-i18n="menu_download">Ladda ner konversation</span>
     </button>
     <button onclick="showContactInfo(); closeActionsMenu();" role="menuitem">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
       </svg>
-      Kontakta oss direkt
+      <span data-i18n="menu_contact">Kontakta oss direkt</span>
     </button>
   </div>
 
@@ -1202,7 +1202,7 @@
           <button class="lang-chip" data-lang="fi" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇫🇮</span><span class="lang-name">Suomi</span></button>
         </div>
         <button class="welcome-start-btn" id="welcomeStartBtn" onclick="startChatFromWelcome()">Starta chatt</button>
-        <div class="welcome-disclaimer">Svaren är AI-genererade. <a href="https://www.svalov.se/gdpr/behandling-av-personuppgifter" target="_blank" rel="noopener">Så behandlas dina uppgifter</a>.</div>
+        <div class="welcome-disclaimer" id="welcomeDisclaimer">Svaren är AI-genererade. <a href="https://www.svalov.se/gdpr/behandling-av-personuppgifter" target="_blank" rel="noopener">Så behandlas dina uppgifter</a>.</div>
       </div>
     </div>
 
@@ -1212,7 +1212,7 @@
         <line x1="12" y1="16" x2="12" y2="12"/>
         <line x1="12" y1="8" x2="12.01" y2="8"/>
       </svg>
-      <span>Svaren är AI-genererade. Kontrollera alltid viktig information. <a href="https://www.svalov.se/gdpr/behandling-av-personuppgifter" target="_blank" rel="noopener">Så behandlas dina uppgifter</a>.</span>
+      <span id="chatDisclaimerText">Svaren är AI-genererade. Kontrollera alltid viktig information. <a href="https://www.svalov.se/gdpr/behandling-av-personuppgifter" target="_blank" rel="noopener">Så behandlas dina uppgifter</a>.</span>
     </div>
     <div class="chat-messages" id="chatMessages" aria-live="polite" aria-atomic="false"></div>
 
@@ -1225,8 +1225,8 @@
     <div class="contact-overlay" id="contactOverlay" role="dialog" aria-label="Kontakta Svalövs kommun">
       <div class="contact-header">
         <div class="contact-header-text">
-          <div class="contact-header-title-text">Kontakta Svalövs kommun</div>
-          <div class="contact-header-sub">Frågor som chatten inte kan svara på? Här når du oss direkt.</div>
+          <div class="contact-header-title-text" data-i18n="contact_title">Kontakta Svalövs kommun</div>
+          <div class="contact-header-sub" data-i18n="contact_sub">Frågor som chatten inte kan svara på? Här når du oss direkt.</div>
         </div>
         <button class="contact-close-btn" onclick="closeContactOverlay()" aria-label="Stäng kontaktinformation">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
@@ -1236,39 +1236,39 @@
       </div>
       <div class="contact-overlay-inner">
         <div class="contact-section">
-          <div class="contact-section-title">Kontaktcenter</div>
+          <div class="contact-section-title" data-i18n="contact_center">Kontaktcenter</div>
           <div class="contact-row">
-            <span class="contact-label">Telefon</span>
+            <span class="contact-label" data-i18n="label_phone">Telefon</span>
             <a class="contact-value" href="tel:0418-475000">0418-47 50 00</a>
           </div>
           <div class="contact-row">
-            <span class="contact-label">E-post</span>
+            <span class="contact-label" data-i18n="label_email">E-post</span>
             <a class="contact-value" href="mailto:kontakt@svalov.se">kontakt@svalov.se</a>
           </div>
         </div>
 
         <div class="contact-section">
-          <div class="contact-section-title">Öppettider</div>
+          <div class="contact-section-title" data-i18n="contact_hours">Öppettider</div>
           <div class="contact-row">
-            <span class="contact-label">Mån–Fre</span>
+            <span class="contact-label" data-i18n="label_monfri">Mån–Fre</span>
             <span class="contact-value" style="cursor:default;">08:00–16:00</span>
           </div>
         </div>
 
         <div class="contact-section">
-          <div class="contact-section-title">Webbplats</div>
+          <div class="contact-section-title" data-i18n="contact_website">Webbplats</div>
           <div class="contact-row">
             <span class="contact-label">Svalöv.se</span>
             <a class="contact-value" href="https://www.svalov.se" target="_blank" rel="noopener">svalov.se</a>
           </div>
           <div class="contact-row">
-            <span class="contact-label">Personuppgifter</span>
+            <span class="contact-label" data-i18n="label_personaldata">Personuppgifter</span>
             <a class="contact-value" href="https://www.svalov.se/gdpr/behandling-av-personuppgifter" target="_blank" rel="noopener">Så behandlas dina uppgifter</a>
           </div>
         </div>
 
         <div class="contact-section">
-          <div class="contact-section-title">Besöksadress</div>
+          <div class="contact-section-title" data-i18n="contact_address">Besöksadress</div>
           <div class="contact-address">Herrevadsgatan 10, Svalöv</div>
         </div>
       </div>
@@ -1276,13 +1276,13 @@
 
     <!-- Input -->
     <div class="chat-input-bar">
-      <button class="util-btn" onclick="newSession()" data-tooltip="Ny chatt" data-tooltip-align="left" aria-label="Starta en ny chatt">
+      <button class="util-btn" onclick="newSession()" data-tooltip="Ny chatt" data-tooltip-align="left" data-i18n-tt="tt_new" aria-label="Starta en ny chatt">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M23 4v6h-6"/>
           <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
         </svg>
       </button>
-      <button class="util-btn" onclick="showContactInfo()" data-tooltip="Kontakta en människa" data-tooltip-align="left" aria-label="Kontakta Svalövs kommun direkt">
+      <button class="util-btn" onclick="showContactInfo()" data-tooltip="Kontakta en människa" data-tooltip-align="left" data-i18n-tt="tt_contact" aria-label="Kontakta Svalövs kommun direkt">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
           <circle cx="12" cy="7" r="4"/>
@@ -1470,7 +1470,7 @@
 
         const thanks = document.createElement('span');
         thanks.className = 'feedback-thanks';
-        thanks.textContent = 'Tack för din feedback';
+        thanks.textContent = t('feedback_thanks');
         container.appendChild(thanks);
 
         try {
@@ -1515,6 +1515,38 @@
   };
   window.__welcomeLang = 'sv';
 
+  /* Full UI-översättningstabell (statiska strängar) — alla 9 certifierade språk. */
+  const UI_I18N = {"sv":{"disclaimer_main":"Svaren är AI-genererade. Kontrollera alltid viktig information.","disclaimer_link":"Så behandlas dina uppgifter","disclaimer_welcome":"Svaren är AI-genererade.","reset_greet":"Chatten har startats om. Vad kan jag hjälpa dig med?","error":"Tyvärr gick något fel. Försök igen om en stund, eller kontakta oss via menyn.","rate_limit":"Vänta några sekunder innan du skickar fler meddelanden.","feedback_thanks":"Tack för din feedback","placeholder":"Skriv din fråga...","tt_more":"Fler alternativ","tt_minimize":"Minimera","tt_close":"Avsluta chatt","tt_new":"Ny chatt","tt_contact":"Kontakta en människa","menu_restart":"Börja om chatten","menu_download":"Ladda ner konversation","menu_contact":"Kontakta oss direkt","contact_title":"Kontakta Svalövs kommun","contact_sub":"Frågor som chatten inte kan svara på? Här når du oss direkt.","contact_center":"Kontaktcenter","label_phone":"Telefon","label_email":"E-post","contact_hours":"Öppettider","label_monfri":"Mån–Fre","contact_website":"Webbplats","label_personaldata":"Personuppgifter","contact_address":"Besöksadress","header_subtitle":"AI-assistent · Svalövs kommun"},"en":{"disclaimer_main":"Answers are AI-generated. Always verify important information.","disclaimer_link":"How your data is handled","disclaimer_welcome":"Answers are AI-generated.","reset_greet":"The chat has been restarted. How can I help you?","error":"Sorry, something went wrong. Please try again shortly, or contact us via the menu.","rate_limit":"Please wait a few seconds before sending more messages.","feedback_thanks":"Thank you for your feedback","placeholder":"Type your question...","tt_more":"More options","tt_minimize":"Minimize","tt_close":"End chat","tt_new":"New chat","tt_contact":"Contact a human","menu_restart":"Restart the chat","menu_download":"Download conversation","menu_contact":"Contact us directly","contact_title":"Contact Svalövs kommun","contact_sub":"Questions the chat can't answer? Here's how to reach us directly.","contact_center":"Contact center","label_phone":"Phone","label_email":"Email","contact_hours":"Opening hours","label_monfri":"Mon–Fri","contact_website":"Website","label_personaldata":"Personal data","contact_address":"Visiting address","header_subtitle":"AI assistant · Svalövs kommun"},"ar":{"disclaimer_main":"الإجابات مُولّدة بالذكاء الاصطناعي. تحقّق دائمًا من المعلومات المهمة.","disclaimer_link":"كيف تتم معالجة بياناتك","disclaimer_welcome":"الإجابات مُولّدة بالذكاء الاصطناعي.","reset_greet":"تمت إعادة تشغيل المحادثة. كيف يمكنني مساعدتك؟","error":"عذرًا، حدث خطأ ما. يُرجى المحاولة مرة أخرى بعد قليل، أو التواصل معنا عبر القائمة.","rate_limit":"يُرجى الانتظار بضع ثوانٍ قبل إرسال المزيد من الرسائل.","feedback_thanks":"شكرًا على ملاحظاتك","placeholder":"اكتب سؤالك...","tt_more":"خيارات إضافية","tt_minimize":"تصغير","tt_close":"إنهاء المحادثة","tt_new":"محادثة جديدة","tt_contact":"التواصل مع شخص","menu_restart":"إعادة بدء المحادثة","menu_download":"تنزيل المحادثة","menu_contact":"تواصل معنا مباشرة","contact_title":"تواصل مع Svalövs kommun","contact_sub":"أسئلة لا تستطيع المحادثة الإجابة عنها؟ إليك كيفية الوصول إلينا مباشرة.","contact_center":"مركز الاتصال","label_phone":"الهاتف","label_email":"البريد الإلكتروني","contact_hours":"ساعات العمل","label_monfri":"الإثنين–الجمعة","contact_website":"الموقع الإلكتروني","label_personaldata":"البيانات الشخصية","contact_address":"عنوان الزيارة","header_subtitle":"مساعد ذكاء اصطناعي · Svalövs kommun"},"fa":{"disclaimer_main":"پاسخ‌ها توسط هوش مصنوعی تولید شده‌اند. اطلاعات مهم را همیشه بررسی کنید.","disclaimer_link":"نحوه پردازش اطلاعات شما","disclaimer_welcome":"پاسخ‌ها توسط هوش مصنوعی تولید شده‌اند.","reset_greet":"گفت‌وگو از نو آغاز شد. چطور می‌توانم کمکتان کنم؟","error":"متأسفانه خطایی رخ داد. لطفاً کمی بعد دوباره تلاش کنید یا از طریق منو با ما تماس بگیرید.","rate_limit":"لطفاً پیش از ارسال پیام‌های بیشتر چند ثانیه صبر کنید.","feedback_thanks":"از بازخورد شما سپاسگزاریم","placeholder":"پرسش خود را بنویسید...","tt_more":"گزینه‌های بیشتر","tt_minimize":"کوچک کردن","tt_close":"پایان گفت‌وگو","tt_new":"گفت‌وگوی جدید","tt_contact":"تماس با یک انسان","menu_restart":"شروع دوباره گفت‌وگو","menu_download":"دانلود گفت‌وگو","menu_contact":"تماس مستقیم با ما","contact_title":"تماس با Svalövs kommun","contact_sub":"پرسش‌هایی که گفت‌وگو نمی‌تواند پاسخ دهد؟ از این راه‌ها مستقیم با ما در تماس باشید.","contact_center":"مرکز تماس","label_phone":"تلفن","label_email":"ایمیل","contact_hours":"ساعات کاری","label_monfri":"دوشنبه–جمعه","contact_website":"وب‌سایت","label_personaldata":"اطلاعات شخصی","contact_address":"نشانی مراجعه","header_subtitle":"دستیار هوش مصنوعی · Svalövs kommun"},"so":{"disclaimer_main":"Jawaabaha waxaa soo saaray AI. Had iyo jeer hubi macluumaadka muhiimka ah.","disclaimer_link":"Sida xogtaada loo maareeyo","disclaimer_welcome":"Jawaabaha waxaa soo saaray AI.","reset_greet":"Wadahadalka waa la dib u bilaabay. Maxaan kaaga caawin karaa?","error":"Waan ka xunnahay, wax baa qaldamay. Fadlan mar yar ka dib isku day mar kale, ama nagala soo xiriir menu-ga.","rate_limit":"Fadlan sug dhowr ilbiriqsi ka hor inta aanad dirin farriimo dheeraad ah.","feedback_thanks":"Waad ku mahadsan tahay jawaab-celintaada","placeholder":"Qor su'aashaada...","tt_more":"Doorashooyin dheeraad ah","tt_minimize":"Yaree","tt_close":"Jooji wadahadalka","tt_new":"Wadahadal cusub","tt_contact":"La xiriir qof","menu_restart":"Dib u bilow wadahadalka","menu_download":"Soo dejiso wadahadalka","menu_contact":"Si toos ah noola soo xiriir","contact_title":"La xiriir Svalövs kommun","contact_sub":"Su'aalo aanu wadahadalku ka jawaabi karin? Halkan ayaad si toos ah noogala soo xiriiri kartaa.","contact_center":"Xarunta xiriirka","label_phone":"Telefoon","label_email":"Iimayl","contact_hours":"Saacadaha furitaanka","label_monfri":"Isn–Jim","contact_website":"Mareegta","label_personaldata":"Xogta shakhsiga ah","contact_address":"Cinwaanka booqashada","header_subtitle":"Kaaliye AI · Svalövs kommun"},"ti":{"disclaimer_main":"መልስታት ብ AI ዝተፈጥሩ እዮም። ኣገደስቲ ሓበሬታታት ኩሉ ግዜ ኣረጋግጽ።","disclaimer_link":"ሓበሬታኻ ብኸመይ ከም ዝሕዝ","disclaimer_welcome":"መልስታት ብ AI ዝተፈጥሩ እዮም።","reset_greet":"ዕላል እንደገና ተጀሚሩ። ብኸመይ ክሕግዘካ እኽእል?","error":"ይቕሬታ፡ ገለ ጌጋ ኣጋጢሙ። በጃኻ ድሕሪ ቁሩብ እንደገና ፈትን፡ ወይ ብመንዩ ኣቢልካ ኣዘራርበና።","rate_limit":"በጃኻ ተወሳኺ መልእኽትታት ቅድሚ ምልኣኽካ ቁሩብ ሰከንዳት ተጸበ።","feedback_thanks":"ስለ ርእይቶኻ ነመስግን","placeholder":"ሕቶኻ ጽሓፍ...","tt_more":"ተወሰኽቲ ኣማራጺታት","tt_minimize":"ኣጉድል","tt_close":"ዕላል ዕጾ","tt_new":"ሓድሽ ዕላል","tt_contact":"ምስ ሰብ ተራኸብ","menu_restart":"ዕላል እንደገና ጀምር","menu_download":"ዕላል ኣውርድ","menu_contact":"ብቐጥታ ኣዘራርበና","contact_title":"ምስ Svalövs kommun ተራኸብ","contact_sub":"ሕቶታት እቲ ዕላል ክምልሶ ዘይክእል? ኣብዚ ብቐጥታ ክትረኽበና ትኽእል።","contact_center":"ማእከል ርክብ","label_phone":"ተሌፎን","label_email":"ኢመይል","contact_hours":"ሰዓታት ስራሕ","label_monfri":"ሰኑይ–ዓርቢ","contact_website":"መርበብ ሓበሬታ","label_personaldata":"ውልቃዊ ሓበሬታ","contact_address":"ኣድራሻ ምብጻሕ","header_subtitle":"ሓጋዚ AI · Svalövs kommun"},"pl":{"disclaimer_main":"Odpowiedzi są generowane przez AI. Zawsze sprawdzaj ważne informacje.","disclaimer_link":"Jak przetwarzamy Twoje dane","disclaimer_welcome":"Odpowiedzi są generowane przez AI.","reset_greet":"Czat został zrestartowany. W czym mogę pomóc?","error":"Niestety coś poszło nie tak. Spróbuj ponownie za chwilę lub skontaktuj się z nami przez menu.","rate_limit":"Odczekaj kilka sekund przed wysłaniem kolejnych wiadomości.","feedback_thanks":"Dziękujemy za Twoją opinię","placeholder":"Wpisz swoje pytanie...","tt_more":"Więcej opcji","tt_minimize":"Minimalizuj","tt_close":"Zakończ czat","tt_new":"Nowy czat","tt_contact":"Skontaktuj się z człowiekiem","menu_restart":"Rozpocznij czat od nowa","menu_download":"Pobierz rozmowę","menu_contact":"Skontaktuj się z nami bezpośrednio","contact_title":"Kontakt z Svalövs kommun","contact_sub":"Pytania, na które czat nie potrafi odpowiedzieć? Tutaj skontaktujesz się z nami bezpośrednio.","contact_center":"Centrum kontaktu","label_phone":"Telefon","label_email":"E-mail","contact_hours":"Godziny otwarcia","label_monfri":"Pon–Pt","contact_website":"Strona internetowa","label_personaldata":"Dane osobowe","contact_address":"Adres siedziby","header_subtitle":"Asystent AI · Svalövs kommun"},"uk":{"disclaimer_main":"Відповіді згенеровані ШІ. Завжди перевіряйте важливу інформацію.","disclaimer_link":"Як обробляються ваші дані","disclaimer_welcome":"Відповіді згенеровані ШІ.","reset_greet":"Чат перезапущено. Чим можу допомогти?","error":"На жаль, сталася помилка. Спробуйте ще раз за хвилину або зв’яжіться з нами через меню.","rate_limit":"Зачекайте кілька секунд, перш ніж надсилати нові повідомлення.","feedback_thanks":"Дякуємо за ваш відгук","placeholder":"Напишіть своє запитання...","tt_more":"Більше опцій","tt_minimize":"Згорнути","tt_close":"Завершити чат","tt_new":"Новий чат","tt_contact":"Зв’язатися з людиною","menu_restart":"Почати чат спочатку","menu_download":"Завантажити розмову","menu_contact":"Зв’язатися з нами напряму","contact_title":"Зв’язатися зі Svalövs kommun","contact_sub":"Запитання, на які чат не може відповісти? Тут ви зв’яжетеся з нами напряму.","contact_center":"Контактний центр","label_phone":"Телефон","label_email":"Електронна пошта","contact_hours":"Години роботи","label_monfri":"Пн–Пт","contact_website":"Вебсайт","label_personaldata":"Персональні дані","contact_address":"Адреса для відвідувачів","header_subtitle":"Асистент ШІ · Svalövs kommun"},"fi":{"disclaimer_main":"Vastaukset ovat tekoälyn tuottamia. Tarkista tärkeät tiedot aina.","disclaimer_link":"Näin tietojasi käsitellään","disclaimer_welcome":"Vastaukset ovat tekoälyn tuottamia.","reset_greet":"Keskustelu on aloitettu uudelleen. Miten voin auttaa?","error":"Valitettavasti jokin meni vikaan. Yritä hetken kuluttua uudelleen tai ota yhteyttä valikon kautta.","rate_limit":"Odota muutama sekunti ennen kuin lähetät lisää viestejä.","feedback_thanks":"Kiitos palautteestasi","placeholder":"Kirjoita kysymyksesi...","tt_more":"Lisää vaihtoehtoja","tt_minimize":"Pienennä","tt_close":"Lopeta keskustelu","tt_new":"Uusi keskustelu","tt_contact":"Ota yhteyttä ihmiseen","menu_restart":"Aloita keskustelu alusta","menu_download":"Lataa keskustelu","menu_contact":"Ota meihin suoraan yhteyttä","contact_title":"Ota yhteyttä Svalövs kommun","contact_sub":"Kysymyksiä, joihin chat ei osaa vastata? Täältä tavoitat meidät suoraan.","contact_center":"Yhteyskeskus","label_phone":"Puhelin","label_email":"Sähköposti","contact_hours":"Aukioloajat","label_monfri":"Ma–Pe","contact_website":"Verkkosivusto","label_personaldata":"Henkilötiedot","contact_address":"Käyntiosoite","header_subtitle":"Tekoälyavustaja · Svalövs kommun"}};
+
+  function t(key) {
+    const l = window.__welcomeLang || 'sv';
+    return (UI_I18N[l] && UI_I18N[l][key]) || UI_I18N.sv[key] || '';
+  }
+
+  /* Byter ALLA statiska UI-strängar (tooltips, meny, disclaimer, kontakt-overlay,
+     placeholder) till valt språk. RTL för ar/fa. */
+  function applyLang(l) {
+    window.__welcomeLang = l;
+    const rtl = (l === 'ar' || l === 'fa');
+    const dir = rtl ? 'rtl' : 'auto';
+    const GDPR = 'https://www.svalov.se/gdpr/behandling-av-personuppgifter';
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const v = t(el.dataset.i18n);
+      if (v) { el.textContent = v; el.setAttribute('dir', dir); }
+    });
+    document.querySelectorAll('[data-i18n-tt]').forEach(el => {
+      const v = t(el.dataset.i18nTt);
+      if (v) { el.setAttribute('data-tooltip', v); el.setAttribute('aria-label', v); }
+    });
+    const cd = document.getElementById('chatDisclaimerText');
+    if (cd) { cd.innerHTML = t('disclaimer_main') + ' <a href="' + GDPR + '" target="_blank" rel="noopener">' + t('disclaimer_link') + '</a>.'; cd.setAttribute('dir', dir); }
+    const wd = document.getElementById('welcomeDisclaimer');
+    if (wd) { wd.innerHTML = t('disclaimer_welcome') + ' <a href="' + GDPR + '" target="_blank" rel="noopener">' + t('disclaimer_link') + '</a>.'; wd.setAttribute('dir', dir); }
+    const rt = document.getElementById('rateLimitToast');
+    if (rt) rt.textContent = t('rate_limit');
+    if (typeof chatInput !== 'undefined' && chatInput) { chatInput.placeholder = t('placeholder'); chatInput.setAttribute('dir', dir); }
+  }
+
   function selectWelcomeLang(btn) {
     document.querySelectorAll('#welcomeLangs .lang-chip').forEach(c => c.classList.remove('selected'));
     btn.classList.add('selected');
@@ -1527,6 +1559,7 @@
     if (t) { t.textContent = d.title; t.setAttribute('dir','auto'); }
     if (s) { s.textContent = d.sub; s.setAttribute('dir','auto'); }
     if (b) b.textContent = d.start;
+    applyLang(l);
   }
 
   function showWelcome() {
@@ -1599,7 +1632,7 @@
       messageTimes.length = 0;
 
       setTimeout(() => {
-        addMessage('bot', 'Chatten har startats om. Vad kan jag hjälpa dig med?', false);
+        addMessage('bot', t('reset_greet'), false);
       }, 80);
       chatInput.focus();
     }, 240);
@@ -1888,7 +1921,7 @@
     } catch (err) {
       if (sessionId !== originSessionId) return;
       removeTyping();
-      addMessage('bot', 'Tyvärr gick något fel. Försök igen om en stund, eller kontakta oss direkt via menyn.', false);
+      addMessage('bot', t('error'), false);
       console.error('Webhook error:', err);
     } finally {
       if (sessionId === originSessionId) {
