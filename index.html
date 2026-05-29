@@ -233,6 +233,22 @@
     box-shadow: var(--envelope-inset);
   }
   .bot-name { font-size: 14.5px; font-weight: 500; letter-spacing: -0.005em; }
+  .bot-search { position: relative; margin-bottom: 8px; }
+  .bot-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: .45; pointer-events: none; }
+  .bot-search input {
+    width: 100%; box-sizing: border-box;
+    padding: 9px 12px 9px 34px;
+    border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg-warm); color: var(--fg);
+    font: inherit; font-size: 14px; outline: none;
+    transition: border-color 160ms var(--spring), box-shadow 160ms var(--spring);
+  }
+  .bot-search input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .bot-mega-list { max-height: 288px; overflow-y: auto; overscroll-behavior: contain; }
+  .bot-mega-list::-webkit-scrollbar { width: 8px; }
+  .bot-mega-list::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+  .bot-mega-list::-webkit-scrollbar-thumb:hover { background: var(--accent-soft); }
+  .bot-noresult { margin: 10px 6px 4px; font-size: 13.5px; color: var(--fg); opacity: .6; text-align: center; }
 
   .nav-cta {
     margin-left: 10px;
@@ -749,6 +765,11 @@
         <svg class="chev" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5 L6 7.5 L9 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <div class="bot-mega" role="menu" aria-label="Våra chattbotar">
+        <div class="bot-search">
+          <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 11 L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          <input id="bot-search-input" type="text" placeholder="Sök chattbot…" aria-label="Sök chattbot" autocomplete="off">
+        </div>
+        <div class="bot-mega-list" id="bot-mega-list">
         <a class="bot-row" href="halland-chattbot-ny.html" role="menuitem">
           <span class="bot-thumb" aria-hidden="true">H</span>
           <span class="bot-name">HallandGPT</span>
@@ -801,6 +822,8 @@
           <span class="bot-thumb" aria-hidden="true">Sv</span>
           <span class="bot-name">SvalövGPT</span>
         </a>
+        </div>
+        <p class="bot-noresult" id="bot-noresult" hidden>Ingen chattbot matchar din sökning.</p>
       </div>
     </div>
 
@@ -1258,6 +1281,27 @@
       toggle.addEventListener('click', (e) => { e.stopPropagation(); const open = dropdown.classList.toggle('open'); toggle.setAttribute('aria-expanded', open ? 'true' : 'false'); });
       document.addEventListener('click', (e) => { if (!dropdown.contains(e.target)) { dropdown.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); } });
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { dropdown.classList.remove('open'); toggle.setAttribute('aria-expanded', 'false'); } });
+    }
+
+    const botSearch = document.getElementById('bot-search-input');
+    if (botSearch) {
+      const rows = Array.from(document.querySelectorAll('#bot-mega-list .bot-row'));
+      const noResult = document.getElementById('bot-noresult');
+      const filterBots = () => {
+        const q = botSearch.value.trim().toLowerCase();
+        let shown = 0;
+        rows.forEach(r => {
+          const name = (r.querySelector('.bot-name')?.textContent || '').toLowerCase();
+          const match = name.includes(q);
+          r.style.display = match ? '' : 'none';
+          if (match) shown++;
+        });
+        if (noResult) noResult.hidden = shown !== 0;
+      };
+      botSearch.addEventListener('input', filterBots);
+      if (toggle) toggle.addEventListener('click', () => {
+        if (dropdown.classList.contains('open')) setTimeout(() => botSearch.focus(), 60);
+      });
     }
 
     document.querySelectorAll('.faq-item').forEach(item => {
