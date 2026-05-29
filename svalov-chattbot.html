@@ -1255,9 +1255,9 @@
 
 <!-- PII pre-send warning (klient-sidig GDPR-varning) -->
 <style>
-  .pii-overlay { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; background: rgba(15,76,43,0.45); backdrop-filter: blur(2px); padding: 20px; }
+  .pii-overlay { position: absolute; inset: 0; z-index: 60; display: flex; align-items: center; justify-content: center; background: rgba(15,76,43,0.42); backdrop-filter: blur(2px); padding: 16px; border-radius: inherit; }
   .pii-overlay[hidden] { display: none; }
-  .pii-box { background: #fff; max-width: 420px; width: 100%; border-radius: 16px; padding: 26px 24px 20px; box-shadow: 0 24px 60px rgba(15,76,43,0.28); text-align: center; font-family: inherit; animation: piiPop 200ms ease; }
+  .pii-box { background: #fff; width: 100%; max-width: 340px; border-radius: 14px; padding: 22px 18px 16px; box-shadow: 0 16px 40px rgba(15,76,43,0.24); text-align: center; font-family: inherit; animation: piiPop 200ms ease; }
   @keyframes piiPop { from { transform: translateY(10px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
   .pii-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; display: grid; place-items: center; background: #FCF4D6; color: #B5860B; }
   .pii-box h3 { margin: 0 0 8px; font-size: 18px; color: #0F4C2B; }
@@ -1310,6 +1310,7 @@
   (function wirePii() {
     const overlay = document.getElementById('piiOverlay');
     if (!overlay) return;
+    if (chatWindow) chatWindow.appendChild(overlay);   // confine overlay to chat window, not full screen
     const cancel = document.getElementById('piiCancel');
     const confirm = document.getElementById('piiConfirm');
     const close = () => { overlay.hidden = true; };
