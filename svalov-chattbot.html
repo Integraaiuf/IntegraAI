@@ -1253,6 +1253,37 @@
   </div>
 </div>
 
+<!-- PII pre-send warning (klient-sidig GDPR-varning) -->
+<style>
+  .pii-overlay { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; background: rgba(15,76,43,0.45); backdrop-filter: blur(2px); padding: 20px; }
+  .pii-overlay[hidden] { display: none; }
+  .pii-box { background: #fff; max-width: 420px; width: 100%; border-radius: 16px; padding: 26px 24px 20px; box-shadow: 0 24px 60px rgba(15,76,43,0.28); text-align: center; font-family: inherit; animation: piiPop 200ms ease; }
+  @keyframes piiPop { from { transform: translateY(10px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+  .pii-icon { width: 52px; height: 52px; margin: 0 auto 14px; border-radius: 50%; display: grid; place-items: center; background: #FCF4D6; color: #B5860B; }
+  .pii-box h3 { margin: 0 0 8px; font-size: 18px; color: #0F4C2B; }
+  .pii-box p { margin: 0 0 20px; font-size: 14.5px; line-height: 1.5; color: #3a4a40; }
+  .pii-box p strong { color: #0F4C2B; }
+  .pii-actions { display: flex; gap: 10px; }
+  .pii-actions button { flex: 1; padding: 12px 14px; border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: filter 150ms, background 150ms; }
+  .pii-cancel { background: #EAF4EE; color: #0F4C2B; }
+  .pii-cancel:hover { background: #DCEDE3; }
+  .pii-send { background: #00814F; color: #fff; }
+  .pii-send:hover { filter: brightness(1.08); }
+</style>
+<div class="pii-overlay" id="piiOverlay" role="dialog" aria-modal="true" aria-labelledby="piiTitle" hidden>
+  <div class="pii-box">
+    <div class="pii-icon" aria-hidden="true">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 L21 21 H3 Z"/><line x1="12" y1="9" x2="12" y2="14"/><circle cx="12" cy="17.5" r="0.6" fill="currentColor"/></svg>
+    </div>
+    <h3 id="piiTitle">Det här ser ut som personuppgifter</h3>
+    <p>Du verkar ha skrivit <strong><span id="piiKinds">personuppgifter</span></strong>. Undvik att dela personnummer, e-post eller telefonnummer i chatten. Är du säker på att du vill skicka?</p>
+    <div class="pii-actions">
+      <button class="pii-cancel" id="piiCancel" type="button">Avbryt</button>
+      <button class="pii-send" id="piiConfirm" type="button">Skicka ändå</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const chatWindow   = document.getElementById('chatWindow');
   const chatToggle   = document.getElementById('chatToggle');
@@ -1261,6 +1292,32 @@
   const chatInput    = document.getElementById('chatInput');
   const rateLimitToast = document.getElementById('rateLimitToast');
   const actionsMenu    = document.getElementById('actionsMenu');
+
+  // --- PII pre-send warning (klient-sidig GDPR-skydd) ---
+  function detectPII(text) {
+    const kinds = [];
+    if (/\b(?:19|20)?\d{6}[-+\s]?\d{4}\b/.test(text)) kinds.push('personnummer');
+    if (/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(text)) kinds.push('e-postadress');
+    if (/(?:\+46|0046|0)\s?7[\d\s-]{8,}\b/.test(text)) kinds.push('telefonnummer');
+    return kinds.length ? kinds : null;
+  }
+  function showPiiWarning(kinds) {
+    const overlay = document.getElementById('piiOverlay');
+    const span = document.getElementById('piiKinds');
+    if (span) span.textContent = kinds.join(' och ');
+    if (overlay) overlay.hidden = false;
+  }
+  (function wirePii() {
+    const overlay = document.getElementById('piiOverlay');
+    if (!overlay) return;
+    const cancel = document.getElementById('piiCancel');
+    const confirm = document.getElementById('piiConfirm');
+    const close = () => { overlay.hidden = true; };
+    if (cancel) cancel.addEventListener('click', () => { close(); if (chatInput) chatInput.focus(); });
+    if (confirm) confirm.addEventListener('click', () => { close(); window.__piiConfirmed = true; sendMessage(); });
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) close(); });
+  })();
 
   /* ────────────────────────────────────────
      RATE LIMITING – max 2 meddelanden per 10 sek
@@ -1685,6 +1742,9 @@
   async function sendMessage() {
     const text = chatInput.value.trim();
     if (!text) return;
+    const piiKinds = detectPII(text);
+    if (piiKinds && !window.__piiConfirmed) { showPiiWarning(piiKinds); return; }
+    window.__piiConfirmed = false;
     if (isRateLimited()) { showRateLimitToast(); return; }
     recordMessage();
 
