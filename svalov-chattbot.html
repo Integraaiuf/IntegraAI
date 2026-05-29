@@ -1161,6 +1161,51 @@
 
   <!-- Chat body -->
   <div class="chat-body" id="chatBody">
+
+    <!-- ── Welcome / start screen ── -->
+    <style>
+      .welcome-screen{position:absolute;inset:0;z-index:30;background:linear-gradient(180deg,var(--svalov-sky-softer,#F5FAF7),#fff);display:flex;flex-direction:column;overflow-y:auto;border-radius:inherit;animation:welcomeFade .25s ease;}
+      .welcome-screen[hidden]{display:none;}
+      @keyframes welcomeFade{from{opacity:0}to{opacity:1}}
+      .welcome-inner{margin:auto;width:100%;max-width:344px;padding:24px 22px;text-align:center;box-sizing:border-box;}
+      .welcome-logo img{width:56px;height:56px;border-radius:14px;object-fit:contain;background:#fff;padding:6px;box-shadow:0 6px 16px rgba(15,76,43,.14);}
+      .welcome-title{margin:14px 0 6px;font-size:20px;font-weight:750;color:var(--svalov-blue-deep,#0F4C2B);line-height:1.25;}
+      .welcome-sub{margin:0 auto 18px;font-size:13.5px;line-height:1.5;color:var(--text-muted,#4A6274);max-width:300px;}
+      .welcome-lang-label{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-soft,#7A8E9A);margin-bottom:10px;}
+      .welcome-langs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
+      .lang-chip{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;border:1.5px solid var(--line,#E3ECE7);border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .15s,box-shadow .15s,background .15s;}
+      .lang-chip:hover{border-color:var(--svalov-blue,#00814F);}
+      .lang-chip.selected{border-color:var(--svalov-blue,#00814F);box-shadow:0 0 0 2px rgba(0,129,79,.18);background:var(--svalov-sky-light,#EAF4EE);}
+      .lang-flag{font-size:23px;line-height:1;}
+      .lang-name{font-size:11.5px;color:var(--text,#0F2A3D);font-weight:600;}
+      .welcome-start-btn{width:100%;padding:14px;border:none;border-radius:12px;background:var(--svalov-blue,#00814F);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(0,129,79,.28);transition:filter .15s,transform .1s;}
+      .welcome-start-btn:hover{filter:brightness(1.08);}
+      .welcome-start-btn:active{transform:translateY(1px);}
+      .welcome-disclaimer{margin-top:14px;font-size:11px;color:var(--text-soft,#7A8E9A);line-height:1.45;}
+      .welcome-disclaimer a{color:var(--svalov-blue,#00814F);}
+    </style>
+    <div class="welcome-screen" id="welcomeScreen">
+      <div class="welcome-inner">
+        <div class="welcome-logo"><img src="./svalov-logo.png" alt="Svalövs kommun logotyp"></div>
+        <h2 class="welcome-title" id="welcomeTitle" dir="auto">Välkommen till SvalövGPT</h2>
+        <p class="welcome-sub" id="welcomeSub" dir="auto">Svalövs kommuns digitala assistent. Jag hjälper dig hitta information på svalov.se – på ditt språk. Välj språk och starta chatten.</p>
+        <div class="welcome-lang-label">Välj språk · Choose language</div>
+        <div class="welcome-langs" id="welcomeLangs" role="listbox" aria-label="Välj språk">
+          <button class="lang-chip selected" data-lang="sv" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇸🇪</span><span class="lang-name">Svenska</span></button>
+          <button class="lang-chip" data-lang="en" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇬🇧</span><span class="lang-name">English</span></button>
+          <button class="lang-chip" data-lang="ar" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇸🇦</span><span class="lang-name">العربية</span></button>
+          <button class="lang-chip" data-lang="fa" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇮🇷</span><span class="lang-name">فارسی</span></button>
+          <button class="lang-chip" data-lang="so" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇸🇴</span><span class="lang-name">Soomaali</span></button>
+          <button class="lang-chip" data-lang="ti" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇪🇷</span><span class="lang-name">ትግርኛ</span></button>
+          <button class="lang-chip" data-lang="pl" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇵🇱</span><span class="lang-name">Polski</span></button>
+          <button class="lang-chip" data-lang="uk" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇺🇦</span><span class="lang-name">Українська</span></button>
+          <button class="lang-chip" data-lang="fi" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇫🇮</span><span class="lang-name">Suomi</span></button>
+        </div>
+        <button class="welcome-start-btn" id="welcomeStartBtn" onclick="startChatFromWelcome()">Starta chatt</button>
+        <div class="welcome-disclaimer">Svaren är AI-genererade. <a href="https://www.svalov.se/gdpr/behandling-av-personuppgifter" target="_blank" rel="noopener">Så behandlas dina uppgifter</a>.</div>
+      </div>
+    </div>
+
     <div class="chat-disclaimer">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="12" cy="12" r="10"/>
@@ -1456,17 +1501,63 @@
   /* ────────────────────────────────────────
      CORE CHAT FUNCTIONS
   ──────────────────────────────────────── */
+  /* ── Welcome / language start screen ── */
+  const WELCOME_LANGS = {
+    sv: { title:'Välkommen till SvalövGPT', sub:'Svalövs kommuns digitala assistent. Jag hjälper dig hitta information på svalov.se – på ditt språk.', start:'Starta chatt', ph:'Skriv din fråga...', greet:'Hej! Hur kan jag hjälpa dig med frågor om Svalövs kommun?' },
+    en: { title:'Welcome to SvalövGPT', sub:"Svalöv municipality's digital assistant. I help you find information on svalov.se – in your language.", start:'Start chat', ph:'Type your question...', greet:'Hello! How can I help you with questions about Svalöv kommun?' },
+    ar: { title:'مرحبًا بك في SvalövGPT', sub:'المساعد الرقمي لبلدية Svalöv. أساعدك في إيجاد المعلومات على svalov.se – بلغتك.', start:'ابدأ المحادثة', ph:'اكتب سؤالك...', greet:'مرحبًا! كيف يمكنني مساعدتك في الأسئلة المتعلقة ببلدية Svalöv؟' },
+    fa: { title:'به SvalövGPT خوش آمدید', sub:'دستیار دیجیتال شهرداری Svalöv. کمک می‌کنم اطلاعات را در svalov.se به زبان خودتان پیدا کنید.', start:'شروع گفتگو', ph:'سؤال خود را بنویسید...', greet:'سلام! چطور می‌توانم در پرسش‌های مربوط به شهرداری Svalöv کمکتان کنم؟' },
+    so: { title:'Ku soo dhowow SvalövGPT', sub:'Kaaliyaha dijitaalka ah ee degmada Svalöv. Waxaan kaa caawinayaa inaad macluumaad ka hesho svalov.se – luqaddaada.', start:'Bilow sheekada', ph:"Qor su'aashaada...", greet:"Salaan! Sidee baan kaaga caawin karaa su'aalaha ku saabsan degmada Svalöv?" },
+    ti: { title:'ናብ SvalövGPT እንቋዕ ብደሓን መጻእኩም', sub:'ዲጂታላዊ ሓጋዚ ምምሕዳር Svalöv። ኣብ svalov.se ሓበሬታ ብቋንቋኻ ክትረክብ እሕግዘካ።', start:'ዕላል ጀምር', ph:'ሕቶኻ ጽሓፍ...', greet:'ሰላም! ብዛዕባ ምምሕዳር Svalöv ኣብ ዝምልከት ሕቶታት ብኸመይ ክሕግዘካ እኽእል?' },
+    pl: { title:'Witamy w SvalövGPT', sub:'Cyfrowy asystent gminy Svalöv. Pomogę Ci znaleźć informacje na svalov.se – w Twoim języku.', start:'Rozpocznij czat', ph:'Wpisz pytanie...', greet:'Cześć! W czym mogę pomóc w sprawach dotyczących gminy Svalöv?' },
+    uk: { title:'Ласкаво просимо до SvalövGPT', sub:'Цифровий помічник муніципалітету Svalöv. Допоможу знайти інформацію на svalov.se – вашою мовою.', start:'Почати чат', ph:'Введіть запитання...', greet:'Вітаю! Чим я можу допомогти вам із питаннями про муніципалітет Svalöv?' },
+    fi: { title:'Tervetuloa SvalövGPT:hen', sub:'Svalövin kunnan digitaalinen avustaja. Autan löytämään tietoa svalov.se-sivustolta – omalla kielelläsi.', start:'Aloita keskustelu', ph:'Kirjoita kysymyksesi...', greet:'Hei! Miten voin auttaa sinua Svalövin kuntaa koskevissa kysymyksissä?' }
+  };
+  window.__welcomeLang = 'sv';
+
+  function selectWelcomeLang(btn) {
+    document.querySelectorAll('#welcomeLangs .lang-chip').forEach(c => c.classList.remove('selected'));
+    btn.classList.add('selected');
+    const l = btn.dataset.lang;
+    window.__welcomeLang = l;
+    const d = WELCOME_LANGS[l]; if (!d) return;
+    const t = document.getElementById('welcomeTitle');
+    const s = document.getElementById('welcomeSub');
+    const b = document.getElementById('welcomeStartBtn');
+    if (t) { t.textContent = d.title; t.setAttribute('dir','auto'); }
+    if (s) { s.textContent = d.sub; s.setAttribute('dir','auto'); }
+    if (b) b.textContent = d.start;
+  }
+
+  function showWelcome() {
+    const ws = document.getElementById('welcomeScreen');
+    if (ws) ws.removeAttribute('hidden');
+  }
+
+  function startChatFromWelcome() {
+    const ws = document.getElementById('welcomeScreen');
+    if (ws) ws.setAttribute('hidden','');
+    const l = window.__welcomeLang || 'sv';
+    const d = WELCOME_LANGS[l] || WELCOME_LANGS.sv;
+    if (chatInput) { chatInput.placeholder = d.ph; chatInput.setAttribute('dir','auto'); }
+    if (chatMessages.children.length === 0) {
+      ensureSessionId();
+      setTimeout(() => addMessage('bot', d.greet, false), 200);
+    }
+    setTimeout(() => chatInput.focus(), 260);
+  }
+
   function openChat() {
     chatWindow.classList.add('open');
     chatToggle.classList.add('hidden');
-
+    // Fresh open → show welcome/language screen. Ongoing chat → skip straight in.
     if (chatMessages.children.length === 0) {
-      ensureSessionId();
-      setTimeout(() => {
-        addMessage('bot', 'Hej! Jag är Svalövs kommuns AI-assistent. Vad kan jag hjälpa dig med idag?', false);
-      }, 650);
+      showWelcome();
+    } else {
+      const ws = document.getElementById('welcomeScreen');
+      if (ws) ws.setAttribute('hidden','');
+      setTimeout(() => chatInput.focus(), 300);
     }
-    setTimeout(() => chatInput.focus(), 700);
   }
 
   function minimizeChat() {
