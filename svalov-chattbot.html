@@ -402,6 +402,10 @@
     max-width: 100%;
     overflow: hidden;
     color: var(--text);
+    /* Flerspråk: auto-detektera skriftriktning per bubbla (ar/fa = RTL, övriga LTR).
+       Latinska URL:er/telefonnummer hålls korrekt inom RTL-text. = dir="auto". */
+    unicode-bidi: plaintext;
+    text-align: start;
   }
   .msg.bot .msg-bubble {
     background: var(--bot-bubble);
