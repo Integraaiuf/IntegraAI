@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kontakt — Integra AI</title>
+<meta name="description" content="Boka ett kostnadsfritt rådgivningssamtal med Integra AI. Vi svarar inom 24 timmar." />
+<meta name="theme-color" content="#070D0A" />
+<link rel="canonical" href="https://integraai.se/kontakt.html" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .kontakt-page {
+    min-height: 100vh; padding: clamp(140px, 18vw, 200px) 0 clamp(80px, 10vw, 120px);
+    display: flex; align-items: flex-start;
+    position: relative; overflow: hidden;
+  }
+  .kontakt-page::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 80% at 10% 50%, rgba(31,107,80,0.2) 0%, transparent 55%),
+      radial-gradient(ellipse 40% 60% at 90% 20%, rgba(52,211,153,0.07) 0%, transparent 50%);
+  }
+  .kontakt-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: clamp(56px, 8vw, 112px); align-items: start;
+  }
+  .kontakt-info { display: flex; flex-direction: column; gap: 36px; }
+  .kontakt-info-block { display: flex; flex-direction: column; gap: 10px; }
+  .kontakt-info-label { font-family: var(--font-mono); font-size: 10px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-muted); }
+  .kontakt-info-value { font-size: 16px; color: var(--fg-soft); line-height: 1.5; }
+  .kontakt-info-value a { color: var(--fg-soft); transition: color 200ms; }
+  .kontakt-info-value a:hover { color: var(--glow); }
+  .kontakt-divider { width: 1px; height: 48px; background: var(--line); }
+
+  .form-large { display: flex; flex-direction: column; gap: 20px; }
+  .form-large .form-group label { font-size: 14px; color: var(--fg-soft); font-family: var(--font-sans); letter-spacing: 0; font-weight: 500; }
+  .form-large .form-group input,
+  .form-large .form-group textarea {
+    padding: 16px 18px; font-size: 16px;
+    background: var(--bg-2); border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+  }
+  .form-large .form-group textarea { min-height: 160px; }
+  .form-large .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .process-steps { display: flex; flex-direction: column; gap: 0; }
+  .process-step { display: flex; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--line); }
+  .process-step:last-child { border-bottom: none; }
+  .process-num { font-family: var(--font-mono); font-size: 11px; color: var(--glow); font-weight: 500; letter-spacing: 0.1em; flex-shrink: 0; padding-top: 2px; min-width: 28px; }
+  .process-text h4 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
+  .process-text p { margin: 0; font-size: 14px; color: var(--fg-soft); line-height: 1.55; }
+
+  @media (max-width: 900px) {
+    .kontakt-grid { grid-template-columns: 1fr; gap: 48px; }
+    .form-large .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="spotlight" aria-hidden="true"></div>
+<div class="scroll-progress" aria-hidden="true"></div>
+
+<header class="nav scrolled" id="nav" role="banner">
+  <div class="nav-inner">
+    <a href="/" class="brand"><span class="brand-dot" aria-hidden="true"></span>Integra AI</a>
+    <nav class="nav-links" aria-label="Huvudnavigation">
+      <a class="nav-link" href="tjanster.html">Tjänster</a>
+      <a class="nav-link" href="om-oss.html">Om oss</a>
+      <a class="nav-link" href="index.html#faq">FAQ</a>
+      <a class="nav-link" href="kontakt.html" aria-current="page">Kontakt</a>
+      <a class="nav-cta" href="kontakt.html" aria-current="page">Boka rådgivning<svg class="arrow" width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6H10M7 3l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <button class="nav-menu-toggle" id="menu-toggle" aria-label="Öppna meny" aria-expanded="false"><svg class="icon-menu" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6H17M3 10H17M3 14H17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><svg class="icon-close" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" style="display:none"><path d="M5 5L15 15M15 5L5 15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+    </nav>
+  </div>
+</header>
+
+<div class="menu-scrim" id="menu-scrim" aria-hidden="true"></div>
+<aside class="mobile-menu" id="mobile-menu" aria-label="Mobilmeny">
+  <a href="tjanster.html">Tjänster</a>
+  <a href="om-oss.html">Om oss</a>
+  <a href="index.html#faq">FAQ</a>
+  <a href="kontakt.html" aria-current="page">Kontakt</a>
+  <a class="mm-cta" href="kontakt.html">Boka kostnadsfri rådgivning</a>
+</aside>
+
+<main>
+<section class="kontakt-page">
+  <div class="section-wrap" style="width: 100%;">
+    <div class="kontakt-grid">
+
+      <!-- Left col: info -->
+      <div class="fade-up">
+        <span class="label" style="margin-bottom: 24px; display: block;">Kontakt</span>
+        <h1 style="margin: 0 0 16px; font-size: clamp(44px, 6vw, 72px); line-height: 0.97; letter-spacing: -0.035em; font-weight: 600;">
+          Boka ett
+          <span style="font-family: var(--font-display); font-style: italic; font-weight: 400; color: var(--glow);">samtal</span>
+        </h1>
+        <p style="font-size: 17px; line-height: 1.6; color: var(--fg-soft); margin: 0 0 44px; max-width: 36ch;">Berätta om er verksamhet och vad ni vill uppnå. Vi lyssnar och svarar med konkreta förslag — inga sälj­pitchar.</p>
+
+        <div class="kontakt-info">
+          <div class="kontakt-info-block">
+            <span class="kontakt-info-label">E-post</span>
+            <div class="kontakt-info-value"><a href="mailto:integraaiuf@gmail.com">integraaiuf@gmail.com</a></div>
+          </div>
+          <div class="kontakt-divider"></div>
+          <div class="kontakt-info-block">
+            <span class="kontakt-info-label">Svarstid</span>
+            <div class="kontakt-info-value">Inom 24 timmar — vanligtvis samma dag.</div>
+          </div>
+          <div class="kontakt-divider"></div>
+          <div class="kontakt-info-block">
+            <span class="kontakt-info-label">Plats</span>
+            <div class="kontakt-info-value">Halmstad, Sverige.<br/>Möten på plats, via video eller telefon.</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 48px;">
+          <span class="label" style="margin-bottom: 20px; display: block;">Så här går det till</span>
+          <div class="process-steps">
+            <div class="process-step"><span class="process-num">01</span><div class="process-text"><h4>Ni skickar ett meddelande</h4><p>Berätta kort om er verksamhet och vad ni vill lösa.</p></div></div>
+            <div class="process-step"><span class="process-num">02</span><div class="process-text"><h4>Vi hör av oss inom 24h</h4><p>Vi bokar ett kostnadsfritt samtal och förbereder oss på ert område.</p></div></div>
+            <div class="process-step"><span class="process-num">03</span><div class="process-text"><h4>Samtal — 30 minuter</h4><p>Vi lyssnar, ställer frågor och delar konkreta tankar kring vad som kan fungera för er.</p></div></div>
+            <div class="process-step"><span class="process-num">04</span><div class="process-text"><h4>Offert utan krångel</h4><p>Om det finns ett bra match: tydlig offert med fast pris och tidsplan. Inga överraskningar.</p></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right col: form -->
+      <div class="fade-up">
+        <form class="form-large" id="contact-form" novalidate>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Namn</label>
+              <input type="text" id="name" name="name" placeholder="Anna Karlsson" autocomplete="name" required />
+            </div>
+            <div class="form-group">
+              <label for="title">Roll / titel</label>
+              <input type="text" id="title" name="title" placeholder="IT-chef" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="org">Organisation</label>
+            <input type="text" id="org" name="org" placeholder="Halmstads Kommun" autocomplete="organization" />
+          </div>
+          <div class="form-group">
+            <label for="email">E-post <span style="color: var(--glow);">*</span></label>
+            <input type="email" id="email" name="email" placeholder="anna@halmstad.se" autocomplete="email" required />
+          </div>
+          <div class="form-group">
+            <label for="phone">Telefon (frivilligt)</label>
+            <input type="tel" id="phone" name="phone" placeholder="070 000 00 00" autocomplete="tel" />
+          </div>
+          <div class="form-group">
+            <label for="message">Vad vill ni uppnå med AI? <span style="color: var(--glow);">*</span></label>
+            <textarea id="message" name="message" placeholder="Berätta kort om er verksamhet — vad tar mest tid, vad vill ni förbättra, vad har ni provat tidigare…" required></textarea>
+          </div>
+          <div class="form-submit">
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+              Skicka meddelande
+              <svg class="arrow" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 7H12M8 3l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+          <p style="font-size: 13px; color: var(--fg-muted); margin: 0; text-align: center; font-family: var(--font-mono); letter-spacing: 0.04em;">
+            <span class="kontakt-promise" style="justify-content: center;"><span class="pulse" aria-hidden="true"></span>Svar inom 24 timmar · Kostnadsfritt</span>
+          </p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="footer" role="contentinfo">
+  <div class="footer-inner">
+    <div class="footer-brand"><a href="/" class="brand"><span class="brand-dot" aria-hidden="true"></span>Integra AI</a><p class="footer-tagline">Vi gör AI tillgängligt för er organisation — skräddarsytt, prisvärt och praktiskt.</p></div>
+    <div class="footer-col"><h4>Tjänster</h4><ul><li><a href="tjanster.html">AI-agenter</a></li><li><a href="tjanster.html">AI-chattbotar</a></li><li><a href="tjanster.html">Webbutveckling</a></li></ul></div>
+    <div class="footer-col"><h4>Företag</h4><ul><li><a href="om-oss.html">Om oss</a></li><li><a href="kontakt.html">Kontakt</a></li><li><a href="index.html#faq">FAQ</a></li></ul></div>
+    <div class="footer-col"><h4>Chattbotar</h4><ul><li><a href="halland-chattbot-ny.html">HallandGPT</a></li><li><a href="halmstad-chattbot.html">HalmstadGPT</a></li><li><a href="skane-chattbot.html">SkåneGPT</a></li></ul></div>
+    <div class="footer-col"><h4>E-post</h4><ul><li><a href="mailto:integraaiuf@gmail.com">integraaiuf@gmail.com</a></li></ul></div>
+  </div>
+  <div class="footer-base"><span>© 2026 Integra AI UF — Halmstad</span><span class="footer-sig">Hantverk möter automation</span></div>
+</footer>
+
+<script>
+window.addEventListener('load', function () {
+  function loadScript(src, onload) { var s = document.createElement('script'); s.src = src; if (onload) s.onload = onload; document.head.appendChild(s); }
+  loadScript('https://unpkg.com/lenis@1.1.14/dist/lenis.min.js', function () {
+    loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js', function () {
+      loadScript('https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js', function () {
+        loadScript('site.js');
+      });
+    });
+  });
+});
+</script>
+</body>
+</html>
