@@ -1164,24 +1164,25 @@
 
     <!-- ── Welcome / start screen ── -->
     <style>
-      .welcome-screen{position:absolute;inset:0;z-index:30;background:linear-gradient(180deg,var(--tjorn-sky-softer,#F5F8FB),#fff);display:flex;flex-direction:column;justify-content:flex-start;overflow-y:auto;border-radius:inherit;animation:welcomeFade .25s ease;}
+      .welcome-screen{position:absolute;inset:0;z-index:30;background:linear-gradient(180deg,var(--tjorn-sky-softer,#F5F8FB),#fff);display:flex;flex-direction:column;justify-content:center;overflow-y:auto;border-radius:inherit;animation:welcomeFade .25s ease;}
       .welcome-screen[hidden]{display:none;}
       @keyframes welcomeFade{from{opacity:0}to{opacity:1}}
-      .welcome-inner{margin:0 auto;width:100%;max-width:344px;padding:22px 22px;text-align:center;box-sizing:border-box;}
-      .welcome-logo img{width:56px;height:56px;border-radius:14px;object-fit:contain;background:#fff;padding:6px;box-shadow:0 6px 16px rgba(0,59,110,.14);}
-      .welcome-title{margin:12px auto 6px;font-size:20px;font-weight:750;color:var(--tjorn-blue-deep,#003B6E);line-height:1.25;min-height:50px;display:flex;align-items:center;justify-content:center;max-width:320px;}
-      .welcome-sub{margin:0 auto 16px;font-size:13.5px;line-height:1.5;color:var(--text-muted,#4A6274);max-width:300px;min-height:80px;display:flex;align-items:center;justify-content:center;}
-      .welcome-lang-label{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-soft,#7A8E9A);margin-bottom:10px;}
-      .welcome-langs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px;}
-      .lang-chip{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 4px;border:1.5px solid var(--line,#E3ECE7);border-radius:12px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .15s,box-shadow .15s,background .15s;}
+      .welcome-inner{margin:0 auto;width:100%;max-width:344px;padding:14px 20px 12px;text-align:center;box-sizing:border-box;}
+      .welcome-logo img{width:44px;height:44px;border-radius:12px;object-fit:contain;background:#fff;padding:5px;box-shadow:0 6px 16px rgba(0,59,110,.14);}
+      .welcome-title{margin:8px auto 4px;font-size:18px;font-weight:750;color:var(--tjorn-blue-deep,#003B6E);line-height:1.25;min-height:24px;display:flex;align-items:center;justify-content:center;max-width:320px;}
+      .welcome-sub{margin:0 auto 10px;font-size:12.5px;line-height:1.45;color:var(--text-muted,#4A6274);max-width:300px;min-height:54px;display:flex;align-items:center;justify-content:center;}
+      .welcome-lang-label{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-soft,#7A8E9A);margin-bottom:8px;}
+      .welcome-langs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px;}
+      .lang-chip{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 4px;border:1.5px solid var(--line,#E3ECE7);border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;transition:border-color .15s,box-shadow .15s,background .15s;}
       .lang-chip:hover{border-color:var(--tjorn-blue,#0061AD);}
       .lang-chip.selected{border-color:var(--tjorn-blue,#0061AD);box-shadow:0 0 0 2px rgba(0,97,173,.18);background:var(--tjorn-sky-light,#EAF1F8);}
-      .lang-flag{font-size:23px;line-height:1;}
-      .lang-name{font-size:11.5px;color:var(--text,#0F2A3D);font-weight:600;}
-      .welcome-start-btn{width:100%;min-height:50px;padding:12px 14px;border:none;border-radius:12px;background:var(--tjorn-blue,#0061AD);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(0,97,173,.28);transition:filter .15s,transform .1s;display:flex;align-items:center;justify-content:center;box-sizing:border-box;}
+      .lang-flag{line-height:0;}
+      .lang-flag svg{width:27px;height:18px;border-radius:3px;box-shadow:inset 0 0 0 1px rgba(15,42,61,.12);display:block;}
+      .lang-name{font-size:11px;color:var(--text,#0F2A3D);font-weight:600;}
+      .welcome-start-btn{width:100%;min-height:44px;padding:10px 14px;border:none;border-radius:12px;background:var(--tjorn-blue,#0061AD);color:#fff;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 6px 18px rgba(0,97,173,.28);transition:filter .15s,transform .1s;display:flex;align-items:center;justify-content:center;box-sizing:border-box;}
       .welcome-start-btn:hover{filter:brightness(1.08);}
       .welcome-start-btn:active{transform:translateY(1px);}
-      .welcome-disclaimer{margin-top:14px;font-size:11px;color:var(--text-soft,#7A8E9A);line-height:1.45;}
+      .welcome-disclaimer{margin-top:10px;font-size:10.5px;color:var(--text-soft,#7A8E9A);line-height:1.4;}
       .welcome-disclaimer a{color:var(--tjorn-blue,#0061AD);}
     </style>
     <div class="welcome-screen" id="welcomeScreen">
@@ -1191,15 +1192,15 @@
         <p class="welcome-sub" id="welcomeSub" dir="auto">Tjörns kommuns digitala assistent. Jag hjälper dig hitta information på tjorn.se – på ditt språk. Välj språk och starta chatten.</p>
         <div class="welcome-lang-label">Välj språk · Choose language</div>
         <div class="welcome-langs" id="welcomeLangs" role="listbox" aria-label="Välj språk">
-          <button class="lang-chip selected" data-lang="sv" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇸🇪</span><span class="lang-name">Svenska</span></button>
-          <button class="lang-chip" data-lang="en" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇬🇧</span><span class="lang-name">English</span></button>
-          <button class="lang-chip" data-lang="ar" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇸🇦</span><span class="lang-name">العربية</span></button>
-          <button class="lang-chip" data-lang="fa" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇮🇷</span><span class="lang-name">فارسی</span></button>
-          <button class="lang-chip" data-lang="so" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇸🇴</span><span class="lang-name">Soomaali</span></button>
-          <button class="lang-chip" data-lang="ti" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇪🇷</span><span class="lang-name">ትግርኛ</span></button>
-          <button class="lang-chip" data-lang="pl" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇵🇱</span><span class="lang-name">Polski</span></button>
-          <button class="lang-chip" data-lang="uk" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇺🇦</span><span class="lang-name">Українська</span></button>
-          <button class="lang-chip" data-lang="fi" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag">🇫🇮</span><span class="lang-name">Suomi</span></button>
+          <button class="lang-chip selected" data-lang="sv" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag"><svg viewBox="0 0 16 10" preserveAspectRatio="none" aria-hidden="true"><rect width="16" height="10" fill="#006AA7"/><rect x="5" width="2" height="10" fill="#FECC02"/><rect y="4" width="16" height="2" fill="#FECC02"/></svg></span><span class="lang-name">Svenska</span></button>
+          <button class="lang-chip" data-lang="en" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag"><svg viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true"><clipPath id="ukclip"><rect width="60" height="30"/></clipPath><g clip-path="url(#ukclip)"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="2.4"/><path d="M30,0 V30 M0,15 H60" stroke="#fff" stroke-width="10"/><path d="M30,0 V30 M0,15 H60" stroke="#C8102E" stroke-width="6"/></g></svg></span><span class="lang-name">English</span></button>
+          <button class="lang-chip" data-lang="ar" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag"><svg viewBox="0 0 60 40" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="40" fill="#165D31"/><text x="30" y="19" font-size="10" fill="#fff" text-anchor="middle" font-family="serif">لا إله إلا الله</text><rect x="16" y="26" width="28" height="2.4" rx="1.2" fill="#fff"/><rect x="44.5" y="25.4" width="4" height="3.6" rx="1" fill="#fff"/></svg></span><span class="lang-name">العربية</span></button>
+          <button class="lang-chip" data-lang="fa" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag"><svg viewBox="0 0 60 34" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="34" fill="#fff"/><rect width="60" height="11" fill="#239F40"/><rect y="23" width="60" height="11" fill="#DA0000"/><path d="M30 13.2 c-3.4 1.6 -3.4 6 0 7.6 c3.4 -1.6 3.4 -6 0 -7.6" fill="none" stroke="#DA0000" stroke-width="1.5"/><path d="M30 12.6 V16" stroke="#DA0000" stroke-width="1.2"/></svg></span><span class="lang-name">فارسی</span></button>
+          <button class="lang-chip" data-lang="so" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag"><svg viewBox="0 0 60 40" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="40" fill="#4189DD"/><path d="M30 11 L32.16 17.65 L39.16 17.65 L33.5 21.76 L35.66 28.4 L30 24.3 L24.34 28.4 L26.5 21.76 L20.84 17.65 L27.84 17.65 Z" fill="#fff"/></svg></span><span class="lang-name">Soomaali</span></button>
+          <button class="lang-chip" data-lang="ti" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag"><svg viewBox="0 0 60 40" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="20" fill="#3C8C3F"/><rect y="20" width="60" height="20" fill="#418FDE"/><path d="M0 0 L46 20 L0 40 Z" fill="#EA0437"/><circle cx="14" cy="20" r="5.2" fill="none" stroke="#F3C03A" stroke-width="1.5"/><path d="M14 16.5 V23.5" stroke="#F3C03A" stroke-width="1.3"/></svg></span><span class="lang-name">ትግርኛ</span></button>
+          <button class="lang-chip" data-lang="pl" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag"><svg viewBox="0 0 60 40" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="20" fill="#fff"/><rect y="20" width="60" height="20" fill="#DC143C"/></svg></span><span class="lang-name">Polski</span></button>
+          <button class="lang-chip" data-lang="uk" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag"><svg viewBox="0 0 60 40" preserveAspectRatio="none" aria-hidden="true"><rect width="60" height="20" fill="#0057B7"/><rect y="20" width="60" height="20" fill="#FFD700"/></svg></span><span class="lang-name">Українська</span></button>
+          <button class="lang-chip" data-lang="fi" onclick="selectWelcomeLang(this)" role="option"><span class="lang-flag"><svg viewBox="0 0 18 11" preserveAspectRatio="none" aria-hidden="true"><rect width="18" height="11" fill="#fff"/><rect x="5" width="3" height="11" fill="#003580"/><rect y="4" width="18" height="3" fill="#003580"/></svg></span><span class="lang-name">Suomi</span></button>
         </div>
         <button class="welcome-start-btn" id="welcomeStartBtn" onclick="startChatFromWelcome()">Starta chatt</button>
         <div class="welcome-disclaimer" id="welcomeDisclaimer">Svaren är AI-genererade. <a href="https://www.tjorn.se/kommun-och-politik/overklaga-beslut-rattssakerhet/sa-skyddas-dina-personuppgifter" target="_blank" rel="noopener">Så behandlas dina uppgifter</a>.</div>
