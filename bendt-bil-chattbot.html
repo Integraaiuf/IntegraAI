@@ -1955,5 +1955,33 @@
     }
   });
 </script>
+<!-- === UNDER UTVECKLING – chatten avstängd tills vidare (Bendt Bil) === -->
+<script>
+(function () {
+  var MSG = 'Bendt Bil-assistenten är under utveckling och tillfälligt avstängd. Den öppnar snart.';
+  function notice() { try { alert(MSG); } catch (e) {} }
+  // Block entry from welcome screen and any send attempt
+  window.startChatFromWelcome = notice;
+  window.sendMessage = function () { notice(); };
+  function disableChat() {
+    var inp = document.getElementById('chatInput');
+    if (inp) { inp.disabled = true; inp.value = ''; inp.placeholder = 'Chatten är avstängd – under utveckling'; }
+    var send = document.getElementById('sendBtn');
+    if (send) send.disabled = true;
+    var startBtn = document.getElementById('welcomeStartBtn');
+    if (startBtn) { startBtn.disabled = true; startBtn.style.opacity = '.55'; startBtn.style.cursor = 'not-allowed'; startBtn.textContent = 'Öppnar snart'; }
+    var inner = document.querySelector('.welcome-inner');
+    if (inner && !document.getElementById('devBanner')) {
+      var b = document.createElement('div');
+      b.id = 'devBanner';
+      b.textContent = '🚧 Under utveckling – chatten är tillfälligt avstängd';
+      b.style.cssText = 'background:#FCF4D6;color:#7a5a00;border:1px solid #E9D9A0;border-radius:10px;padding:10px 14px;margin:0 0 16px;font-weight:600;font-size:14px;text-align:center;';
+      inner.insertBefore(b, inner.firstChild);
+    }
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', disableChat);
+  else disableChat();
+})();
+</script>
 </body>
 </html>
