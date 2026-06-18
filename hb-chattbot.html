@@ -25,7 +25,7 @@
 
     --text:             #0E1E2B;
     --text-muted:       #4A6072;
-    --text-soft:        #7A8B98;
+    --text-soft:        #5C6B77;
     --border:           #E2E8EE;
     --border-strong:    #C6D2DF;
     --bg:               #FFFFFF;
@@ -511,7 +511,7 @@
     border: none;
     cursor: pointer;
     padding: 3px 2px;
-    color: var(--border-strong);
+    color: #8593A0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -684,7 +684,7 @@
     font-weight: 500;
   }
   .char-counter.visible { opacity: 1; }
-  .char-counter.warning { color: #A6790F; opacity: 1; }
+  .char-counter.warning { color: #8A6400; opacity: 1; }
   .char-counter.limit { color: #1E6B3F; font-weight: 700; opacity: 1; }
 
   /* Utility-knappar */
@@ -1954,6 +1954,69 @@
       }
     }
   });
+</script>
+<script>
+/* ───────── Tillgänglighetspatch (WCAG 2.1 AA / DOS-lagen) ─────────
+   - Döljer stängd chattpanel och kontakt-overlay för tangentbord/skärmläsare (inert).
+   - Fokus-fälla i öppen dialog, kontakt-overlay och PII-ruta.
+   - aria-expanded på öppna-knappen, fokus åter till knappen vid stängning. */
+(function () {
+  const toggle  = document.getElementById('chatToggle');
+  const win     = document.getElementById('chatWindow');
+  const contact = document.getElementById('contactOverlay');
+  const pii     = document.getElementById('piiOverlay');
+  if (!toggle || !win) return;
+
+  const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
+
+  function setInert(el, hidden) {
+    if (!el) return;
+    if (hidden) { el.setAttribute('inert', ''); el.setAttribute('aria-hidden', 'true'); }
+    else        { el.removeAttribute('inert'); el.removeAttribute('aria-hidden'); }
+  }
+
+  function trap(el, isActive) {
+    if (!el) return;
+    el.addEventListener('keydown', function (e) {
+      if (e.key !== 'Tab' || !isActive()) return;
+      const nodes = Array.prototype.filter.call(
+        el.querySelectorAll(FOCUSABLE), n => n.offsetParent !== null
+      );
+      if (!nodes.length) return;
+      const first = nodes[0], last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+  }
+  trap(win, () => win.classList.contains('open'));
+  trap(contact, () => contact && contact.classList.contains('visible'));
+  trap(pii, () => pii && !pii.hasAttribute('hidden'));
+
+  function syncWindow() {
+    const open = win.classList.contains('open');
+    toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    setInert(win, !open);
+    if (!open && win.contains(document.activeElement)) toggle.focus();
+  }
+  function syncContact() {
+    if (!contact) return;
+    const open = contact.classList.contains('visible');
+    setInert(contact, !open);
+    if (open) { const f = contact.querySelector(FOCUSABLE); if (f) f.focus(); }
+  }
+
+  toggle.setAttribute('aria-haspopup', 'dialog');
+  toggle.setAttribute('aria-expanded', 'false');
+
+  new MutationObserver(syncWindow).observe(win, { attributes: true, attributeFilter: ['class'] });
+  if (contact) new MutationObserver(syncContact).observe(contact, { attributes: true, attributeFilter: ['class'] });
+  if (pii) new MutationObserver(function () {
+    if (!pii.hasAttribute('hidden')) { const f = pii.querySelector(FOCUSABLE); if (f) f.focus(); }
+  }).observe(pii, { attributes: true, attributeFilter: ['hidden'] });
+
+  syncWindow();
+  syncContact();
+})();
 </script>
 </body>
 </html>
