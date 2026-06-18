@@ -2053,12 +2053,20 @@
   if (welcome) new MutationObserver(recompute).observe(welcome, { attributes: true, attributeFilter: ['hidden'] });
   if (menu) new MutationObserver(recompute).observe(menu, { attributes: true, attributeFilter: ['class'] });
 
-  // Språkväljare: korrekt aria-selected på alternativen (4.1.2 Name/Role/Value)
+  // Språkväljare: växlingsknappar med aria-pressed (tydligt valt-läge i skärmläsare)
+  // + lang-attribut på varje språknamn så att namn med annat alfabet uttalas rätt (3.1.2).
   const langs = document.getElementById('welcomeLangs');
   if (langs) {
+    langs.setAttribute('role', 'group');
     const chips = langs.querySelectorAll('.lang-chip');
+    chips.forEach(c => {
+      c.removeAttribute('role');
+      const code = c.dataset.lang;
+      const nameEl = c.querySelector('.lang-name');
+      if (code && nameEl) nameEl.setAttribute('lang', code);
+    });
     const syncLangs = () => chips.forEach(c =>
-      c.setAttribute('aria-selected', c.classList.contains('selected') ? 'true' : 'false'));
+      c.setAttribute('aria-pressed', c.classList.contains('selected') ? 'true' : 'false'));
     syncLangs();
     langs.addEventListener('click', () => setTimeout(syncLangs, 0));
   }
