@@ -603,7 +603,7 @@
   }
   .chat-input-wrap input {
     width: 100%;
-    border: 1.5px solid var(--border-strong);
+    border: 1.5px solid #7E8C99;
     border-radius: 999px;
     padding: 11px 44px 11px 16px;
     font-family: inherit;
@@ -1814,6 +1814,11 @@
           <span class="msg-time">${time}</span>
         </div>`;
     }
+    const srLabel = document.createElement('span');
+    srLabel.className = 'sr-only';
+    srLabel.textContent = (type === 'bot') ? 'HBGPT: ' : (type === 'human') ? 'Kundservice: ' : 'Du: ';
+    const mc = msg.querySelector('.msg-content');
+    if (mc) mc.insertBefore(srLabel, mc.firstChild);
     chatMessages.appendChild(msg);
 
     if (type === 'bot' || type === 'human') {
@@ -2013,6 +2018,16 @@
   if (pii) new MutationObserver(function () {
     if (!pii.hasAttribute('hidden')) { const f = pii.querySelector(FOCUSABLE); if (f) f.focus(); }
   }).observe(pii, { attributes: true, attributeFilter: ['hidden'] });
+
+  // Språkväljare: korrekt aria-selected på alternativen (4.1.2 Name/Role/Value)
+  const langs = document.getElementById('welcomeLangs');
+  if (langs) {
+    const chips = langs.querySelectorAll('.lang-chip');
+    const syncLangs = () => chips.forEach(c =>
+      c.setAttribute('aria-selected', c.classList.contains('selected') ? 'true' : 'false'));
+    syncLangs();
+    langs.addEventListener('click', () => setTimeout(syncLangs, 0));
+  }
 
   syncWindow();
   syncContact();
