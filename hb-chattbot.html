@@ -2020,8 +2020,20 @@
     const open = win.classList.contains('open');
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     setInert(win, !open);
-    if (open) recompute();
-    if (!open && win.contains(document.activeElement)) toggle.focus();
+    if (open) {
+      recompute();
+      // Flytta in fokus i panelen, dölj sedan öppna-knappen från tab-ordningen
+      if (!win.contains(document.activeElement)) {
+        const f = (welcome && !welcome.hasAttribute('hidden'))
+          ? welcome.querySelector(FOCUSABLE)
+          : (win.querySelector('#chatInput') || win.querySelector(FOCUSABLE));
+        if (f) f.focus();
+      }
+      setInert(toggle, true);
+    } else {
+      setInert(toggle, false);
+      if (win.contains(document.activeElement)) toggle.focus();
+    }
   }
   function syncContact() {
     if (!contact) return;
