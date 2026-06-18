@@ -1970,6 +1970,11 @@
   const win     = document.getElementById('chatWindow');
   const contact = document.getElementById('contactOverlay');
   const pii     = document.getElementById('piiOverlay');
+  const welcome = document.getElementById('welcomeScreen');
+  const menu    = document.getElementById('actionsMenu');
+  const messages = document.getElementById('chatMessages');
+  const disclaimer = win && win.querySelector('.chat-disclaimer');
+  const inputBar   = win && win.querySelector('.chat-input-bar');
   if (!toggle || !win) return;
 
   const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -1997,17 +2002,31 @@
   trap(contact, () => contact && contact.classList.contains('visible'));
   trap(pii, () => pii && !pii.hasAttribute('hidden'));
 
+  // Dolda underlager (åtgärdsmeny, panel bakom välkomstskärmen, kontakt-overlay)
+  // tas ur tab-ordningen så att fokus inte hamnar på osynliga kontroller.
+  function recompute() {
+    if (!win.classList.contains('open')) return;
+    const welcomeShown = welcome && !welcome.hasAttribute('hidden');
+    const contactShown = contact && contact.classList.contains('visible');
+    const menuOpen     = menu && menu.classList.contains('open');
+    const bgInert = welcomeShown || contactShown;
+    setInert(messages, bgInert);
+    setInert(disclaimer, bgInert);
+    setInert(inputBar, bgInert);
+    setInert(contact, !contactShown);
+    setInert(menu, !menuOpen);
+  }
   function syncWindow() {
     const open = win.classList.contains('open');
     toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
     setInert(win, !open);
+    if (open) recompute();
     if (!open && win.contains(document.activeElement)) toggle.focus();
   }
   function syncContact() {
     if (!contact) return;
-    const open = contact.classList.contains('visible');
-    setInert(contact, !open);
-    if (open) { const f = contact.querySelector(FOCUSABLE); if (f) f.focus(); }
+    recompute();
+    if (contact.classList.contains('visible')) { const f = contact.querySelector(FOCUSABLE); if (f) f.focus(); }
   }
 
   toggle.setAttribute('aria-haspopup', 'dialog');
@@ -2018,6 +2037,9 @@
   if (pii) new MutationObserver(function () {
     if (!pii.hasAttribute('hidden')) { const f = pii.querySelector(FOCUSABLE); if (f) f.focus(); }
   }).observe(pii, { attributes: true, attributeFilter: ['hidden'] });
+
+  if (welcome) new MutationObserver(recompute).observe(welcome, { attributes: true, attributeFilter: ['hidden'] });
+  if (menu) new MutationObserver(recompute).observe(menu, { attributes: true, attributeFilter: ['class'] });
 
   // Språkväljare: korrekt aria-selected på alternativen (4.1.2 Name/Role/Value)
   const langs = document.getElementById('welcomeLangs');
